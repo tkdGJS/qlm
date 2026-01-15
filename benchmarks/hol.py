@@ -193,7 +193,7 @@ async def basic_test():
 
     # -----------------------------
     # dataset 후보 만들기 (base_prompt 기준)
-    # dataset1: 멀티턴에서 human->gpt 페어 전부 (짧은 base_prompt 위주)
+    # dataset1: 멀티턴에서 human->gpt 싱글/멀티 페어 (짧은 base_prompt 위주)
     # dataset2: 첫 왕복만 (긴 base_prompt 위주)
     # -----------------------------
     dataset1_candidates: List[Dict[str, Any]] = []
@@ -233,24 +233,41 @@ async def basic_test():
                         "id": item_id, "pair": "0-1", "base_tok_len": tl, "base_prompt": base_p
                     })
 
-        # dataset1: 멀티턴 전체 페어
-        for i in range(len(conv) - 1):
-            a_i, b_i = conv[i], conv[i + 1]
-            if a_i.get("from") == "human" and b_i.get("from") == "gpt":
-                base_p = (a_i.get("value") or "").strip()
-                ans = (b_i.get("value") or "").strip()
-                if base_p and ans:
-                    tl = token_len(tokenizer, base_p, trunc_max=trunc_check_short)
-                    if tl <= max_base_prompt_short:
-                        dataset1_candidates.append({
-                            "id": item_id,
-                            "pair": f"{i}-{i+1}",
-                            "base_tok_len": tl,
-                            "base_prompt": base_p,
-                            "answer": ans
-                        })
+#        # dataset1: 멀티턴 전체 페어
+#        for i in range(len(conv) - 1):
+#            a_i, b_i = conv[i], conv[i + 1]
+#            if a_i.get("from") == "human" and b_i.get("from") == "gpt":
+#                base_p = (a_i.get("value") or "").strip()
+#                ans = (b_i.get("value") or "").strip()
+#                if base_p and ans:
+#                    tl = token_len(tokenizer, base_p, trunc_max=trunc_check_short)
+#                    if tl <= max_base_prompt_short:
+#                        dataset1_candidates.append({
+#                            "id": item_id,
+#                            "pair": f"{i}-{i+1}",
+#                            "base_tok_len": tl,
+#                            "base_prompt": base_p,
+#                            "answer": ans
+#                        })
+#    print(f"dataset1_candidates(multi-turn pairs, base<=short-limit): {len(dataset1_candidates)}")
+        # dataset1: 첫 왕복(0/1)만
+        if a0.get("from") == "human" and b0.get("from") == "gpt":
+            base_p = (a0.get("value") or "").strip()
+            ans = (b0.get("value") or "").strip()
+            if base_p and ans:
+                tl = token_len(tokenizer, base_p, trunc_max=trunc_check_short)
+                if tl <= max_base_prompt_short:
+                    dataset1_candidates.append({
+                        "id": item_id,
+                        "pair": "0-1",
+                        "base_tok_len": tl,
+                        "base_prompt": base_p,
+                        "answer": ans
+                    })
 
-    print(f"dataset1_candidates(multi-turn pairs, base<=short-limit): {len(dataset1_candidates)}")
+    print(f"dataset1_candidates(first-pair, base<=short-limit): {len(dataset1_candidates)}")
+    #싱글 페어 dataset1
+
     print(f"dataset2_candidates(first-pair, base<=long-limit)      : {len(dataset2_candidates)}")
     print(f"too_long_long(>long base-limit)                         : {len(too_long_long)}")
 
@@ -390,7 +407,7 @@ async def basic_test():
             "final_prompt_preview": final_prompt[:200].replace("\n", "\\n"),
         })
 
-    dump_jsonl("debug/debug_pushed_requests.jsonl", pushed_log, limit=500)
+#    dump_jsonl("debug/debug_pushed_requests.jsonl", pushed_log, limit=500)
 
     print(f"Successfully pushed (logged) {len(pushed_log)} requests.")
     print("Now waiting for processing...")
