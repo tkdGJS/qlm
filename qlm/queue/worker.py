@@ -4,7 +4,9 @@ import time
 from openai import OpenAI
 from qlm.endpoints.endpoint import Endpoint
 from transformers import AutoTokenizer
-
+import threading
+import httpx
+import os
 #[SH] 토큰 개수 로컬에서 계산
 _TOKENIZER_CACHE = {}
 
@@ -35,10 +37,15 @@ class Worker:
         self.endpoint= endpoint
         self.openai_api_base = f"{self.address}/v1"
         self.openai_api_key = "EMPTY"
-        self.client = OpenAI(
-            api_key=self.openai_api_key,
-            base_url=self.openai_api_base,
-        )
+        #[SH]
+#        self.client = OpenAI(
+#            api_key=self.openai_api_key,
+#            base_url=self.openai_api_base,
+#        )
+        self._client_local = threading.local()
+        self._client_timeout = httpx.Timeout(connect=10.0, read=None, write=60.0, pool=10.0)
+        self._stream_retries = max(0, int(os.environ.get("QLM_STREAM_RETRIES", "1")))
+        self._stream_retry_sleep_s = float(os.environ.get("QLM_STREAM_RETRY_SLEEP_S", "0.5"))
         self.worker_id = uuid.uuid4()
 
         # === [추가할 코드] =======================================
@@ -48,6 +55,20 @@ class Worker:
         # ==================================================
 
         print(f"Worker {self.worker_id} registered at {self.address}")
+    def _get_client(self) -> OpenAI:
+        client = getattr(self._client_local, "client", None)
+        if client is None:
+            client = OpenAI(
+                api_key=self.openai_api_key,
+                base_url=self.openai_api_base,
+                timeout=self._client_timeout,
+            )
+            self._client_local.client = client
+        return client
+
+    def _reset_client(self) -> None:
+        if hasattr(self._client_local, "client"):
+            del self._client_local.client
 
     def add_request(self, prompt, model,slo,insertion_time,original_slo,original_insertion_time, max_tokens=None, seq_no=None):
         """
@@ -71,30 +92,44 @@ class Worker:
                 kwargs["max_tokens"] = int(max_tokens)
 
             #completion = self.client.completions.create(model=model, prompt=prompt, **kwargs)
+            output_text = ""
+            for attempt in range(self._stream_retries + 1):
+                try:
+                    first_token_time = None
+                    #[SH] TTFT 추적 로직
+                    client = self._get_client()
+                    stream = client.completions.create(
+                    model=model,
+                    prompt=prompt,
+                    stream=True,
+                    **kwargs
+                    )
+                    # 스트림 소비 (출력 텍스트가 필요 없으면 누적 안 해도 됨)
+                    text_parts = []
+#                    last_usage = None
 
-            #[SH] TTFT 추적 로직
-            stream = self.client.completions.create(
-            model=model,
-            prompt=prompt,
-            stream=True,
-            **kwargs
-            )
-            # 스트림 소비 (출력 텍스트가 필요 없으면 누적 안 해도 됨)
-            text_parts = []
-#            last_usage = None
+                    for chunk in stream:
+                        # 텍스트 조각이 실제로 올 때 TTFT를 찍는 게 더 정확함
+                        if getattr(chunk, "choices", None):
+                            t = getattr(chunk.choices[0], "text", None)
+                            if t:
+                                if first_token_time is None:
+                                    first_token_time = time.time()
+                                text_parts.append(t)
 
-            for chunk in stream:
-                # 텍스트 조각이 실제로 올 때 TTFT를 찍는 게 더 정확함
-                if getattr(chunk, "choices", None):
-                    t = getattr(chunk.choices[0], "text", None)
-                    if t:
-                        if first_token_time is None:
-                            first_token_time = time.time()
-                        text_parts.append(t)
+#                    u = getattr(chunk, "usage", None)
+#                    if u is not None:
+#                        last_usage = u
 
-#                u = getattr(chunk, "usage", None)
-#                if u is not None:
-#                    last_usage = u
+                    output_text = "".join(text_parts)
+                    break
+                except Exception as stream_error:
+                    self._reset_client()
+                    if attempt < self._stream_retries:
+                        print(f"[Warning] stream error (attempt {attempt + 1}/{self._stream_retries + 1}): {stream_error}")
+                        time.sleep(self._stream_retry_sleep_s)
+                        continue
+                    raise
 
             # TTFT
             ttft = (first_token_time - start_time) if first_token_time else None
@@ -129,7 +164,6 @@ class Worker:
             ttft_part = f"TTFT: {ttft:.4f} | " if ttft is not None else "TTFT: None | "
 
             # ---- 로컬 토큰 계산 추가 ----
-            output_text = "".join(text_parts)
             tok = get_tokenizer(model)
             prompt_toks = len(tok.encode(prompt, add_special_tokens=False))
             completion_toks = len(tok.encode(output_text, add_special_tokens=False))

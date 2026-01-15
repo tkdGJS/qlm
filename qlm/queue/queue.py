@@ -24,6 +24,7 @@ class Queue:
         self.vq_engine = VirtualQueueEngine()
         #[SH] seq_no
         self._seq_counter = itertools.count(0)
+        self._inflight_sems = {}
 
         # run_queue 루프 sleep 간격(초). 기본값 0.1
         # 실험: QLM_QUEUE_LOOP_SLEEP=0.05 같은 식으로 조절
@@ -43,6 +44,8 @@ class Queue:
         worker = Worker(address, port, endpoint)
         self.workers.append(worker)
         self.vq_engine.add_worker(worker)
+        self._inflight_sems[worker] = asyncio.Semaphore(self.config.max_batch_size)
+
 
     def push(self, prompt, model, slo, insertion_time, max_tokens=None):
         """
@@ -89,10 +92,14 @@ class Queue:
                 try:
                     backpressure = worker.get_backpressure()
                     has_request = self.vq_engine.has_request(worker)
+                    inflight_sem = self._inflight_sems.get(worker)
 
-                    if has_request and backpressure < self.config.max_batch_size:
+                    if has_request and backpressure < self.config.max_batch_size and inflight_sem is not None:
+                        if inflight_sem.locked():
+                            continue
+                        await inflight_sem.acquire()
                         request_to_serve = self.vq_engine.pop_request(worker)
-                        asyncio.create_task(
+                        task = asyncio.create_task(
                             asyncio.to_thread(
                                 worker.add_request,
                                 request_to_serve.prompt,
@@ -109,6 +116,7 @@ class Queue:
                                 #================================================
                             )
                         )
+                        task.add_done_callback(lambda _: inflight_sem.release())
                 except asyncio.CancelledError as e:
                     print("handling cancelled error", e)
 #            await asyncio.sleep(0.1)
