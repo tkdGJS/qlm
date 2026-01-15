@@ -7,6 +7,7 @@ from qlm.queue.request import Request
 from qlm.endpoints.endpoint import Endpoint
 import time
 import itertools
+import os
 
 class Queue:
     """
@@ -23,6 +24,15 @@ class Queue:
         self.vq_engine = VirtualQueueEngine()
         #[SH] seq_no
         self._seq_counter = itertools.count(0)
+
+        # run_queue 루프 sleep 간격(초). 기본값 0.1
+        # 실험: QLM_QUEUE_LOOP_SLEEP=0.05 같은 식으로 조절
+        try:
+            self.loop_sleep_s = float(os.environ.get("QLM_QUEUE_LOOP_SLEEP", "0.1"))
+        except ValueError:
+            self.loop_sleep_s = 0.1
+        if self.loop_sleep_s < 0:
+            self.loop_sleep_s = 0.0
 
     def register_worker(self, address, port, endpoint):
         """
@@ -101,4 +111,6 @@ class Queue:
                         )
                 except asyncio.CancelledError as e:
                     print("handling cancelled error", e)
-            await asyncio.sleep(0.1)    
+#            await asyncio.sleep(0.1)
+            await asyncio.sleep(self.loop_sleep_s)
+
