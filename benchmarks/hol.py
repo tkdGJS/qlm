@@ -122,7 +122,7 @@ async def basic_test():
     # --------- knobs (원하면 환경변수로 튜닝) ----------
     DATASET_PATH = os.environ.get("DATASET_PATH", "data/ShareGPT_V3_unfiltered_cleaned_split.json")
 
-    TARGET_COUNT = int(os.environ.get("TARGET_COUNT", "1000"))
+    TARGET_COUNT = int(os.environ.get("TARGET_COUNT", "500"))
 
     # 실행시간 분리 핵심: 출력 길이 상한
     MAX_TOKENS_SHORT = int(os.environ.get("MAX_TOKENS_SHORT", "32"))     # dataset1

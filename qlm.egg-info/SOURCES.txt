@@ -1,5 +1,4 @@
 LICENSE
-README.md
 setup.py
 qlm.egg-info/PKG-INFO
 qlm.egg-info/SOURCES.txt
