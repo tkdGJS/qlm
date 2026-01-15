@@ -123,7 +123,11 @@ async def basic_test():
     DATASET_PATH = os.environ.get("DATASET_PATH", "data/ShareGPT_V3_unfiltered_cleaned_split.json")
 
     TARGET_COUNT = int(os.environ.get("TARGET_COUNT", "500"))
-
+    RUN_SECONDS = int(os.environ.get("RUN_SECONDS", "300"))
+    PUSH_INTERVAL_S = float(os.environ.get("PUSH_INTERVAL_S", "0"))
+    PUSH_RATE_RPS = float(os.environ.get("PUSH_RATE_RPS", "0"))
+    DRAIN_TIMEOUT_S = float(os.environ.get("DRAIN_TIMEOUT_S", "0"))
+    PUSH_LOG_LIMIT = int(os.environ.get("PUSH_LOG_LIMIT", "500"))
     # 실행시간 분리 핵심: 출력 길이 상한
     MAX_TOKENS_SHORT = int(os.environ.get("MAX_TOKENS_SHORT", "32"))     # dataset1
     MAX_TOKENS_LONG  = int(os.environ.get("MAX_TOKENS_LONG", "1024"))    # dataset2
@@ -333,51 +337,79 @@ async def basic_test():
     # 실험 기록(나중에 HOL 분석용): 실제로 큐에 들어간 요청을 JSONL로 남김
     pushed_log: List[Dict[str, Any]] = []
 
+    push_interval_s = PUSH_INTERVAL_S
+    if push_interval_s <= 0 and PUSH_RATE_RPS > 0:
+        push_interval_s = 1.0 / PUSH_RATE_RPS
     # push 순서 만들기
     # - seq: dataset1 다 넣고 dataset2
     # - interleave: 1개씩 번갈아
     # - shuffle: 둘 합쳐서 랜덤 섞기 (보통 HOL 관찰엔 이게 좋음)
-    work_items: List[Dict[str, Any]] = []
+    dataset1_items: List[Dict[str, Any]] = []
+    dataset2_items: List[Dict[str, Any]] = []
     for r in chosen1:
-        work_items.append({
+        dataset1_items.append({
             "dataset": "dataset1",
             "final_prompt": make_final_prompt(r["base_prompt"], PREFIX_SHORT),
             "base_tok_len": r["base_tok_len"],
             "max_tokens": MAX_TOKENS_SHORT
         })
     for r in chosen2:
-        work_items.append({
+        dataset2_items.append({
             "dataset": "dataset2",
             "final_prompt": make_final_prompt(r["base_prompt"], PREFIX_LONG),
             "base_tok_len": r["base_tok_len"],
             "max_tokens": MAX_TOKENS_LONG
         })
 
-    if ORDER_MODE == "shuffle":
-        random.shuffle(work_items)
-    elif ORDER_MODE == "interleave":
-        # 간단 라운드로빈(길이 다를 때는 끝난 쪽은 스킵)
-        d1 = [x for x in work_items if x["dataset"] == "dataset1"]
-        d2 = [x for x in work_items if x["dataset"] == "dataset2"]
-        work_items = []
-        i = 0
-        while i < max(len(d1), len(d2)):
-            if i < len(d1):
-                work_items.append(d1[i])
-            if i < len(d2):
-                work_items.append(d2[i])
-            i += 1
-    else:
-        # seq: 기본적으로 dataset1 먼저, 그 다음 dataset2 (원하면 여기 순서 바꿔도 됨)
-        pass
+        
+    combined_items = dataset1_items + dataset2_items
+
+    if not combined_items:
+        print("No work items available. Exiting.")
+        queue_run_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await queue_run_task
+        return
+
+    seq_items = dataset1_items + dataset2_items
+    seq_index = 0
+    interleave_toggle = 0
+
+    def next_item() -> Dict[str, Any]:
+        nonlocal seq_index, interleave_toggle
+        if ORDER_MODE == "shuffle":
+            return random.choice(combined_items)
+        if ORDER_MODE == "interleave":
+            for _ in range(2):
+                if interleave_toggle % 2 == 0 and dataset1_items:
+                    interleave_toggle += 1
+                    return random.choice(dataset1_items)
+                if interleave_toggle % 2 == 1 and dataset2_items:
+                    interleave_toggle += 1
+                    return random.choice(dataset2_items)
+                interleave_toggle += 1
+            return random.choice(combined_items)
+
+        if not seq_items:
+            return random.choice(combined_items)
+        item = seq_items[seq_index % len(seq_items)]
+        seq_index += 1
+        return item
 
     start_time = time.time()
+    end_time = start_time + RUN_SECONDS
     print(f"!!! BENCHMARK START TIME: {start_time} !!!")
-    print(f"Pushing total={len(work_items)} (ORDER_MODE={ORDER_MODE})")
+    print(f"Pushing for {RUN_SECONDS}s (ORDER_MODE={ORDER_MODE})")
+    if push_interval_s > 0:
+        print(f"  push_interval_s={push_interval_s:.6f}")
+    else:
+        print("  push_interval_s=0 (no throttling)")
     print(f"  dataset1: max_tokens={MAX_TOKENS_SHORT}, prefix=ON")
     print(f"  dataset2: max_tokens={MAX_TOKENS_LONG},  prefix=ON")
 
-    for wi in work_items:
+    pushed_count = 0
+    while time.time() < end_time:
+        wi = next_item()
         slo = sample_slo()
         final_prompt = wi["final_prompt"]
         max_toks = wi["max_tokens"]
@@ -398,35 +430,40 @@ async def basic_test():
             slo=slo,
             max_tokens=max_toks,   # <-- execution time 분리 핵심 (패치 필요)
         )
+        pushed_count += 1
+        if len(pushed_log) < PUSH_LOG_LIMIT:
+            pushed_log.append({
+                "dataset": wi["dataset"],
+                "slo": slo,
+                "base_tok_len": wi["base_tok_len"],
+                "max_tokens": max_toks,
+                "final_prompt_preview": final_prompt[:200].replace("\n", "\\n"),
+            })
+        if push_interval_s > 0:
+            await asyncio.sleep(push_interval_s)
 
-        pushed_log.append({
-            "dataset": wi["dataset"],
-            "slo": slo,
-            "base_tok_len": wi["base_tok_len"],
-            "max_tokens": max_toks,
-            "final_prompt_preview": final_prompt[:200].replace("\n", "\\n"),
-        })
-
-#    dump_jsonl("debug/debug_pushed_requests.jsonl", pushed_log, limit=500)
-
-    print(f"Successfully pushed (logged) {len(pushed_log)} requests.")
-    print("Now waiting for processing...")
-
+    print(f"Successfully pushed {pushed_count} requests (logged {len(pushed_log)}).")
+    if DRAIN_TIMEOUT_S > 0:
+        print("Now waiting for processing...")
     # -----------------------------
     # 완료 대기
     # -----------------------------
     try:
-        while True:
-            total_backpressure = sum(worker.get_backpressure() for worker in q.workers)
-            total_queued_groups = sum(len(vq.groups) for vq in q.vq_engine.vqs)
-            print(f"Status: [Worker Load: {total_backpressure}] / [Queue Waiting Groups: {total_queued_groups}]")
+        if DRAIN_TIMEOUT_S > 0:
+            drain_deadline = time.time() + DRAIN_TIMEOUT_S
+            while True:
+                total_backpressure = sum(worker.get_backpressure() for worker in q.workers)
+                total_queued_groups = sum(len(vq.groups) for vq in q.vq_engine.vqs)
+                print(f"Status: [Worker Load: {total_backpressure}] / [Queue Waiting Groups: {total_queued_groups}]")
 
-            if total_backpressure == 0 and total_queued_groups == 0:
-                print("All requests processed. Exiting.")
-                break
+                if total_backpressure == 0 and total_queued_groups == 0:
+                    print("All requests processed. Exiting.")
+                    break
+                if time.time() >= drain_deadline:
+                    print("Drain timeout reached. Exiting.")
+                    break
 
-            await asyncio.sleep(5)
-
+                await asyncio.sleep(5)
     finally:
         queue_run_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
