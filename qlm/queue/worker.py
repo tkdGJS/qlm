@@ -10,6 +10,7 @@ import os
 #[SH] 토큰 개수 로컬에서 계산
 _TOKENIZER_CACHE = {}
 
+
 def get_tokenizer(model_name: str):
     tok = _TOKENIZER_CACHE.get(model_name)
     if tok is None:
@@ -201,15 +202,28 @@ class Worker:
         except Exception as e:
             print(f"Error in adding request: {e}")
 
-    def _read_metrics(self, metric_name):
-        """
-        Reads all metrics from the worker and checks for a match with the metric name.
-        """
-        metrics = requests.get(f"{self.address}/metrics")
+#    def _read_metrics(self, metric_name):
+#        """
+#        Reads all metrics from the worker and checks for a match with the metric name.
+#        """
+#        metrics = requests.get(f"{self.address}/metrics")
+#
+#        for line in metrics.text.splitlines():
+#            if line.startswith(metric_name):
+#                return float(line.split()[-1])
 
-        for line in metrics.text.splitlines():
+
+    def _read_metrics(self, metric_name: str) -> float:
+        r = requests.get(f"{self.address}/metrics", timeout=2)
+        r.raise_for_status()
+    
+        for line in r.text.splitlines():
             if line.startswith(metric_name):
                 return float(line.split()[-1])
+    
+        # 메트릭이 없으면(예: swapped) 0으로 간주
+        return 0.0
+
 
     def get_backpressure(self):
         """

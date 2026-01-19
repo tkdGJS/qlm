@@ -87,50 +87,55 @@ kill_all_python_user() {
 }
 
 cleanup_gpu() {
-  if ! command -v nvidia-smi >/dev/null 2>&1; then
-    log "nvidia-smi not found; skip GPU cleanup"
-    return
-  fi
-  if ! command -v timeout >/dev/null 2>&1; then
-    log "timeout not found; consider: sudo apt-get install coreutils"
-  fi
+  local -a pids=()   # <-- 중요: 먼저 선언/초기화 (unbound 방지)
 
-  log "GPU processes (before cleanup):"
-  timeout 10 nvidia-smi || {
-    log "WARNING: nvidia-smi timed out (10s)"
-    return
-  }
-
-  mapfile -t pids < <(timeout 10 nvidia-smi --query-compute-apps=pid --format=csv,noheader 2>/dev/null | awk '{print $1}' | sort -u || true)
+  mapfile -t pids < <(
+    timeout 10 nvidia-smi --query-compute-apps=pid --format=csv,noheader 2>/dev/null \
+    | awk '{print $1}' | sort -u || true
+  )
   if ((${#pids[@]} > 0)); then
-    log "Killing GPU compute PIDs: ${pids[*]}"
-    kill -TERM "${pids[@]}" 2>/dev/null || true
-    sleep 2
-    kill -KILL "${pids[@]}" 2>/dev/null || true
+    local my_uid
+    my_uid="$(id -u)"
+    local -a my_pids=()
+    local -a skipped=()
+
+    # nvidia-smi에 찍힌 PID 중 "내 uid" 소유만 추려서 kill
+    for pid in "${pids[@]}"; do
+      [[ -z "${pid}" ]] && continue
+      # ps가 실패하면(이미 종료 등) 그냥 스킵
+      local uid
+      uid="$(ps -o uid= -p "${pid}" 2>/dev/null | awk '{print $1}')"
+      if [[ -n "${uid}" && "${uid}" == "${my_uid}" ]]; then
+        my_pids+=("${pid}")
+      else
+        skipped+=("${pid}:${uid:-unknown}")
+      fi
+    done
+
+    if ((${#my_pids[@]} > 0)); then
+      log "Killing *my* GPU compute PIDs (uid=${my_uid}): ${my_pids[*]}"
+      kill -TERM "${my_pids[@]}" 2>/dev/null || true
+      sleep 2
+      kill -KILL "${my_pids[@]}" 2>/dev/null || true
+    else
+      log "No GPU compute PIDs owned by uid=${my_uid} to kill"
+    fi
+
+    # 참고용: 내 uid가 아닌 PID들은 kill 대상에서 제외
+    if ((${#skipped[@]} > 0)); then
+      log "Skipped non-owned GPU PIDs (pid:uid): ${skipped[*]}"
+    fi
   else
     log "No GPU compute PIDs found"
   fi
 
-  log "GPU processes (after cleanup):"
-  timeout 10 nvidia-smi || log "WARNING: nvidia-smi timed out (10s)"
 }
 
-cleanup_dram() {
-  log "DRAM/cache cleanup: sync + drop_caches(3)"
-  sync || true
-  if [[ "$DROP_CACHES" == "1" ]]; then
-    echo 3 | sudo -n tee /proc/sys/vm/drop_caches >/dev/null ||
-      log "WARNING: drop_caches failed (sudo password required or not permitted)"
-  else
-    log "DROP_CACHES=0 so skipping /proc/sys/vm/drop_caches"
-  fi
-}
 
 reboot_like_cleanup() {
   log "=== Reboot-like cleanup start ==="
   kill_all_python_user
   cleanup_gpu
-  cleanup_dram
   log "=== Reboot-like cleanup end ==="
 }
 

@@ -8,8 +8,8 @@ fi
 
 eval set -- "$OPTIONS"
 
-MODEL="unsloth/Llama-3.2-1B-Instruct"
-#MODEL="meta-llama/Llama-3.2-1B-Instruct"
+#MODEL="unsloth/Llama-3.2-1B-Instruct"
+MODEL="meta-llama/Llama-3.2-1B-Instruct"
 PORT="8000"
 
 while true; do
