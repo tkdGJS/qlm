@@ -51,7 +51,7 @@ def compute_metrics(csv_path, classify="out_tok"):
     df = df.replace([np.inf, -np.inf], np.nan)
     df = df.dropna(subset=["_t_ins","queue_delay","service_time","_t_dsp","_t_fin"])
     df = df[(df["queue_delay"] >= 0) & (df["service_time"] >= 0) & (df["_t_fin"] >= df["_t_dsp"]) & (df["_t_dsp"] >= df["_t_ins"])]
-    if len(df) < 30:
+    if len(df) < 10:
         return None
 
     df = df.sort_values("_t_ins").reset_index(drop=True)

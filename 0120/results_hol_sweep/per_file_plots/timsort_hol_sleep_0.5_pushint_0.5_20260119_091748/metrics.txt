@@ -1,0 +1,6 @@
+file=timsort_hol_sleep_0.5_pushint_0.5_20260119_091748.csv
+sleep=0.5
+pushint=0.5
+n_total=978
+n_short=492
+hol_corr(short_queue_delay, blocking_depth)=0.47380430407473056
