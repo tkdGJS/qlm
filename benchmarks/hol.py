@@ -178,7 +178,9 @@ async def basic_test():
     print("Waiting for vLLM server to start...")
     await asyncio.sleep(10)
 
+    #global queue
     q = Queue()
+    #virtual queue
     q.register_worker("localhost", 8000, endpoint)
 
     queue_run_task = asyncio.create_task(q.run_queue())
