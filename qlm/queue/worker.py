@@ -131,20 +131,45 @@ class Worker:
                         continue
                     raise
 
+
             # TTFT
             ttft = (first_token_time - start_time) if first_token_time else None
             #[SH] TTFT 추적 로직 끝
 
             end_time = time.time()                    # 1. 실제 종료 시간
 
-            # === [추가된 부분: SLO 위반 계산 로직] ===
-            #=================================================================================================================
-            deadline = original_insertion_time + original_slo  # 2. 마감 기한
-            diff = end_time - deadline                # 3. 차이 (양수면 지각, 음수면 여유)
-            wait_time=start_time - original_insertion_time     # 4. 큐 대기 시간
-            latency=end_time - start_time             # 5. 요청 처리 시간
-            violation = max(0, diff)                  # 6. violation 계산
+#            ######################################################################################
+#            # SLO : completion time             
+#            # === [추가된 부분: SLO 위반 계산 로직] ===
+#            deadline = original_insertion_time + original_slo  # 2. 마감 기한
+#            diff = end_time - deadline                # 3. 차이 (양수면 지각, 음수면 여유)
+#            wait_time=start_time - original_insertion_time     # 4. 큐 대기 시간
+#            latency=end_time - start_time             # 5. 요청 처리 시간
+#            violation = max(0, diff)                  # 6. violation 계산
+#            
+#            # SLO : completion time             
+#            ######################################################################################
+
+
+            ######################################################################################
+            # SLO : TTFT 
+            deadline = original_insertion_time + original_slo  # 마감 기한은 동일
             
+            # TTFT 기준으로 "관측 시각"을 first_token_time으로 사용
+            # (예외적으로 first_token_time이 없으면 end_time으로 fallback)
+            obs_time = first_token_time if first_token_time else end_time
+            
+            diff = obs_time - deadline                  # TTFT가 deadline을 넘겼는지
+            wait_time = start_time - original_insertion_time  # 큐 대기 시간(그대로)
+            latency = obs_time - start_time             # 처리 시간(이제 '첫 토큰까지' 처리시간 의미)
+            violation = max(0, diff)                    # violation 계산(그대로)
+
+            # SLO : TTFT
+            ######################################################################################
+
+
+
+
             # 누적 violation 합계 업데이트
             self.total_violation += violation
             
