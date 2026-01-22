@@ -1,0 +1,29 @@
+# datasets
+data/
+dataset/
+datasets/
+*.json
+*.jsonl
+
+# model / weights
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+
+# logs / cache
+logs/
+*.log
+__pycache__/
+.cache/
+
+# env
+tkdgjs/
+.venv/
+.env
+
+
+# result
+debug/
+0113/
