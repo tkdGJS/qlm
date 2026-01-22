@@ -1,0 +1,71 @@
+=== Basic Benchmark Test (PREFIX mode) ===
+[LEN] vllm_max_len=16000, tokenizer.model_max_length=131072 -> effective=16000
+[LEN] max_prompt_tokens_short=15960, prefix_short_tokens=11 -> max_base_prompt_short=15949
+[LEN] max_prompt_tokens_long =14968,  prefix_long_tokens =16  -> max_base_prompt_long =14952
+Starting server and wait to load model weights
+Server started at localhost:8000 with model meta-llama/Llama-3.2-1B-Instruct
+Waiting for vLLM server to start...
+Worker 60ce6d80-f52b-4d12-8caa-5946cb90adc7 registered at http://localhost:8000
+
+[Part 2] Loading dataset from: data/ShareGPT_V3_unfiltered_cleaned_split.json
+dataset1_candidates(first-pair, base<=short-limit): 58755
+dataset2_candidates(first-pair, base<=long-limit)      : 58754
+too_long_long(>long base-limit)                         : 12
+[dataset1_candidates base tok lens] n=58755 min=1 p50=31 p90=676 p99=2860 max=15769
+[dataset2_candidates base tok lens] n=58754 min=1 p50=31 p90=675 p99=2859 max=12323
+[DEBUG] wrote 12 rows -> debug/debug_too_long_for_long_top50.jsonl
+dataset1 chosen: 500 | base_tok_range ~ 16..16
+dataset2 chosen: 500 | base_tok_range ~ 2924..12323
+[DEBUG] wrote 50 rows -> debug/debug_dataset1_sample_base.jsonl
+[DEBUG] wrote 50 rows -> debug/debug_dataset2_sample_base.jsonl
+!!! BENCHMARK START TIME: 1769020457.271531 !!!
+Pushing for 300s (ORDER_MODE=shuffle)
+  push_interval_s=10.000000
+  dataset1: max_tokens=32, prefix=ON
+  dataset2: max_tokens=1024,  prefix=ON
+[VQ0] groups=1 head_deadline=1769020491.284 slack=34.000 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020491.284
+[VQ0] groups=1 head_deadline=1769020537.307 slack=69.817 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020537.307
+[DEBUG] OrigSLO: 34.00 | Insertion Time: 1769020457.2843 | Wait Time: 0.0168 | prompt_tok= 3840 out_tok= 1021 total_tok= 4861 | TTFT: 0.5254 | Execution Time: 0.5254 | Diff: -33.4578 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020471.9843495 | SuccessRate: 100.00% (1/1)
+[VQ0] groups=1 head_deadline=1769020517.309 slack=39.123 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020517.309
+[DEBUG] OrigSLO: 40.00 | Insertion Time: 1769020477.3089 | Wait Time: 0.9089 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0620 | Execution Time: 0.0620 | Diff: -39.0291 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020478.6855478 | SuccessRate: 100.00% (2/2)
+[DEBUG] OrigSLO: 70.00 | Insertion Time: 1769020467.3066 | Wait Time: 0.2026 | prompt_tok= 3405 out_tok= 1024 total_tok= 4429 | TTFT: 0.3765 | Execution Time: 0.3765 | Diff: -69.4209 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020481.0091574 | SuccessRate: 100.00% (3/3)
+[DEBUG] OrigSLO: 158.00 | Insertion Time: 1769020487.3122 | Wait Time: 0.2028 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0586 | Execution Time: 0.0586 | Diff: -157.7385 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020487.9862866 | SuccessRate: 100.00% (4/4)
+[DEBUG] OrigSLO: 129.00 | Insertion Time: 1769020497.3383 | Wait Time: 0.4984 | prompt_tok= 3087 out_tok= 1035 total_tok= 4122 | TTFT: 0.3969 | Execution Time: 0.3969 | Diff: -128.1047 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020511.7119353 | SuccessRate: 100.00% (5/5)
+[DEBUG] OrigSLO: 30.00 | Insertion Time: 1769020517.3725 | Wait Time: 0.1024 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0578 | Execution Time: 0.0578 | Diff: -29.8399 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020517.9520407 | SuccessRate: 100.00% (6/6)
+[DEBUG] OrigSLO: 102.00 | Insertion Time: 1769020507.3704 | Wait Time: 0.7986 | prompt_tok= 4513 out_tok= 1027 total_tok= 5540 | TTFT: 0.5253 | Execution Time: 0.5253 | Diff: -100.6761 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020522.1797364 | SuccessRate: 100.00% (7/7)
+[DEBUG] OrigSLO: 121.00 | Insertion Time: 1769020527.3748 | Wait Time: 0.4364 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0564 | Execution Time: 0.0564 | Diff: -120.5072 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020528.263897 | SuccessRate: 100.00% (8/8)
+[DEBUG] OrigSLO: 133.00 | Insertion Time: 1769020537.3770 | Wait Time: 0.7597 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0592 | Execution Time: 0.0592 | Diff: -132.1811 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020538.5849397 | SuccessRate: 100.00% (9/9)
+[DEBUG] OrigSLO: 102.00 | Insertion Time: 1769020557.4485 | Wait Time: 0.3335 | prompt_tok= 5583 out_tok= 111 total_tok= 5694 | TTFT: 0.6960 | Execution Time: 0.6960 | Diff: -100.9705 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020560.0889132 | SuccessRate: 100.00% (10/10)
+[DEBUG] OrigSLO: 152.00 | Insertion Time: 1769020547.4086 | Wait Time: 0.0339 | prompt_tok= 3526 out_tok= 1030 total_tok= 4556 | TTFT: 0.4129 | Execution Time: 0.4129 | Diff: -151.5532 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020561.4732747 | SuccessRate: 100.00% (11/11)
+[DEBUG] OrigSLO: 139.00 | Insertion Time: 1769020567.4507 | Wait Time: 0.6618 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0488 | Execution Time: 0.0488 | Diff: -138.2894 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020568.5510502 | SuccessRate: 100.00% (12/12)
+[DEBUG] OrigSLO: 187.00 | Insertion Time: 1769020587.4976 | Wait Time: 0.2356 | prompt_tok= 3365 out_tok= 40 total_tok= 3405 | TTFT: 0.3868 | Execution Time: 0.3868 | Diff: -186.3776 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020588.685273 | SuccessRate: 100.00% (13/13)
+[DEBUG] OrigSLO: 201.00 | Insertion Time: 1769020577.4734 | Wait Time: 0.9520 | prompt_tok= 3271 out_tok= 1022 total_tok= 4293 | TTFT: 0.3958 | Execution Time: 0.3958 | Diff: -199.6522 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020592.232625 | SuccessRate: 100.00% (14/14)
+[DEBUG] OrigSLO: 44.00 | Insertion Time: 1769020607.5224 | Wait Time: 0.8728 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0582 | Execution Time: 0.0582 | Diff: -43.0690 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020608.8642635 | SuccessRate: 100.00% (15/15)
+[DEBUG] OrigSLO: 102.00 | Insertion Time: 1769020597.5212 | Wait Time: 0.5329 | prompt_tok= 3559 out_tok= 1029 total_tok= 4588 | TTFT: 0.4407 | Execution Time: 0.4407 | Diff: -101.0264 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020611.3827176 | SuccessRate: 100.00% (16/16)
+[VQ0] groups=1 head_deadline=1769020794.544 slack=176.892 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020794.544
+[VQ0] groups=1 head_deadline=1769020657.545 slack=29.560 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020657.545
+[DEBUG] OrigSLO: 30.00 | Insertion Time: 1769020627.5454 | Wait Time: 0.4731 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0510 | Execution Time: 0.0510 | Diff: -29.4758 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020628.4755466 | SuccessRate: 100.00% (17/17)
+[DEBUG] OrigSLO: 177.00 | Insertion Time: 1769020617.5438 | Wait Time: 0.1404 | prompt_tok= 2980 out_tok= 1028 total_tok= 4008 | TTFT: 0.3723 | Execution Time: 0.3723 | Diff: -176.4873 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020630.817543 | SuccessRate: 100.00% (18/18)
+[VQ0] groups=1 head_deadline=1769020725.547 slack=87.233 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769020725.547
+[DEBUG] OrigSLO: 88.00 | Insertion Time: 1769020637.5473 | Wait Time: 0.7980 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0564 | Execution Time: 0.0564 | Diff: -87.1457 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020638.779201 | SuccessRate: 100.00% (19/19)
+[DEBUG] OrigSLO: 142.00 | Insertion Time: 1769020647.5497 | Wait Time: 0.1046 | prompt_tok= 27 out_tok= 18 total_tok= 45 | TTFT: 0.0576 | Execution Time: 0.0576 | Diff: -141.8377 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020647.9426222 | SuccessRate: 100.00% (20/20)
+[DEBUG] OrigSLO: 127.00 | Insertion Time: 1769020667.5743 | Wait Time: 0.7331 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0577 | Execution Time: 0.0577 | Diff: -126.2092 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020668.7732139 | SuccessRate: 100.00% (21/21)
+[DEBUG] OrigSLO: 19.00 | Insertion Time: 1769020657.5731 | Wait Time: 0.4041 | prompt_tok= 3276 out_tok= 1025 total_tok= 4301 | TTFT: 0.3824 | Execution Time: 0.3824 | Diff: -18.2135 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020671.1392207 | SuccessRate: 100.00% (22/22)
+[DEBUG] OrigSLO: 131.00 | Insertion Time: 1769020687.6204 | Wait Time: 0.3149 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0577 | Execution Time: 0.0577 | Diff: -130.6274 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020688.397658 | SuccessRate: 100.00% (23/23)
+[DEBUG] OrigSLO: 212.00 | Insertion Time: 1769020677.6184 | Wait Time: 1.0153 | prompt_tok= 2945 out_tok= 1030 total_tok= 3975 | TTFT: 0.3363 | Execution Time: 0.3363 | Diff: -210.6484 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020691.7234437 | SuccessRate: 100.00% (24/24)
+[DEBUG] OrigSLO: 148.00 | Insertion Time: 1769020697.6511 | Wait Time: 0.6153 | prompt_tok= 3202 out_tok= 1026 total_tok= 4228 | TTFT: 0.4218 | Execution Time: 0.4218 | Diff: -146.9629 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020712.0046651 | SuccessRate: 100.00% (25/25)
+[DEBUG] OrigSLO: 199.00 | Insertion Time: 1769020707.6802 | Wait Time: 0.9290 | prompt_tok= 3096 out_tok= 1026 total_tok= 4122 | TTFT: 0.3530 | Execution Time: 0.3530 | Diff: -197.7180 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020723.0240898 | SuccessRate: 100.00% (26/26)
+[DEBUG] OrigSLO: 20.00 | Insertion Time: 1769020727.7100 | Wait Time: 0.5364 | prompt_tok= 27 out_tok= 17 total_tok= 44 | TTFT: 0.0553 | Execution Time: 0.0553 | Diff: -19.4083 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020728.5321689 | SuccessRate: 100.00% (27/27)
+[DEBUG] OrigSLO: 52.00 | Insertion Time: 1769020717.7083 | Wait Time: 0.2034 | prompt_tok= 4788 out_tok= 900 total_tok= 5688 | TTFT: 0.5545 | Execution Time: 0.5545 | Diff: -51.2421 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020730.5856388 | SuccessRate: 100.00% (28/28)
+[DEBUG] OrigSLO: 180.00 | Insertion Time: 1769020737.7112 | Wait Time: 0.8546 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0580 | Execution Time: 0.0580 | Diff: -179.0874 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020739.019052 | SuccessRate: 100.00% (29/29)
+[DEBUG] OrigSLO: 198.00 | Insertion Time: 1769020747.7132 | Wait Time: 0.1391 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0550 | Execution Time: 0.0550 | Diff: -197.8059 | Violation: 0.0000 | TotalViolation: 0.0000 | Finished Time: 1769020748.320941 | SuccessRate: 100.00% (30/30)
+Successfully pushed 30 requests (logged 30).
+Now waiting for processing...
+Status: [Worker Load: 0.0] / [Queue Waiting Groups: 0]
+All requests processed. Exiting.
