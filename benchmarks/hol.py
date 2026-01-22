@@ -353,6 +353,7 @@ async def basic_test():
             "dataset": "dataset1",
             "final_prompt": make_final_prompt(r["base_prompt"], PREFIX_SHORT),
             "base_tok_len": r["base_tok_len"],
+            "slo_type" : 0,
             "max_tokens": MAX_TOKENS_SHORT
         })
     for r in chosen2:
@@ -360,6 +361,7 @@ async def basic_test():
             "dataset": "dataset2",
             "final_prompt": make_final_prompt(r["base_prompt"], PREFIX_LONG),
             "base_tok_len": r["base_tok_len"],
+            "slo_type" : 1,
             "max_tokens": MAX_TOKENS_LONG
         })
 
@@ -414,20 +416,22 @@ async def basic_test():
         wi = next_item()
         slo = sample_slo()
         final_prompt = wi["final_prompt"]
+        slo_type = wi["slo_type"]
         max_toks = wi["max_tokens"]
 
-        # 안전: 최종 프롬프트가 컨텍스트를 넘지 않는지 한 번 더 체크(느리면 주석 가능)
-        # (여기서는 max_prompt_tokens_{short/long}을 넘으면 skip)
-        if wi["dataset"] == "dataset1":
-            if token_len(tokenizer, final_prompt, trunc_max=max_prompt_tokens_short) > max_prompt_tokens_short:
-                continue
-        else:
-            if token_len(tokenizer, final_prompt, trunc_max=max_prompt_tokens_long) > max_prompt_tokens_long:
-                continue
+#        # 안전: 최종 프롬프트가 컨텍스트를 넘지 않는지 한 번 더 체크(느리면 주석 가능)
+#        # (여기서는 max_prompt_tokens_{short/long}을 넘으면 skip)
+#        if wi["dataset"] == "dataset1":
+#            if token_len(tokenizer, final_prompt, trunc_max=max_prompt_tokens_short) > max_prompt_tokens_short:
+#                continue
+#        else:
+#            if token_len(tokenizer, final_prompt, trunc_max=max_prompt_tokens_long) > max_prompt_tokens_long:
+#                continue
 
         q.push(
             prompt=final_prompt,
             model=model_name,
+            slo_type=slo_type,
             insertion_time=time.time(),
             slo=slo,
             max_tokens=max_toks,   # <-- execution time 분리 핵심 (패치 필요)
