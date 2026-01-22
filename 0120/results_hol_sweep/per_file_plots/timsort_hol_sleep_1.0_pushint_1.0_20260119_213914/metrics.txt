@@ -3,4 +3,4 @@ sleep=1.0
 pushint=1.0
 n_total=287
 n_short=144
-hol_corr(short_queue_delay, blocking_depth)=0.22108768605072793
+hol_corr(short_queue_delay, blocking_depth)=0.22108768605072768

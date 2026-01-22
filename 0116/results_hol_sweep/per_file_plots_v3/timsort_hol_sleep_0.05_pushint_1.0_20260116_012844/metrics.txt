@@ -1,0 +1,8 @@
+file=timsort_hol_sleep_0.05_pushint_1.0_20260116_012844.csv
+sleep=0.05
+pushint=1.0
+deadline_mode=budget_seconds
+n_total=290
+n_short=145
+hol_corr(short_queue_delay, blocking_depth)=0.12280494885310657
+inversion_rate_at_dispatch=0.0

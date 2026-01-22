@@ -1,0 +1,6 @@
+file=timsort_hol_sleep_0.5_pushint_5.0_20260116_044522.csv
+sleep=0.5
+pushint=5.0
+N_total=57
+N_plotted=57
+y=(_t_ins+orig_slo)-_t_fin

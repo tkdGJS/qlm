@@ -129,8 +129,8 @@ def heatmap(df, value_col, title, outpath):
 
     plt.xticks(np.arange(pv.shape[1]), [str(c) for c in pv.columns], rotation=45, ha="right")
     plt.yticks(np.arange(pv.shape[0]), [str(r) for r in pv.index])
-    plt.xlabel("pushint (sec)")
-    plt.ylabel("sleep (sec)")
+    plt.xlabel("push (sec)")
+    plt.ylabel("dispatch (sec)")
     plt.title(title)
     plt.tight_layout()
     plt.savefig(outpath, dpi=220)

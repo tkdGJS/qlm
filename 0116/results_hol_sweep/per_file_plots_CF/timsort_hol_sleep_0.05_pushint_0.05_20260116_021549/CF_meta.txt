@@ -1,0 +1,6 @@
+file=timsort_hol_sleep_0.05_pushint_0.05_20260116_021549.csv
+sleep=0.05
+pushint=0.05
+N_total=636
+N_plotted=200
+deadline_key_source=csv(deadline=_t_ins+orig_slo) (log empty)

@@ -1,0 +1,7 @@
+q20_slo=18.0
+q80_slo=53.0
+n_good=70 n_bad=68
+good_corr_block_wait=-0.015151633499409616
+bad_corr_block_wait=0.12152507136751986
+good_p99_wait=762.250114
+bad_p99_wait=878.625401
