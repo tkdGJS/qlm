@@ -1,6 +1,0 @@
-file=timsort_hol_sleep_0.5_pushint_0.1_20260119_202445.csv
-sleep=0.5
-pushint=0.1
-n_total=628
-n_short=316
-hol_corr(short_queue_delay, blocking_depth)=-0.007474645608251984

@@ -39,5 +39,5 @@ done
 
 echo "Model: $MODEL"
 echo "Port: $PORT"
-vllm serve $MODEL --port $PORT --dtype=half --max-model-len 16000 #--gpu-memory-utilization 0.8
+vllm serve $MODEL --port $PORT --dtype=half --max-model-len 16000 --gpu-memory-utilization 0.9
 #vllm serve $MODEL --port $PORT --max-model-len 32768 #--gpu-memory-utilization 0.8

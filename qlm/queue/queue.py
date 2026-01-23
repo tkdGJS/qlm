@@ -22,7 +22,6 @@ class Queue:
         self.workers = []
         self.config = Config()
         self.vq_engine = VirtualQueueEngine()
-        #[SH] seq_no
         self._seq_counter = itertools.count(0)
         self._inflight_sems = {}
 
@@ -35,19 +34,44 @@ class Queue:
         if self.loop_sleep_s < 0:
             self.loop_sleep_s = 0.0
 
-    def register_worker(self, address, port, endpoint):
+    #def register_worker(self, address, port, endpoint):
+    def register_worker(
+        self,
+        address,
+        port,
+        endpoint,
+        max_num_batched_tokens: int | None = None,
+        max_num_seqs: int | None = None,
+        max_model_len: int | None = None,
+        kv_hard_wm: float = 0.92,
+        kv_soft_wm: float = 0.95,
+        min_free_vram_gb: float = 1.0,
+        gpu_index: int = 0,
+        ):
         """
         Registers a worker with the queue.
         :param address: The address of the worker.
         :param port: The port of the worker.
         """
-        worker = Worker(address, port, endpoint)
+        #worker = Worker(address, port, endpoint)
+        worker = Worker(
+            address=address,
+            port=port,
+            endpoint=endpoint,
+            max_num_batched_tokens=max_num_batched_tokens,
+            max_num_seqs=max_num_seqs,
+            max_model_len=max_model_len,
+            kv_hard_wm=kv_hard_wm,
+            kv_soft_wm=kv_soft_wm,
+            min_free_vram_gb=min_free_vram_gb,
+            gpu_index=gpu_index,
+        )
         self.workers.append(worker)
         self.vq_engine.add_worker(worker)
         self._inflight_sems[worker] = asyncio.Semaphore(self.config.max_batch_size)
 
 
-    def push(self, prompt, model, slo, insertion_time, max_tokens=None):
+    def push(self, prompt, model, insertion_time,slo, max_tokens=None, slo_type: int = 0):
         """
         Pushes a request to the virtual queue engine.
         :param prompt: The prompt for the request.
@@ -57,14 +81,12 @@ class Queue:
         :[SH]param max_tokens: (optional) max output tokens for generation
         :[SH]param seqno: input sequence number
         """
-        #[SH] seq_no
-        seq_no = next(self._seq_counter)
         #
         #new_request = Request(
         #    prompt=prompt, model=model, slo=slo, insertion_time=insertion_time
         #)
         new_request = Request(
-            prompt=prompt, model=model, slo=slo, insertion_time=insertion_time, max_tokens=max_tokens, seq_no=seq_no
+            prompt=prompt, model=model, insertion_time=insertion_time,slo=slo, max_tokens=max_tokens, slo_type=slo_type
         )
 
         self.vq_engine.add_request(new_request)
@@ -111,7 +133,6 @@ class Queue:
                                 request_to_serve.original_slo,
                                 request_to_serve.original_insertion_time,
                                 request_to_serve.max_tokens,  #[SH] 토큰 출력량 최대치 설정
-                                seq_no=request_to_serve.seq_no
 
                                 #================================================
                             )

@@ -4,7 +4,7 @@ import time
 from openai import OpenAI
 from qlm.endpoints.endpoint import Endpoint
 from transformers import AutoTokenizer
-from monitoring import VLLMHTTPMonitor
+from qlm.queue.monitoring import VLLMHTTPMonitor
 import threading
 import httpx
 import os
@@ -39,7 +39,6 @@ class Worker:
 #[SH] 수정 전
 #    def __init__(self, address, port, endpoint):
     def __init__(self, address, port, endpoint,
-                 gpu_index: int = 0,
                  # 토큰/시퀀스 예산은 "원격 vLLM 실행 인자"라서
                  # 지금 구조에선 orchestrator(너 코드)가 알고 있어야 함.
                  max_num_batched_tokens: int | None = None,
@@ -47,7 +46,9 @@ class Worker:
                  max_model_len: int | None = None,
                  kv_hard_wm: float = 0.92,
                  kv_soft_wm: float = 0.95,
-                 min_free_vram_gb: float = 1.0):
+                 min_free_vram_gb: float = 1.0,
+                 gpu_index: int = 0,
+                 ):
 
 
         """
@@ -170,7 +171,7 @@ class Worker:
         if hasattr(self._client_local, "client"):
             del self._client_local.client
 
-    def add_request(self, prompt, model, slo_type,insertion_time,original_slo,original_insertion_time, max_tokens=None, seq_no=None):
+    def add_request(self, prompt, model, insertion_time,original_slo,original_insertion_time, max_tokens=None, slo_type: int = 0):
         """
         Add a request to the worker.
         :param prompt: The prompt to be added.
@@ -301,8 +302,8 @@ class Worker:
                 return f"{b / (1024**3):.2f}GiB"
             
             tbt_sorted = sorted(tbt_samples)
-            tbt_p95 = percentile(tbt_sorted, 0.95)
-            tbt_p99 = percentile(tbt_sorted, 0.99)
+            tbt_p95 = _percentile(tbt_sorted, 0.95)
+            tbt_p99 = _percentile(tbt_sorted, 0.99)
             
             tbt_part = f"TBT_p95={_fmt(tbt_p95)} | TBT_p99={_fmt(tbt_p99)} | "
             snap_part = (
@@ -321,7 +322,7 @@ class Worker:
                 f"Insertion Time: {original_insertion_time:.4f} | "
                 f"Wait Time: {wait_time:.4f} | "
                 f"prompt_tok= {prompt_toks} out_tok= {completion_toks} total_tok= {total_toks} | "
-                + ttft_part +
+                + ttft_part
                 + tbt_part +
                 f"TTLT: {ttlt:.4f} | "
                 f"Diff: {diff:.4f} | "
