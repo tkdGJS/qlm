@@ -1,5 +1,0 @@
-=== Basic Benchmark Test (PREFIX mode) ===
-[LEN] vllm_max_len=16000, tokenizer.model_max_length=131072 -> effective=16000
-[LEN] max_prompt_tokens_short=15960, prefix_short_tokens=11 -> max_base_prompt_short=15949
-[LEN] max_prompt_tokens_long =14968,  prefix_long_tokens =16  -> max_base_prompt_long =14952
-Starting server and wait to load model weights

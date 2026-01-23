@@ -478,6 +478,7 @@ async def basic_test():
         slo = sample_slo()
         final_prompt = wi["final_prompt"]
         max_toks = wi["max_tokens"]
+        slo_type = 0 if wi["dataset"] == "dataset1" else 1
 
         # 안전: 최종 프롬프트가 컨텍스트를 넘지 않는지 한 번 더 체크(느리면 주석 가능)
         # (여기서는 max_prompt_tokens_{short/long}을 넘으면 skip)
@@ -494,12 +495,14 @@ async def basic_test():
             insertion_time=time.time(),
             slo=slo,
             max_tokens=max_toks,   # <-- execution time 분리 핵심 (패치 필요)
+            slo_type=slo_type,
         )
         pushed_count += 1
         if len(pushed_log) < PUSH_LOG_LIMIT:
             pushed_log.append({
                 "dataset": wi["dataset"],
                 "slo": slo,
+                "slo_type": slo_type,
                 "base_tok_len": wi["base_tok_len"],
                 "max_tokens": max_toks,
                 "final_prompt_preview": final_prompt[:200].replace("\n", "\\n"),
