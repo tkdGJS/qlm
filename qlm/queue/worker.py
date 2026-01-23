@@ -92,6 +92,11 @@ class Worker:
         self.total_violation = 0.0  # 누적 위반 시간을 저장할 변수
         self.processed_count = 0  # 전체 처리 횟수
         self.success_count = 0    # SLO 달성 성공 횟수 (Violation == 0)
+        self.tbt_total_violation = 0.0
+        self.tbt_processed_count = 0
+        self.tbt_success_count = 0
+        self.tbt_slo_interactive_s = float(os.environ.get("QLM_SLO_TBT_INTERACTIVE_S", "1"))
+        self.tbt_slo_batch_s = float(os.environ.get("QLM_SLO_TBT_BATCH_S", "200"))
         # ==================================================
 
         print(f"Worker {self.worker_id} registered at {self.address}")
@@ -304,6 +309,21 @@ class Worker:
             tbt_sorted = sorted(tbt_samples)
             tbt_p95 = _percentile(tbt_sorted, 0.95)
             tbt_p99 = _percentile(tbt_sorted, 0.99)
+
+            tbt_slo_s = self.tbt_slo_interactive_s if slo_type == 0 else self.tbt_slo_batch_s
+            tbt_violation = None
+            tbt_attainment_ratio = None
+            if tbt_p99 is not None:
+                tbt_violation = max(0.0, tbt_p99 - tbt_slo_s)
+                self.tbt_total_violation += tbt_violation
+                self.tbt_processed_count += 1
+                if tbt_violation == 0:
+                    self.tbt_success_count += 1
+                tbt_attainment_ratio = (
+                    (self.tbt_success_count / self.tbt_processed_count) * 100
+                    if self.tbt_processed_count > 0
+                    else 0.0
+                )
             
             tbt_part = f"TBT_p95={_fmt(tbt_p95)} | TBT_p99={_fmt(tbt_p99)} | "
             snap_part = (
@@ -324,6 +344,9 @@ class Worker:
                 f"prompt_tok= {prompt_toks} out_tok= {completion_toks} total_tok= {total_toks} | "
                 + ttft_part
                 + tbt_part +
+                f"TBT_SLO={tbt_slo_s:.2f} | "
+                f"TBT_Violation={_fmt(tbt_violation)} | "
+                f"TBT_SuccessRate={_fmt(tbt_attainment_ratio, '{:.2f}', 'NA')}% "
                 f"TTLT: {ttlt:.4f} | "
                 f"Diff: {diff:.4f} | "
                 f"Violation: {violation:.4f} | "
