@@ -5,7 +5,7 @@
 Plot QLM experiment CSVs.
 
 Expected columns (from log2csv.py):
-- success_rate_pct, execution_time, wait_time, violation, prompt_tok, out_tok
+- success_rate_pct, ttlt, wait_time, violation, prompt_tok, out_tok
 """
 
 from __future__ import annotations
@@ -150,6 +150,9 @@ def load_csvs(paths: List[Path]) -> Dict[float, Dict[float, pd.DataFrame]]:
             continue
 
         df = pd.read_csv(p).reset_index(drop=True)
+        # compat: old column name -> new
+        if "ttlt" not in df.columns and "execution_time" in df.columns:
+            df = df.rename(columns={"execution_time": "ttlt"})
         data.setdefault(sleep, {})[push] = df
     return data
 
@@ -293,13 +296,13 @@ def main():
             kind="line",
         )
 
-        # 2) execution_time
+        # 2) ttlt
         plot_multi_line_by_sleep(
             push_data, colors,
-            ycol="execution_time",
-            title=f"(2) Execution Time vs CSV Row Index | push={push_str}",
-            ylabel="execution_time (s)",
-            out_path=push_dir / "2_execution_time.png",
+            ycol="ttlt",
+            title=f"(2) TTLT vs CSV Row Index | push={push_str}",
+            ylabel="ttlt (s)",
+            out_path=push_dir / "2_ttlt.png",
             kind="line",
         )
 

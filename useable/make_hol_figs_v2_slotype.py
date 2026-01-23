@@ -25,19 +25,22 @@ def parse_time_series(s):
 
 # ----------------------------
 # HOL metrics for your CSV schema
-# required: insertion_time, wait_time, execution_time
+# required: insertion_time, wait_time, ttlt
 # optional: finished_time, out_tok, prompt_tok, success_rate_pct, violation
 # ----------------------------
 def compute_metrics(csv_path, classify="out_tok"):
     df = pd.read_csv(csv_path)
+    # compat: old column name -> new
+    if "ttlt" not in df.columns and "execution_time" in df.columns:
+        df = df.rename(columns={"execution_time": "ttlt"})
 
-    for c in ["insertion_time", "wait_time", "execution_time"]:
+    for c in ["insertion_time", "wait_time", "ttlt"]:
         if c not in df.columns:
             raise KeyError(f"{csv_path}: missing {c}. cols={list(df.columns)}")
 
     df["_t_ins"] = parse_time_series(df["insertion_time"])
     df["queue_delay"] = pd.to_numeric(df["wait_time"], errors="coerce")
-    df["service_time"] = pd.to_numeric(df["execution_time"], errors="coerce")
+    df["service_time"] = pd.to_numeric(df["ttlt"], errors="coerce")
     df["_t_dsp"] = df["_t_ins"] + df["queue_delay"]
 
     if "finished_time" in df.columns:
@@ -172,7 +175,7 @@ def main():
             os.path.join(outdir, "H2_p99_short_queueing_heatmap.png"))
 
     heatmap(res, "hol_frac",
-            "HOL fraction: P(short wait_time > 10x median(short execution_time))",
+            "HOL fraction: P(short wait_time > 10x median(short ttlt))",
             os.path.join(outdir, "H3_hol_fraction_heatmap.png"))
 
     heatmap(res, "success_rate_pct_end",

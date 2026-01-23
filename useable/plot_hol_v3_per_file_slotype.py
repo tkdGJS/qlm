@@ -42,8 +42,11 @@ def plot_one(csv_path: str, out_dir: str):
         pushint = m.group(2)
 
     df = pd.read_csv(csv_path)
+    # compat: old column name -> new
+    if "ttlt" not in df.columns and "execution_time" in df.columns:
+        df = df.rename(columns={"execution_time": "ttlt"})
 
-    need = ["insertion_time", "wait_time", "execution_time"]
+    need = ["insertion_time", "wait_time", "ttlt"]
     for c in need:
         if c not in df.columns:
             raise KeyError(f"{csv_path}: Missing required column '{c}'. cols={list(df.columns)}")
@@ -51,7 +54,7 @@ def plot_one(csv_path: str, out_dir: str):
     # times
     df["_t_ins"] = parse_time_series(df["insertion_time"])
     df["queue_delay"] = pd.to_numeric(df["wait_time"], errors="coerce")
-    df["service_time"] = pd.to_numeric(df["execution_time"], errors="coerce")
+    df["service_time"] = pd.to_numeric(df["ttlt"], errors="coerce")
     # orig_slo: EDF deadline용 (있으면 D에서 사용)
     if "orig_slo" in df.columns:
         df["orig_slo_s"] = pd.to_numeric(df["orig_slo"], errors="coerce")
@@ -81,7 +84,7 @@ def plot_one(csv_path: str, out_dir: str):
     # ---- (A) short: queue vs service scatter ----
     plt.figure(figsize=(8,6))
     plt.scatter(short["service_time"], short["queue_delay"], s=12, alpha=0.6)
-    plt.xlabel("Service time (execution_time) [s]")
+    plt.xlabel("Service time (ttlt) [s]")
     plt.ylabel("Queueing delay (wait_time) [s]")
     plt.title(f"HOL evidence: SHORT queueing vs service {title_suffix}")
     plt.grid(True, alpha=0.3)
