@@ -6,7 +6,7 @@ class Request:
     Request class to store the request to LLM
     """
 
-    def __init__(self, prompt, model, slo, insertion_time, max_tokens=None, slo_type: int = 1):
+    def __init__(self, prompt, model, slo, insertion_time, max_tokens=None, slo_type: int = 1, gpu_index: int = 0):
         """
         :param prompt: The prompt to be sent to the model
         :param model: The model to be used for the request
@@ -24,6 +24,7 @@ class Request:
         self.insertion_time = insertion_time
         self.original_insertion_time = insertion_time
         self.max_tokens = max_tokens
+        self.gpu_index = gpu_index
 
     def __hash__(self):
         return hash(self.request_id)

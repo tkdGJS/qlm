@@ -128,12 +128,11 @@ class Queue:
                                 request_to_serve.model,
 
                                 #================================================
-                                request_to_serve.slo,             # <--- 추가됨
                                 request_to_serve.insertion_time,   # <--- 추가됨
                                 request_to_serve.original_slo,
                                 request_to_serve.original_insertion_time,
                                 request_to_serve.max_tokens,  #[SH] 토큰 출력량 최대치 설정
-
+                                request_to_serve.slo_type,
                                 #================================================
                             )
                         )

@@ -64,6 +64,57 @@ def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
 
     return None
 
+def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
+    """
+    start_vllm.sh에서 --max-num-batched-tokens 값을 파싱.
+    """
+    candidates = []
+    proj = os.environ.get("QLMPROJDIR")
+    if proj:
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm.sh"))
+    candidates.append("start_vllm.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm.sh"))
+
+    for p in candidates:
+        if not os.path.exists(p):
+            continue
+        try:
+            txt = open(p, "r", encoding="utf-8", errors="ignore").read()
+        except Exception:
+            continue
+
+        m = re.search(r"--max-num-batched-tokens(?:\s+|=)(\d+)", txt)
+        if m:
+            return int(m.group(1))
+
+    return None
+
+
+def read_vllm_max_num_seqs_from_start_sh() -> Optional[int]:
+    """
+    start_vllm.sh에서 --max-num-seqs 값을 파싱.
+    """
+    candidates = []
+    proj = os.environ.get("QLMPROJDIR")
+    if proj:
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm.sh"))
+    candidates.append("start_vllm.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm.sh"))
+
+    for p in candidates:
+        if not os.path.exists(p):
+            continue
+        try:
+            txt = open(p, "r", encoding="utf-8", errors="ignore").read()
+        except Exception:
+            continue
+
+        m = re.search(r"--max-num-seqs(?:\s+|=)(\d+)", txt)
+        if m:
+            return int(m.group(1))
+
+    return None
+
 
 def effective_max_len(tokenizer) -> int:
     """
@@ -181,7 +232,18 @@ async def basic_test():
     #global queue
     q = Queue()
     #virtual queue
-    q.register_worker("localhost", 8000, endpoint)
+
+    max_num_batched_tokens = read_vllm_max_num_batched_tokens_from_start_sh()
+    max_num_seqs = read_vllm_max_num_seqs_from_start_sh()
+    max_model_len = read_vllm_max_model_len_from_start_sh()
+
+    q.register_worker("localhost", 8000, endpoint,
+            max_num_batched_tokens=max_num_batched_tokens,
+            max_num_seqs=max_num_seqs,
+            max_model_len=max_model_len,
+            gpu_index=0,
+            )
+
 
     queue_run_task = asyncio.create_task(q.run_queue())
     queue_run_task.add_done_callback(_print_task_exception)
@@ -408,6 +470,7 @@ async def basic_test():
         print("  push_interval_s=0 (no throttling)")
     print(f"  dataset1: max_tokens={MAX_TOKENS_SHORT}, prefix=ON")
     print(f"  dataset2: max_tokens={MAX_TOKENS_LONG},  prefix=ON")
+
 
     pushed_count = 0
     while time.time() < end_time:

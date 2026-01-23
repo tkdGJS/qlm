@@ -171,7 +171,7 @@ class Worker:
         if hasattr(self._client_local, "client"):
             del self._client_local.client
 
-    def add_request(self, prompt, model, insertion_time,original_slo,original_insertion_time, max_tokens=None, slo_type: int = 0):
+    def add_request(self, prompt, model, insertion_time, original_slo, original_insertion_time, max_tokens=None, slo_type: int = 0):
         """
         Add a request to the worker.
         :param prompt: The prompt to be added.
@@ -251,7 +251,7 @@ class Worker:
             # TTFT
             ttft = (first_token_time - start_time) if first_token_time else None
 
-            end_time = time.time() - start_time
+            end_time = time.time()
             ttlt = end_time - start_time
 
             # 공통: deadline은 동일하게 계산
@@ -317,7 +317,7 @@ class Worker:
             # [로그 메시지 생성]
             log_message = (
                 f"[DEBUG] OrigSLO: {original_slo:.2f} | "
-                f"slo_type: {slo_type}"
+                f"slo_type: {slo_type} | "
                 #f"[DEBUG] req_id={request_id}"
                 f"Insertion Time: {original_insertion_time:.4f} | "
                 f"Wait Time: {wait_time:.4f} | "
