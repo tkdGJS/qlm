@@ -3,8 +3,8 @@ set -euo pipefail
 
 # ====== 설정 ======
 # sweep 할 값들 (원하는대로 수정)
-SLEEPS=(0.001 0.005 0.01 0.05 0.1)
-#SLEEPS=(0.1)
+#SLEEPS=(0.001 0.005 0.01 0.05 0.1)
+SLEEPS=(0.1)
 
 # VQ push 속도 sweep:
 #  - MODE=rps : PUSH_RATE_RPS로 sweep (권장)
