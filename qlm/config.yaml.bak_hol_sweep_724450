@@ -1,4 +1,4 @@
-max_batch_size: 120
+max_batch_size: 10
 
 workload_tokens: 100
 #workload_tokens: 2048
