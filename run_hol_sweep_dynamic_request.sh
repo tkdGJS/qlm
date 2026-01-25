@@ -3,16 +3,16 @@ set -euo pipefail
 
 # ====== 설정 ======
 # sweep 할 값들 (원하는대로 수정)
-#SLEEPS=(0.01 0.05 0.1 0.5 1.0)
-SLEEPS=(0.1)
+SLEEPS=(0.001 0.005 0.01 0.05 0.1)
+#SLEEPS=(0.1)
 
 # VQ push 속도 sweep:
 #  - MODE=rps : PUSH_RATE_RPS로 sweep (권장)
 #  - MODE=interval : PUSH_INTERVAL_S로 sweep
 PUSH_MODE="interval"
-PUSH_RPS_LIST=(1 2 5 10 20 50)                      # PUSH_MODE=rps 일 때 사용
-#PUSH_INTERVAL_LIST=(10.0 5.0 1.0 0.5 0.1 0.05 0.01) # PUSH_MODE=interval 일 때 사용
-PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
+PUSH_RPS_LIST=(1 2 5 10 20 50)                         # PUSH_MODE=rps 일 때 사용
+PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
+#PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 DRAIN_TIMEOUT_S_DEFAULT=600
@@ -132,7 +132,7 @@ reboot_like_cleanup() {
   log "=== Reboot-like cleanup start ==="
   kill_all_python_user
   cleanup_gpu
-  cleanup_dram
+  #cleanup_dram
   log "=== Reboot-like cleanup end ==="
 }
 
@@ -190,11 +190,11 @@ run_one() {
   reboot_like_cleanup
 
   require_cmd python3
-  if [[ -f "log2csv.py" ]]; then
+  if [[ -f "log2csv_monitoring_slotype.py" ]]; then
     log "Converting log -> csv: ${csv_file}"
-    python3 log2csv.py "${log_file}" -o "${csv_file}"
+    python3 log2csv_monitoring_slotype.py "${log_file}" -o "${csv_file}"
   else
-    log "WARNING: log2csv.py not found in current directory. Skipping csv conversion."
+    log "WARNING: log2csv_monitoring_slotype.py not found in current directory. Skipping csv conversion."
   fi
 
   log "Post-rest ${REST_SEC}s..."
