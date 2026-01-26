@@ -1,0 +1,420 @@
+=== Basic Benchmark Test (PREFIX mode) ===
+[LEN] vllm_max_len=32768, tokenizer.model_max_length=131072 -> effective=32768
+[LEN] max_prompt_tokens_short=32728, prefix_short_tokens=11 -> max_base_prompt_short=32717
+[LEN] max_prompt_tokens_long =31736,  prefix_long_tokens =16  -> max_base_prompt_long =31720
+Starting server and wait to load model weights
+Server started at localhost:8000 with model meta-llama/Llama-3.2-1B-Instruct
+Waiting for vLLM server to start...
+Worker 302bce22-6df5-432a-a25b-d98d1e650398 registered at http://localhost:8000
+
+[Part 2] Loading dataset from: data/ShareGPT_V3_unfiltered_cleaned_split.json
+dataset1_candidates(first-pair, base<=short-limit): 58761
+dataset2_candidates(first-pair, base<=long-limit)      : 58761
+too_long_long(>long base-limit)                         : 5
+[dataset1_candidates base tok lens] n=58761 min=1 p50=31 p90=677 p99=2861 max=29650
+[dataset2_candidates base tok lens] n=58761 min=1 p50=31 p90=677 p99=2861 max=29650
+[DEBUG] wrote 5 rows -> debug/debug_too_long_for_long_top50.jsonl
+dataset1 chosen: 500 | base_tok_range ~ 16..16
+dataset2 chosen: 500 | base_tok_range ~ 2938..29650
+[DEBUG] wrote 50 rows -> debug/debug_dataset1_sample_base.jsonl
+[DEBUG] wrote 50 rows -> debug/debug_dataset2_sample_base.jsonl
+!!! BENCHMARK START TIME: 1769413891.207773 !!!
+Pushing for 300s (ORDER_MODE=shuffle)
+  push_interval_s=0.001000
+  dataset1: max_tokens=32, prefix=ON
+  dataset2: max_tokens=1024,  prefix=ON
+[VQ0] groups=1 head_deadline=1769414091.224 slack=200.000 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769414091.224
+[SORT] algo=timsort calls=1 avg=0.032ms max=0.032ms
+[VQ0] groups=100 head_deadline=1769413895.148 slack=-1.107 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413895.148, 1769413895.195, 1769413895.296, 1769413895.309, 1769413895.351
+[SORT] algo=timsort calls=222 avg=0.130ms max=1.182ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.5908 | Wait Time: 0.0492 | prompt_tok= 3096 out_tok= 0 total_tok= 3096 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 7.8871 | Diff: -192.0637 | Violation: 0.0000 | TotalViolation: 33.6744 | Finished Time: 1769413900.6458914 | SuccessRate: 100.00% (3/8) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.3403 | Wait Time: 0.0576 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.0234 | TBT_p95=0.6004 | TBT_p99=7.1265 | TBT_SLO=1.00 | TBT_Violation=6.1265 | TBT_SuccessRate=0.00% TTLT: 9.2517 | Diff: 0.0810 | Violation: 0.0810 | TotalViolation: 33.8501 | Finished Time: 1769413900.6751914 | SuccessRate: 33.33% (3/10) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.4930 | Wait Time: 0.0481 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.9774 | TBT_p95=0.0538 | TBT_p99=0.4762 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=50.00% TTLT: 9.0750 | Diff: 7.0255 | Violation: 7.0255 | TotalViolation: 33.8501 | Finished Time: 1769413900.6819215 | SuccessRate: 42.86% (3/10) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.3245 | Wait Time: 0.0444 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.0503 | TBT_p95=0.4708 | TBT_p99=7.1215 | TBT_SLO=1.00 | TBT_Violation=6.1215 | TBT_SuccessRate=33.33% TTLT: 9.2996 | Diff: 0.0947 | Violation: 0.0947 | TotalViolation: 33.8501 | Finished Time: 1769413900.6895242 | SuccessRate: 30.00% (3/10) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.0039 | Wait Time: 0.0317 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.4944 | TBT_p95=0.0864 | TBT_p99=0.4952 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=50.00% TTLT: 8.5836 | Diff: 6.5261 | Violation: 6.5261 | TotalViolation: 47.0630 | Finished Time: 1769413900.7355337 | SuccessRate: 37.50% (4/14) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.1756 | Wait Time: 0.0398 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.2996 | TBT_p95=0.0495 | TBT_p99=0.6520 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=60.00% TTLT: 8.4851 | Diff: 6.3394 | Violation: 6.3394 | TotalViolation: 54.0435 | Finished Time: 1769413900.769282 | SuccessRate: 25.00% (4/17) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.6637 | Wait Time: 0.0304 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.8276 | TBT_p95=0.0450 | TBT_p99=0.6051 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 8.9967 | Diff: 6.8580 | Violation: 6.8580 | TotalViolation: 60.8121 | Finished Time: 1769413900.7841089 | SuccessRate: 27.27% (4/18) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.7691 | Wait Time: 0.0601 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.6811 | TBT_p95=0.1160 | TBT_p99=0.5716 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.43% TTLT: 8.9398 | Diff: 6.7413 | Violation: 6.7413 | TotalViolation: 60.8121 | Finished Time: 1769413900.7843292 | SuccessRate: 23.53% (4/18) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.2451 | Wait Time: 0.1150 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.0583 | TBT_p95=0.5933 | TBT_p99=7.1151 | TBT_SLO=1.00 | TBT_Violation=6.1151 | TBT_SuccessRate=62.50% TTLT: 9.3918 | Diff: 0.1733 | Violation: 0.1733 | TotalViolation: 60.8121 | Finished Time: 1769413900.7999644 | SuccessRate: 25.00% (4/18) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.2710 | Wait Time: 0.0849 | prompt_tok= 27 out_tok= 31 total_tok= 58 | TTFT: 0.2000 | TBT_p95=0.6083 | TBT_p99=7.9863 | TBT_SLO=1.00 | TBT_Violation=6.9863 | TBT_SuccessRate=55.56% TTLT: 9.3678 | Diff: -0.7151 | Violation: 0.0000 | TotalViolation: 60.8121 | Finished Time: 1769413900.800203 | SuccessRate: 28.57% (4/18) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.3542 | Wait Time: 0.0836 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.9824 | TBT_p95=0.6007 | TBT_p99=7.1150 | TBT_SLO=1.00 | TBT_Violation=6.1150 | TBT_SuccessRate=50.00% TTLT: 9.3027 | Diff: 0.0660 | Violation: 0.0660 | TotalViolation: 60.8121 | Finished Time: 1769413900.8185546 | SuccessRate: 26.67% (4/18) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.7540 | Wait Time: 0.0313 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.7373 | TBT_p95=0.1680 | TBT_p99=0.5861 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=54.55% TTLT: 8.9863 | Diff: 6.7686 | Violation: 6.7686 | TotalViolation: 67.5833 | Finished Time: 1769413900.8289607 | SuccessRate: 22.22% (4/19) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.4018 | Wait Time: 0.0646 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.9509 | TBT_p95=0.5212 | TBT_p99=7.1292 | TBT_SLO=1.00 | TBT_Violation=6.1292 | TBT_SuccessRate=50.00% TTLT: 9.2364 | Diff: 0.0155 | Violation: 0.0155 | TotalViolation: 67.5833 | Finished Time: 1769413900.8295004 | SuccessRate: 23.08% (4/19) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.39GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.7371 | Wait Time: 0.0410 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.7302 | TBT_p95=0.0881 | TBT_p99=0.7322 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=53.85% TTLT: 9.0477 | Diff: 6.7712 | Violation: 6.7712 | TotalViolation: 74.2821 | Finished Time: 1769413900.8603463 | SuccessRate: 21.05% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.8268 | Wait Time: 0.0371 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.6616 | TBT_p95=0.0527 | TBT_p99=0.7272 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=57.14% TTLT: 8.9816 | Diff: 6.6987 | Violation: 6.6987 | TotalViolation: 74.2821 | Finished Time: 1769413900.8636978 | SuccessRate: 20.00% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.1053 | Wait Time: 0.0358 | prompt_tok= 3579 out_tok= 10 total_tok= 3589 | TTFT: 7.3702 | TBT_p95=0.0414 | TBT_p99=0.0414 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=60.00% TTLT: 7.6786 | Diff: -192.2856 | Violation: 0.0000 | TotalViolation: 74.2821 | Finished Time: 1769413901.579957 | SuccessRate: 100.00% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.7203 | Wait Time: 0.0366 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.7640 | TBT_p95=0.0465 | TBT_p99=0.4733 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=62.50% TTLT: 8.7468 | Diff: 6.8006 | Violation: 6.8006 | TotalViolation: 74.2821 | Finished Time: 1769413902.5419457 | SuccessRate: 66.67% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.6994 | Wait Time: 0.0397 | prompt_tok= 4688 out_tok= 17 total_tok= 4705 | TTFT: 7.7857 | TBT_p95=0.0436 | TBT_p99=0.0436 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=64.71% TTLT: 8.7652 | Diff: -191.1951 | Violation: 0.0000 | TotalViolation: 74.2821 | Finished Time: 1769413902.5426214 | SuccessRate: 75.00% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[VQ0] groups=250 head_deadline=1769413895.195 slack=-7.876 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413895.195, 1769413895.296, 1769413895.309, 1769413895.351, 1769413895.391
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.9431 | Wait Time: 0.0369 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.5461 | TBT_p95=0.0708 | TBT_p99=0.4852 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 8.6251 | Diff: 6.5830 | Violation: 6.5830 | TotalViolation: 74.2821 | Finished Time: 1769413903.0756478 | SuccessRate: 50.00% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413891.8101 | Wait Time: 0.0381 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 7.7010 | TBT_p95=0.0569 | TBT_p99=0.4936 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.42% TTLT: 8.7225 | Diff: 6.7390 | Violation: 6.7390 | TotalViolation: 74.2821 | Finished Time: 1769413903.6919718 | SuccessRate: 60.00% (4/20) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[SORT] algo=timsort calls=260 avg=0.149ms max=1.182ms
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.3415 | Wait Time: 8.6224 | prompt_tok= 27 out_tok= 12 total_tok= 39 | TTFT: 1.0817 | TBT_p95=1.5160 | TBT_p99=1.5160 | TBT_SLO=1.00 | TBT_Violation=0.5160 | TBT_SuccessRate=65.00% TTLT: 3.5043 | Diff: 8.7041 | Violation: 8.7041 | TotalViolation: 82.9862 | Finished Time: 1769413904.4757447 | SuccessRate: 19.05% (4/21) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.6073 | Wait Time: 11.1914 | prompt_tok= 27 out_tok= 6 total_tok= 33 | TTFT: 0.5917 | TBT_p95=0.0533 | TBT_p99=0.0533 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 0.8501 | Diff: 10.7831 | Violation: 10.7831 | TotalViolation: 93.7693 | Finished Time: 1769413904.6496058 | SuccessRate: 18.18% (4/22) | KV=0.808 run=30 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.4805 | Wait Time: 8.5959 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 2.4583 | TBT_p95=0.1162 | TBT_p99=0.6620 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.18% TTLT: 4.1172 | Diff: 10.0542 | Violation: 10.0542 | TotalViolation: 123.8918 | Finished Time: 1769413905.2024982 | SuccessRate: 17.39% (4/25) | KV=0.538 run=12 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.4950 | Wait Time: 8.5702 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 2.4877 | TBT_p95=0.1002 | TBT_p99=0.6460 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.57% TTLT: 4.1363 | Diff: 10.0579 | Violation: 10.0579 | TotalViolation: 160.6870 | Finished Time: 1769413905.2119768 | SuccessRate: 16.00% (4/29) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.2123 | Wait Time: 8.7027 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.1287 | TBT_p95=0.6574 | TBT_p99=1.5669 | TBT_SLO=1.00 | TBT_Violation=0.5669 | TBT_SuccessRate=66.67% TTLT: 4.2963 | Diff: 8.8314 | Violation: 8.8314 | TotalViolation: 179.6225 | Finished Time: 1769413905.2274663 | SuccessRate: 14.29% (4/31) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.5228 | Wait Time: 10.0226 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.9877 | TBT_p95=0.1468 | TBT_p99=0.6537 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.00% TTLT: 2.6526 | Diff: 10.0103 | Violation: 10.0103 | TotalViolation: 179.6225 | Finished Time: 1769413905.22764 | SuccessRate: 16.67% (4/31) | KV=0.601 run=18 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.5089 | Wait Time: 8.5420 | prompt_tok= 27 out_tok= 31 total_tok= 58 | TTFT: 2.4938 | TBT_p95=0.1157 | TBT_p99=0.6591 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.23% TTLT: 4.1589 | Diff: 10.0358 | Violation: 10.0358 | TotalViolation: 179.6225 | Finished Time: 1769413905.231706 | SuccessRate: 14.81% (4/31) | KV=0.538 run=12 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.1958 | Wait Time: 8.7036 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.1452 | TBT_p95=0.6638 | TBT_p99=1.5274 | TBT_SLO=1.00 | TBT_Violation=0.5274 | TBT_SuccessRate=66.67% TTLT: 4.3188 | Diff: 8.8488 | Violation: 8.8488 | TotalViolation: 179.6225 | Finished Time: 1769413905.2319312 | SuccessRate: 13.33% (4/31) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.4162 | Wait Time: 8.5643 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 2.5739 | TBT_p95=0.0645 | TBT_p99=0.6546 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=67.86% TTLT: 4.2288 | Diff: 10.1382 | Violation: 10.1382 | TotalViolation: 179.6225 | Finished Time: 1769413905.2321236 | SuccessRate: 15.38% (4/31) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.4669 | Wait Time: 8.5812 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 2.5054 | TBT_p95=0.0852 | TBT_p99=0.6552 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.97% TTLT: 4.1749 | Diff: 10.0866 | Violation: 10.0866 | TotalViolation: 179.6225 | Finished Time: 1769413905.2322886 | SuccessRate: 12.90% (4/31) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.2712 | Wait Time: 8.6148 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1750 | TBT_p95=0.6459 | TBT_p99=2.5120 | TBT_SLO=1.00 | TBT_Violation=1.5120 | TBT_SuccessRate=66.67% TTLT: 4.3258 | Diff: 7.7898 | Violation: 7.7898 | TotalViolation: 179.6225 | Finished Time: 1769413905.2351892 | SuccessRate: 13.79% (4/31) | KV=0.537 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.5927 | Wait Time: 11.1741 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.6225 | TBT_p95=0.0676 | TBT_p99=1.4891 | TBT_SLO=1.00 | TBT_Violation=0.4891 | TBT_SuccessRate=64.52% TTLT: 3.2558 | Diff: 10.7966 | Violation: 10.7966 | TotalViolation: 190.4190 | Finished Time: 1769413907.0392947 | SuccessRate: 12.50% (4/32) | KV=0.808 run=30 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.6210 | Wait Time: 11.8959 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0809 | TBT_p95=0.0650 | TBT_p99=1.4776 | TBT_SLO=1.00 | TBT_Violation=0.4776 | TBT_SuccessRate=62.50% TTLT: 2.7346 | Diff: 10.9767 | Violation: 10.9767 | TotalViolation: 201.3958 | Finished Time: 1769413907.262398 | SuccessRate: 12.12% (4/33) | KV=0.809 run=31 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.6346 | Wait Time: 12.0676 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1019 | TBT_p95=0.0774 | TBT_p99=1.4724 | TBT_SLO=1.00 | TBT_Violation=0.4724 | TBT_SuccessRate=60.61% TTLT: 2.7397 | Diff: 11.1695 | Violation: 11.1695 | TotalViolation: 212.5653 | Finished Time: 1769413907.450847 | SuccessRate: 11.76% (4/34) | KV=0.810 run=31 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.6485 | Wait Time: 12.6013 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1008 | TBT_p95=0.0630 | TBT_p99=1.4665 | TBT_SLO=1.00 | TBT_Violation=0.4665 | TBT_SuccessRate=58.82% TTLT: 2.7894 | Diff: 11.7021 | Violation: 11.7021 | TotalViolation: 224.2674 | Finished Time: 1769413908.044801 | SuccessRate: 11.43% (4/35) | KV=0.809 run=23 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.6625 | Wait Time: 12.6355 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.5686 | TBT_p95=0.0551 | TBT_p99=1.0066 | TBT_SLO=1.00 | TBT_Violation=0.0066 | TBT_SuccessRate=57.14% TTLT: 2.7788 | Diff: 12.2041 | Violation: 12.2041 | TotalViolation: 248.6330 | Finished Time: 1769413908.083144 | SuccessRate: 11.11% (4/37) | KV=0.809 run=23 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.7042 | Wait Time: 12.6083 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.5533 | TBT_p95=0.0585 | TBT_p99=1.0131 | TBT_SLO=1.00 | TBT_Violation=0.0131 | TBT_SuccessRate=55.56% TTLT: 2.7675 | Diff: 12.1615 | Violation: 12.1615 | TotalViolation: 274.7508 | Finished Time: 1769413908.0867467 | SuccessRate: 10.81% (4/39) | KV=0.809 run=23 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.7902 | Wait Time: 12.5652 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.4726 | TBT_p95=0.0589 | TBT_p99=0.0622 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=56.76% TTLT: 2.7287 | Diff: 13.0377 | Violation: 13.0377 | TotalViolation: 274.7508 | Finished Time: 1769413908.091176 | SuccessRate: 10.53% (4/39) | KV=0.810 run=23 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.7470 | Wait Time: 12.6304 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.4496 | TBT_p95=0.0646 | TBT_p99=0.0672 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=57.89% TTLT: 2.7089 | Diff: 13.0800 | Violation: 13.0800 | TotalViolation: 274.7508 | Finished Time: 1769413908.0913603 | SuccessRate: 10.26% (4/39) | KV=0.810 run=23 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[VQ0] groups=302 head_deadline=1769413896.653 slack=-11.492 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413896.653, 1769413896.765, 1769413896.826, 1769413896.939, 1769413897.002
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.8351 | Wait Time: 14.2464 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0842 | TBT_p95=0.0592 | TBT_p99=0.0794 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=58.97% TTLT: 1.3473 | Diff: 13.3306 | Violation: 13.3306 | TotalViolation: 288.0814 | Finished Time: 1769413908.432416 | SuccessRate: 10.00% (4/40) | KV=0.949 run=31 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.8842 | Wait Time: 14.6412 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1264 | TBT_p95=0.0574 | TBT_p99=0.0677 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=60.00% TTLT: 1.3784 | Diff: 13.7677 | Violation: 13.7677 | TotalViolation: 301.8490 | Finished Time: 1769413908.9063306 | SuccessRate: 9.76% (4/41) | KV=0.951 run=30 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[SORT] algo=timsort calls=349 avg=0.201ms max=1.182ms
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.9551 | Wait Time: 15.1856 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1316 | TBT_p95=0.0648 | TBT_p99=0.0686 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=60.98% TTLT: 1.3546 | Diff: 14.3172 | Violation: 14.3172 | TotalViolation: 316.1662 | Finished Time: 1769413909.5046651 | SuccessRate: 9.52% (4/42) | KV=0.953 run=26 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413892.9735 | Wait Time: 15.2151 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1568 | TBT_p95=0.0590 | TBT_p99=0.0605 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=61.90% TTLT: 1.3429 | Diff: 14.3719 | Violation: 14.3719 | TotalViolation: 330.5381 | Finished Time: 1769413909.535335 | SuccessRate: 9.30% (4/43) | KV=0.953 run=26 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.0271 | Wait Time: 15.4238 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1515 | TBT_p95=0.0573 | TBT_p99=0.0673 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=62.79% TTLT: 1.3036 | Diff: 14.5753 | Violation: 14.5753 | TotalViolation: 345.1135 | Finished Time: 1769413909.7574482 | SuccessRate: 9.09% (4/44) | KV=0.954 run=27 wait=4 swap=0 VRAM=12.47GiB/15.00GiB
+[VQ0] groups=364 head_deadline=1769413897.072 slack=-16.137 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.072, 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425
+[SORT] algo=timsort calls=422 avg=0.255ms max=1.182ms
+[VQ0] groups=443 head_deadline=1769413897.072 slack=-21.155 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.072, 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425
+[SORT] algo=timsort calls=501 avg=0.316ms max=1.327ms
+[VQ0] groups=524 head_deadline=1769413897.072 slack=-26.192 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.072, 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425
+[SORT] algo=timsort calls=583 avg=0.380ms max=1.327ms
+[VQ0] groups=604 head_deadline=1769413897.072 slack=-31.230 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.072, 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425
+[SORT] algo=timsort calls=664 avg=0.441ms max=1.446ms
+[VQ0] groups=686 head_deadline=1769413897.072 slack=-36.252 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.072, 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425
+[SORT] algo=timsort calls=744 avg=0.505ms max=1.610ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.5208 | Wait Time: 0.0422 | prompt_tok= 3672 out_tok= 871 total_tok= 4543 | TTFT: 7.9493 | TBT_p95=0.0522 | TBT_p99=0.2322 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=63.64% TTLT: 45.8059 | Diff: -154.1518 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413937.3844147 | SuccessRate: 11.11% (5/45) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[VQ0] groups=771 head_deadline=1769413897.179 slack=-41.171 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.179, 1769413897.292, 1769413897.366, 1769413897.425, 1769413897.557
+[SORT] algo=timsort calls=830 avg=0.573ms max=1.849ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.0699 | Wait Time: 0.0377 | prompt_tok= 3806 out_tok= 1025 total_tok= 4831 | TTFT: 7.4056 | TBT_p95=0.0519 | TBT_p99=0.2468 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=64.44% TTLT: 51.0168 | Diff: -148.9455 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1413558 | SuccessRate: 13.04% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.2237 | Wait Time: 0.1298 | prompt_tok= 3883 out_tok= 1027 total_tok= 4910 | TTFT: 1.0697 | TBT_p95=0.0492 | TBT_p99=0.2525 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=65.22% TTLT: 51.7731 | Diff: -148.0971 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.144523 | SuccessRate: 16.67% (16/56) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.9818 | Wait Time: 0.0376 | prompt_tok= 5198 out_tok= 1024 total_tok= 6222 | TTFT: 7.4964 | TBT_p95=0.0509 | TBT_p99=0.2300 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=65.96% TTLT: 51.1108 | Diff: -148.8516 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1551387 | SuccessRate: 20.00% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.5608 | Wait Time: 0.0372 | prompt_tok= 3467 out_tok= 1015 total_tok= 4482 | TTFT: 7.9195 | TBT_p95=0.0515 | TBT_p99=0.2381 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 51.5342 | Diff: -148.4286 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1557136 | SuccessRate: 23.08% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.6446 | Wait Time: 0.0334 | prompt_tok= 5665 out_tok= 1023 total_tok= 6688 | TTFT: 7.8386 | TBT_p95=0.0511 | TBT_p99=0.2455 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=67.35% TTLT: 51.4503 | Diff: -148.5164 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1574523 | SuccessRate: 18.37% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.3119 | Wait Time: 0.0433 | prompt_tok= 3455 out_tok= 1026 total_tok= 4481 | TTFT: 1.0655 | TBT_p95=0.0506 | TBT_p99=0.2529 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.00% TTLT: 51.7794 | Diff: -148.1772 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1604643 | SuccessRate: 25.93% (16/56) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.33GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.1503 | Wait Time: 0.0413 | prompt_tok= 5665 out_tok= 1026 total_tok= 6691 | TTFT: 7.3177 | TBT_p95=0.0523 | TBT_p99=0.2360 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=68.63% TTLT: 50.9397 | Diff: -149.0190 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1610632 | SuccessRate: 21.57% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.0332 | Wait Time: 0.0422 | prompt_tok= 3556 out_tok= 1028 total_tok= 4584 | TTFT: 7.4487 | TBT_p95=0.0504 | TBT_p99=0.2360 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.23% TTLT: 51.0600 | Diff: -148.8978 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.16386 | SuccessRate: 27.27% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.4733 | Wait Time: 0.0305 | prompt_tok= 3473 out_tok= 1025 total_tok= 4498 | TTFT: 8.0163 | TBT_p95=0.0496 | TBT_p99=0.2454 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.81% TTLT: 51.6324 | Diff: -148.3371 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1642005 | SuccessRate: 28.57% (16/56) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.39GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.9238 | Wait Time: 0.0361 | prompt_tok= 4376 out_tok= 1030 total_tok= 5406 | TTFT: 7.5542 | TBT_p95=0.0519 | TBT_p99=0.2470 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=70.37% TTLT: 51.1740 | Diff: -148.7899 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.1655378 | SuccessRate: 24.53% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413891.8870 | Wait Time: 0.0358 | prompt_tok= 9835 out_tok= 1022 total_tok= 10857 | TTFT: 7.5964 | TBT_p95=0.0527 | TBT_p99=0.2340 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=70.91% TTLT: 51.2033 | Diff: -148.7609 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413943.180749 | SuccessRate: 14.89% (16/56) | KV=0.071 run=8 wait=1 swap=0 VRAM=7.50GiB/15.00GiB
+[VQ0] groups=856 head_deadline=1769413897.292 slack=-46.080 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.292, 1769413897.366, 1769413897.425, 1769413897.557, 1769413897.568
+[SORT] algo=timsort calls=926 avg=0.644ms max=1.895ms
+[VQ0] groups=973 head_deadline=1769413897.993 slack=-50.425 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413897.993, 1769413898.028, 1769413898.128, 1769413898.143, 1769413898.156
+[SORT] algo=timsort calls=1052 avg=0.691ms max=1.895ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413893.2176 | Wait Time: 49.9671 | prompt_tok= 5011 out_tok= 0 total_tok= 5011 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 6.7169 | Diff: -143.3160 | Violation: 0.0000 | TotalViolation: 345.1135 | Finished Time: 1769413949.9191709 | SuccessRate: 29.82% (17/57) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.3755 | Wait Time: 49.9089 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.6182 | TBT_p95=0.2243 | TBT_p99=0.3731 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.43% TTLT: 8.9818 | Diff: 55.5271 | Violation: 55.5271 | TotalViolation: 678.8105 | Finished Time: 1769413952.277127 | SuccessRate: 29.31% (17/63) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.2782 | Wait Time: 49.9436 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.6769 | TBT_p95=0.2305 | TBT_p99=0.3666 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.93% TTLT: 9.0529 | Diff: 55.6205 | Violation: 55.6205 | TotalViolation: 734.3134 | Finished Time: 1769413952.2803516 | SuccessRate: 27.42% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.1859 | Wait Time: 49.9807 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.7279 | TBT_p95=0.2290 | TBT_p99=0.3708 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.41% TTLT: 9.1097 | Diff: 55.7086 | Violation: 55.7086 | TotalViolation: 734.3134 | Finished Time: 1769413952.2809222 | SuccessRate: 26.98% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.2338 | Wait Time: 49.9645 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.7017 | TBT_p95=0.2295 | TBT_p99=0.3666 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.88% TTLT: 9.0730 | Diff: 55.6662 | Violation: 55.6662 | TotalViolation: 734.3134 | Finished Time: 1769413952.2811003 | SuccessRate: 28.81% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.2924 | Wait Time: 49.9162 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.7001 | TBT_p95=0.2562 | TBT_p99=0.3692 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=73.33% TTLT: 9.0651 | Diff: 55.6163 | Violation: 55.6163 | TotalViolation: 734.3134 | Finished Time: 1769413952.281281 | SuccessRate: 28.33% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.3894 | Wait Time: 49.8813 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.6215 | TBT_p95=0.2245 | TBT_p99=0.3700 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=73.77% TTLT: 9.0076 | Diff: 55.5028 | Violation: 55.5028 | TotalViolation: 734.3134 | Finished Time: 1769413952.281689 | SuccessRate: 26.56% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.3328 | Wait Time: 49.9137 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 6.6446 | TBT_p95=0.2140 | TBT_p99=0.3619 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=74.19% TTLT: 9.0276 | Diff: 55.5583 | Violation: 55.5583 | TotalViolation: 734.3134 | Finished Time: 1769413952.2818646 | SuccessRate: 27.87% (17/64) | KV=0.373 run=9 wait=9 swap=3 VRAM=12.47GiB/15.00GiB
+[VQ0] groups=1065 head_deadline=1769413898.328 slack=-55.153 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413898.328, 1769413898.370, 1769413898.481, 1769413898.495, 1769413898.534
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.4527 | Wait Time: 8.5600 | prompt_tok= 3605 out_tok= 1024 total_tok= 4629 | TTFT: 2.5805 | TBT_p95=0.0630 | TBT_p99=0.2534 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=74.60% TTLT: 52.6964 | Diff: -138.7436 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.7195842 | SuccessRate: 29.85% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.2968 | Wait Time: 8.7240 | prompt_tok= 3280 out_tok= 1024 total_tok= 4304 | TTFT: 2.5149 | TBT_p95=0.0625 | TBT_p99=0.2469 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.00% TTLT: 52.6879 | Diff: -138.5881 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.7206118 | SuccessRate: 28.79% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.3698 | Wait Time: 8.5530 | prompt_tok= 3375 out_tok= 1025 total_tok= 4400 | TTFT: 1.1572 | TBT_p95=0.0643 | TBT_p99=0.2635 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.38% TTLT: 52.7868 | Diff: -138.6602 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.7258322 | SuccessRate: 30.88% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.3252 | Wait Time: 8.6190 | prompt_tok= 3159 out_tok= 1029 total_tok= 4188 | TTFT: 1.5913 | TBT_p95=0.0619 | TBT_p99=0.2512 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.76% TTLT: 52.7673 | Diff: -138.6137 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.728489 | SuccessRate: 31.88% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.2563 | Wait Time: 8.7124 | prompt_tok= 4701 out_tok= 1021 total_tok= 5722 | TTFT: 2.5772 | TBT_p95=0.0638 | TBT_p99=0.2483 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.12% TTLT: 52.7370 | Diff: -138.5506 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.7336168 | SuccessRate: 27.69% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.4007 | Wait Time: 8.6317 | prompt_tok= 3283 out_tok= 1024 total_tok= 4307 | TTFT: 2.5130 | TBT_p95=0.0644 | TBT_p99=0.2407 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.47% TTLT: 52.6820 | Diff: -138.6863 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413953.7360256 | SuccessRate: 32.86% (23/70) | KV=0.538 run=12 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[SORT] algo=timsort calls=1148 avg=0.750ms max=2.307ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413893.4525 | Wait Time: 58.8740 | prompt_tok= 3160 out_tok= 0 total_tok= 3160 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 2.2148 | Diff: -138.9112 | Violation: 0.0000 | TotalViolation: 734.3134 | Finished Time: 1769413954.554749 | SuccessRate: 33.80% (24/71) | KV=0.968 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.6229 | Wait Time: 60.1586 | prompt_tok= 27 out_tok= 0 total_tok= 27 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=1.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 1.1064 | Diff: 60.2650 | Violation: 60.2650 | TotalViolation: 794.5784 | Finished Time: 1769413954.888615 | SuccessRate: 33.33% (24/72) | KV=0.713 run=24 wait=2 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.5498 | Wait Time: 10.9976 | prompt_tok= 2996 out_tok= 1030 total_tok= 4026 | TTFT: 0.8232 | TBT_p95=0.0636 | TBT_p99=0.2512 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.81% TTLT: 52.2593 | Diff: -136.7430 | Violation: 0.0000 | TotalViolation: 794.5784 | Finished Time: 1769413955.8240337 | SuccessRate: 34.25% (26/74) | KV=0.744 run=27 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413892.5782 | Wait Time: 11.0877 | prompt_tok= 3367 out_tok= 1028 total_tok= 4395 | TTFT: 0.7038 | TBT_p95=0.0643 | TBT_p99=0.2512 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=77.14% TTLT: 52.1496 | Diff: -136.7627 | Violation: 0.0000 | TotalViolation: 794.5784 | Finished Time: 1769413955.8296337 | SuccessRate: 35.14% (26/74) | KV=0.744 run=27 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.6095 | Wait Time: 60.1670 | prompt_tok= 27 out_tok= 10 total_tok= 37 | TTFT: 1.1083 | TBT_p95=0.4528 | TBT_p99=0.4528 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=77.46% TTLT: 2.0904 | Diff: 60.2753 | Violation: 60.2753 | TotalViolation: 854.8537 | Finished Time: 1769413955.8783457 | SuccessRate: 34.67% (26/75) | KV=0.713 run=24 wait=2 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.4264 | Wait Time: 58.8891 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1152 | TBT_p95=1.0895 | TBT_p99=1.5337 | TBT_SLO=1.00 | TBT_Violation=0.5337 | TBT_SuccessRate=76.39% TTLT: 4.7327 | Diff: 58.0043 | Violation: 58.0043 | TotalViolation: 912.8580 | Finished Time: 1769413957.0563722 | SuccessRate: 34.21% (26/76) | KV=0.967 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.4663 | Wait Time: 58.8655 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.2080 | TBT_p95=1.0931 | TBT_p99=1.5266 | TBT_SLO=1.00 | TBT_Violation=0.5266 | TBT_SuccessRate=75.34% TTLT: 4.7778 | Diff: 58.0735 | Violation: 58.0735 | TotalViolation: 1087.0135 | Finished Time: 1769413957.117988 | SuccessRate: 33.33% (26/79) | KV=0.968 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.4945 | Wait Time: 58.8482 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1967 | TBT_p95=1.0904 | TBT_p99=1.5221 | TBT_SLO=1.00 | TBT_Violation=0.5221 | TBT_SuccessRate=74.32% TTLT: 4.7705 | Diff: 58.0449 | Violation: 58.0449 | TotalViolation: 1087.0135 | Finished Time: 1769413957.1181896 | SuccessRate: 32.91% (26/79) | KV=0.968 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.5082 | Wait Time: 58.8391 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1980 | TBT_p95=1.0903 | TBT_p99=1.5196 | TBT_SLO=1.00 | TBT_Violation=0.5196 | TBT_SuccessRate=73.33% TTLT: 4.7514 | Diff: 58.0371 | Violation: 58.0371 | TotalViolation: 1087.0135 | Finished Time: 1769413957.1183877 | SuccessRate: 33.77% (26/79) | KV=0.968 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.4811 | Wait Time: 58.9157 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.2501 | TBT_p95=1.0844 | TBT_p99=1.5305 | TBT_SLO=1.00 | TBT_Violation=0.5305 | TBT_SuccessRate=72.37% TTLT: 4.8135 | Diff: 58.1658 | Violation: 58.1658 | TotalViolation: 1145.1793 | Finished Time: 1769413957.2144186 | SuccessRate: 32.50% (26/80) | KV=0.968 run=25 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413893.8693 | Wait Time: 63.2812 | prompt_tok= 3940 out_tok= 0 total_tok= 3940 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 1.2935 | Diff: -135.4254 | Violation: 0.0000 | TotalViolation: 1145.1793 | Finished Time: 1769413958.459514 | SuccessRate: 33.33% (27/81) | KV=0.836 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[VQ0] groups=1169 head_deadline=1769413899.219 slack=-59.275 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.219, 1769413899.233, 1769413899.247, 1769413899.261, 1769413899.275
+[SORT] algo=timsort calls=1271 avg=0.804ms max=2.549ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769413893.7891 | Wait Time: 63.2897 | prompt_tok= 3808 out_tok= 10 total_tok= 3818 | TTFT: 0.5035 | TBT_p95=0.9453 | TBT_p99=0.9453 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.73% TTLT: 2.7645 | Diff: -133.9458 | Violation: 0.0000 | TotalViolation: 1145.1793 | Finished Time: 1769413959.8564916 | SuccessRate: 34.15% (28/82) | KV=0.838 run=31 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.6369 | Wait Time: 60.1603 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.0869 | TBT_p95=1.0963 | TBT_p99=1.3321 | TBT_SLO=1.00 | TBT_Violation=0.3321 | TBT_SuccessRate=71.79% TTLT: 6.8648 | Diff: 60.2472 | Violation: 60.2472 | TotalViolation: 1326.3170 | Finished Time: 1769413960.6716385 | SuccessRate: 33.33% (28/85) | KV=0.713 run=24 wait=2 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.5806 | Wait Time: 60.1589 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.1435 | TBT_p95=1.0893 | TBT_p99=1.3244 | TBT_SLO=1.00 | TBT_Violation=0.3244 | TBT_SuccessRate=70.89% TTLT: 6.9242 | Diff: 60.3025 | Violation: 60.3025 | TotalViolation: 1326.3170 | Finished Time: 1769413960.6725585 | SuccessRate: 32.94% (28/85) | KV=0.713 run=24 wait=2 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.6773 | Wait Time: 61.2343 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.3537 | TBT_p95=1.0890 | TBT_p99=1.3392 | TBT_SLO=1.00 | TBT_Violation=0.3392 | TBT_SuccessRate=70.00% TTLT: 5.7491 | Diff: 60.5881 | Violation: 60.5881 | TotalViolation: 1386.6072 | Finished Time: 1769413960.6824732 | SuccessRate: 33.73% (28/86) | KV=0.817 run=31 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.5955 | Wait Time: 60.1712 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.1190 | TBT_p95=1.0976 | TBT_p99=1.3307 | TBT_SLO=1.00 | TBT_Violation=0.3307 | TBT_SuccessRate=69.14% TTLT: 6.9101 | Diff: 60.2902 | Violation: 60.2902 | TotalViolation: 1386.6072 | Finished Time: 1769413960.6851795 | SuccessRate: 32.56% (28/86) | KV=0.713 run=24 wait=2 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.8056 | Wait Time: 63.3370 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.3033 | TBT_p95=0.4004 | TBT_p99=0.7488 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.51% TTLT: 4.5281 | Diff: 63.6404 | Violation: 63.6404 | TotalViolation: 1513.8026 | Finished Time: 1769413961.6778424 | SuccessRate: 32.18% (28/88) | KV=0.836 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.8843 | Wait Time: 63.3491 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 1.2061 | TBT_p95=0.4092 | TBT_p99=0.7519 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=69.88% TTLT: 4.4378 | Diff: 63.5551 | Violation: 63.5551 | TotalViolation: 1513.8026 | Finished Time: 1769413961.6780486 | SuccessRate: 31.82% (28/88) | KV=0.872 run=28 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.9728 | Wait Time: 66.7331 | prompt_tok= 27 out_tok= 26 total_tok= 53 | TTFT: 0.1455 | TBT_p95=0.0831 | TBT_p99=0.2285 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=70.24% TTLT: 1.9544 | Diff: 65.8786 | Violation: 65.8786 | TotalViolation: 1645.5469 | Finished Time: 1769413962.6750264 | SuccessRate: 31.11% (28/90) | KV=0.971 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.9864 | Wait Time: 66.7390 | prompt_tok= 27 out_tok= 25 total_tok= 52 | TTFT: 0.1267 | TBT_p95=0.0882 | TBT_p99=0.2011 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=70.59% TTLT: 1.9277 | Diff: 65.8657 | Violation: 65.8657 | TotalViolation: 1645.5469 | Finished Time: 1769413962.6798894 | SuccessRate: 31.46% (28/90) | KV=0.971 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413893.9589 | Wait Time: 66.7549 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1370 | TBT_p95=0.0899 | TBT_p99=0.2024 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=70.93% TTLT: 2.2574 | Diff: 65.8919 | Violation: 65.8919 | TotalViolation: 1777.2929 | Finished Time: 1769413962.979738 | SuccessRate: 30.77% (28/92) | KV=0.971 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.0006 | Wait Time: 66.7627 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.0914 | TBT_p95=0.0877 | TBT_p99=0.2201 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.26% TTLT: 2.2088 | Diff: 65.8541 | Violation: 65.8541 | TotalViolation: 1777.2929 | Finished Time: 1769413962.9887068 | SuccessRate: 30.43% (28/92) | KV=0.971 run=28 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[VQ0] groups=1247 head_deadline=1769413899.579 slack=-63.936 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.579, 1769413899.623, 1769413899.638, 1769413899.701, 1769413899.714
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.0144 | Wait Time: 67.7080 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1007 | TBT_p95=0.1061 | TBT_p99=0.2010 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.59% TTLT: 2.2181 | Diff: 66.8087 | Violation: 66.8087 | TotalViolation: 1844.1016 | Finished Time: 1769413963.941502 | SuccessRate: 30.11% (28/93) | KV=0.974 run=30 wait=0 swap=0 VRAM=12.47GiB/15.00GiB
+[SORT] algo=timsort calls=1355 avg=0.870ms max=13.107ms
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.1476 | Wait Time: 68.5673 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1815 | TBT_p95=0.1009 | TBT_p99=0.1064 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=71.91% TTLT: 2.3134 | Diff: 67.7487 | Violation: 67.7487 | TotalViolation: 1979.5527 | Finished Time: 1769413965.0299838 | SuccessRate: 29.79% (28/95) | KV=0.978 run=29 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.1945 | Wait Time: 68.5270 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1754 | TBT_p95=0.0895 | TBT_p99=0.0965 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.22% TTLT: 2.3078 | Diff: 67.7024 | Violation: 67.7024 | TotalViolation: 1979.5527 | Finished Time: 1769413965.0311182 | SuccessRate: 29.47% (28/95) | KV=0.978 run=29 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.3092 | Wait Time: 68.7206 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1858 | TBT_p95=0.0827 | TBT_p99=0.0884 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.53% TTLT: 2.2878 | Diff: 67.9064 | Violation: 67.9064 | TotalViolation: 2047.4591 | Finished Time: 1769413965.3303459 | SuccessRate: 29.17% (28/96) | KV=0.979 run=29 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.2959 | Wait Time: 68.7258 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1826 | TBT_p95=0.0901 | TBT_p99=0.0933 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=72.83% TTLT: 2.3109 | Diff: 67.9084 | Violation: 67.9084 | TotalViolation: 2115.3676 | Finished Time: 1769413965.3344307 | SuccessRate: 28.87% (28/97) | KV=0.979 run=29 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769413894.3509 | Wait Time: 69.6102 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 0.1343 | TBT_p95=0.0899 | TBT_p99=0.0943 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=73.12% TTLT: 2.2734 | Diff: 68.7444 | Violation: 68.7444 | TotalViolation: 2184.1120 | Finished Time: 1769413966.2385767 | SuccessRate: 28.57% (28/98) | KV=0.982 run=30 wait=1 swap=0 VRAM=12.47GiB/15.00GiB
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[VQ0] groups=1435 head_deadline=1769413899.766 slack=-68.754 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.766, 1769413899.818, 1769413899.989, 1769413900.003, 1769413900.044
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[SORT] algo=timsort calls=1569 avg=0.930ms max=13.107ms
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[VQ0] groups=1858 head_deadline=1769413899.766 slack=-73.760 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.766, 1769413899.818, 1769413899.989, 1769413900.003, 1769413900.044
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[SORT] algo=timsort calls=2039 avg=1.046ms max=13.107ms
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+[VQ0] groups=2322 head_deadline=1769413899.766 slack=-78.769 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.766, 1769413899.818, 1769413899.989, 1769413900.003, 1769413900.044
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[SORT] algo=timsort calls=2500 avg=1.190ms max=13.107ms
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[VQ0] groups=2724 head_deadline=1769413899.766 slack=-83.782 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769413899.766, 1769413899.818, 1769413899.989, 1769413900.003, 1769413900.044
+[SORT] algo=timsort calls=2919 avg=1.506ms max=514.735ms
