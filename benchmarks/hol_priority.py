@@ -173,8 +173,8 @@ async def basic_test():
     # --------- knobs (원하면 환경변수로 튜닝) ----------
     DATASET_PATH = os.environ.get("DATASET_PATH", "data/ShareGPT_V3_unfiltered_cleaned_split.json")
 
-    TARGET_COUNT = int(os.environ.get("TARGET_COUNT", "500"))
-    RUN_SECONDS = int(os.environ.get("RUN_SECONDS", "300"))
+    TARGET_COUNT = int(os.environ.get("TARGET_COUNT", "1000"))
+    RUN_SECONDS = int(os.environ.get("RUN_SECONDS", "600"))
     PUSH_INTERVAL_S = float(os.environ.get("PUSH_INTERVAL_S", "0"))
     PUSH_RATE_RPS = float(os.environ.get("PUSH_RATE_RPS", "0"))
     DRAIN_TIMEOUT_S = float(os.environ.get("DRAIN_TIMEOUT_S", "0"))
