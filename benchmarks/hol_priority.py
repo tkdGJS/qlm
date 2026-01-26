@@ -39,16 +39,16 @@ def summarize_lengths(name: str, lens: List[int]) -> None:
 
 def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
     """
-    하드코딩 피하려고 start_vllm.sh에서 --max-model-len 값을 파싱.
-    (프로젝트가 Endpoint -> start_vllm.sh로 vLLM 띄우는 구조라 이게 현실적으로 잘 맞음)
+    하드코딩 피하려고 start_vllm_swap.sh.sh에서 --max-model-len 값을 파싱.
+    (프로젝트가 Endpoint -> start_vllm_swap.sh.sh로 vLLM 띄우는 구조라 이게 현실적으로 잘 맞음)
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
     # 실행 위치에 따라 상대경로도 시도
-    candidates.append("start_vllm.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm.sh"))
+    candidates.append("start_vllm_swap.sh.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
@@ -66,14 +66,14 @@ def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
 
 def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
     """
-    start_vllm.sh에서 --max-num-batched-tokens 값을 파싱.
+    start_vllm_swap.sh.sh에서 --max-num-batched-tokens 값을 파싱.
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm.sh"))
-    candidates.append("start_vllm.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
+    candidates.append("start_vllm_swap.sh.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
@@ -92,14 +92,14 @@ def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
 
 def read_vllm_max_num_seqs_from_start_sh() -> Optional[int]:
     """
-    start_vllm.sh에서 --max-num-seqs 값을 파싱.
+    start_vllm_swap.sh.sh에서 --max-num-seqs 값을 파싱.
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm.sh"))
-    candidates.append("start_vllm.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
+    candidates.append("start_vllm_swap.sh.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
