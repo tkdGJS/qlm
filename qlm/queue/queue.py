@@ -71,7 +71,7 @@ class Queue:
         self._inflight_sems[worker] = asyncio.Semaphore(self.config.max_batch_size)
 
 
-    def push(self, prompt, model, insertion_time,slo, max_tokens=None, slo_type: int = 0):
+    def push(self, prompt, model, insertion_time, slo, max_tokens=None, slo_type: int = 0, priority: int | None = None):
         """
         Pushes a request to the virtual queue engine.
         :param prompt: The prompt for the request.
@@ -80,13 +80,14 @@ class Queue:
         :param insertion_time: The time at which the request was inserted into the queue. Insertion time is only used for SLO calculation and can be updated during request lifetime.
         :[SH]param max_tokens: (optional) max output tokens for generation
         :[SH]param seqno: input sequence number
+        :param priority: (optional) vLLM priority value
         """
         #
         #new_request = Request(
         #    prompt=prompt, model=model, slo=slo, insertion_time=insertion_time
         #)
         new_request = Request(
-            prompt=prompt, model=model, insertion_time=insertion_time,slo=slo, max_tokens=max_tokens, slo_type=slo_type
+            prompt=prompt, model=model, insertion_time=insertion_time,slo=slo, max_tokens=max_tokens, slo_type=slo_type, priority=priority,
         )
 
         self.vq_engine.add_request(new_request)
@@ -133,6 +134,7 @@ class Queue:
                                 request_to_serve.original_insertion_time,
                                 request_to_serve.max_tokens,  #[SH] 토큰 출력량 최대치 설정
                                 request_to_serve.slo_type,
+                                request_to_serve.priority,
                                 #================================================
                             )
                         )

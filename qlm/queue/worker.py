@@ -176,7 +176,7 @@ class Worker:
         if hasattr(self._client_local, "client"):
             del self._client_local.client
 
-    def add_request(self, prompt, model, insertion_time, original_slo, original_insertion_time, max_tokens=None, slo_type: int = 0):
+    def add_request(self, prompt, model, insertion_time, original_slo, original_insertion_time, max_tokens=None, slo_type: int = 0, priority: int | None = None,):
         """
         Add a request to the worker.
         :param prompt: The prompt to be added.
@@ -203,6 +203,8 @@ class Worker:
             kwargs = {}
             if max_tokens is not None:
                 kwargs["max_tokens"] = int(max_tokens)
+            if priority is not None:
+                kwargs["extra_body"] = {"priority": int(priority)}
 
             #completion = self.client.completions.create(model=model, prompt=prompt, **kwargs)
             output_text = ""

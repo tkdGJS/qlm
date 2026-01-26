@@ -39,5 +39,5 @@ done
 
 echo "Model: $MODEL"
 echo "Port: $PORT"
-vllm serve $MODEL --port $PORT --dtype=half --max-model-len 32768 --max-num-seqs 256 --preemption-mode swap --swap-space 16 --max-num-batched-tokens 131072 --gpu-memory-utilization 0.9
+vllm serve $MODEL --port $PORT --dtype=half --max-model-len 32768 --max-num-seqs 256 --scheduling-policy priority --preemption-mode swap --swap-space 16 --max-num-batched-tokens 131072 --gpu-memory-utilization 0.9
 #vllm serve $MODEL --port $PORT --max-model-len 32768 #--gpu-memory-utilization 0.8
