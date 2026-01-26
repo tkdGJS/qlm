@@ -10,12 +10,13 @@ SLEEPS=(0.001)
 #  - MODE=rps : PUSH_RATE_RPS로 sweep (권장)
 #  - MODE=interval : PUSH_INTERVAL_S로 sweep
 PUSH_MODE="interval"
-PUSH_RPS_LIST=(1 2 5 10 20 50)                         # PUSH_MODE=rps 일 때 사용
-PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
+PUSH_RPS_LIST=(1 2 5 10 20 50) # PUSH_MODE=rps 일 때 사용
+#PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
+PUSH_INTERVAL_LIST=(0.001) # PUSH_MODE=interval 일 때 사용
 #PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
-MAX_BATCH_SIZES=(20 40 60 80 100 120)
+MAX_BATCH_SIZES=(40 60 80 100 120)
 
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 DRAIN_TIMEOUT_S_DEFAULT=600
