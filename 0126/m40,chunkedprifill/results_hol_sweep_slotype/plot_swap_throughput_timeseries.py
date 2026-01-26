@@ -138,7 +138,7 @@ def build_timeseries(
         if is_mostly_monotone_nondec(sc):
             info["swap_mode"] = "swap_cnt_counter"
             swap_events = (g["_sc"].max() - g["_sc"].min()).fillna(0.0)
-            swap_metric = (swap_events / bin_s).rename("swap (count/s)")
+            swap_metric = (swap_events / bin_s).rename("swap_rate_per_s")
         else:
             info["swap_mode"] = f"swap_cnt_instant_{swap_agg}"
             if swap_agg == "max":
@@ -183,7 +183,7 @@ def build_timeseries(
         info["smoothing"] = "none"
 
     # swap-active mask for shading
-    swap_col = "swap (count/s)" if "swap (count/s)" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
+    swap_col = "swap_rate_per_s" if "swap_rate_per_s" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
     if swap_col is not None:
         ts["swap_active"] = (ts[swap_col] > swap_threshold).astype(int)
     else:
@@ -220,11 +220,11 @@ def plot_dual_axis(ts: pd.DataFrame, outdir: str, title_prefix: str):
     t = ts.index.to_numpy(dtype=float)
     y_thr = ts["throughput_rps"].to_numpy(dtype=float)
 
-    swap_col = "swap (count/s)" if "swap (count/s)" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
+    swap_col = "swap_rate_per_s" if "swap_rate_per_s" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
 
     fig, ax1 = plt.subplots(figsize=(10.5, 4.2))
     ax1.plot(t, y_thr, color="#1f77b4", label="throughput (req/s)")
-    ax1.set_xlabel("time (s)")
+    ax1.set_xlabel("time since run start (s)")
     ax1.set_ylabel("throughput (req/s)")
 
     shade_regions(ax1, t, ts["swap_active"].to_numpy(dtype=int))
@@ -249,7 +249,7 @@ def plot_normalized(ts: pd.DataFrame, outdir: str, title_prefix: str):
     if "throughput_rps" not in ts.columns:
         return
 
-    swap_col = "swap (count/s)" if "swap (count/s)" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
+    swap_col = "swap_rate_per_s" if "swap_rate_per_s" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
 
     thr = ts["throughput_rps"].astype(float)
     baseline = thr[ts["swap_active"] == 0].mean()
@@ -263,7 +263,7 @@ def plot_normalized(ts: pd.DataFrame, outdir: str, title_prefix: str):
 
     fig, ax1 = plt.subplots(figsize=(10.5, 4.2))
     ax1.plot(t, ts2["thr_norm"].to_numpy(dtype=float), color="#1f77b4", label="throughput / baseline")
-    ax1.set_xlabel("time (s)")
+    ax1.set_xlabel("time since run start (s)")
     ax1.set_ylabel("normalized throughput")
     ax1.axhline(1.0, color="gray", lw=1, ls="--", alpha=0.7)
 
@@ -288,7 +288,7 @@ def plot_scatter(ts: pd.DataFrame, outdir: str, title_prefix: str):
     if "throughput_rps" not in ts.columns:
         return
 
-    swap_col = "swap (count/s)" if "swap (count/s)" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
+    swap_col = "swap_rate_per_s" if "swap_rate_per_s" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
     if swap_col is None:
         return
 
@@ -308,7 +308,7 @@ def plot_lag_corr(ts: pd.DataFrame, outdir: str, title_prefix: str, max_lag_bins
     if "throughput_rps" not in ts.columns:
         return
 
-    swap_col = "swap (count/s)" if "swap (count/s)" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
+    swap_col = "swap_rate_per_s" if "swap_rate_per_s" in ts.columns else ("swap_cnt" if "swap_cnt" in ts.columns else None)
     if swap_col is None:
         return
 
