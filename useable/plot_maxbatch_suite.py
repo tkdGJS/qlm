@@ -318,7 +318,7 @@ def plot_goodput(runs: List[RunMetrics], outdir: str) -> None:
     plt.figure(figsize=(7, 4))
     plt.plot(df["mb"], df["rps"], marker="o", label="Throughput (req/s)")
     plt.plot(df["mb"], df["goodput"], marker="o", label="Goodput (SLO-satisfying req/s)")
-    plt.xlabel("Max batch size (mb)")
+    plt.xlabel("Max batch size")
     plt.ylabel("req/s")
     plt.title("Throughput vs Goodput")
     plt.legend()
@@ -328,9 +328,9 @@ def plot_goodput(runs: List[RunMetrics], outdir: str) -> None:
     plt.plot(df["mb"], df["viol"] * 100.0, marker="o", label="joint SLO violation")
     if df["tbt_viol"].notna().any():
         plt.plot(df["mb"], df["tbt_viol"] * 100.0, marker="o", label="tbt_violation column")
-    plt.xlabel("Max batch size (mb)")
+    plt.xlabel("Max batch size")
     plt.ylabel("Violation rate (%)")
-    plt.title("SLO Violation Rate vs mb")
+    plt.title("SLO Violation Rate vs max batch size")
     plt.legend()
     savefig(os.path.join(outdir, "slo_violation_vs_mb.png"))
 
@@ -353,9 +353,9 @@ def plot_latency_breakdown(runs: List[RunMetrics], outdir: str) -> None:
 
     plt.bar(mb, w, label="Queue(wait_time)")
     plt.bar(mb, s, bottom=w, label="Service(ttlt-wait)")
-    plt.xlabel("Max batch size (mb)")
+    plt.xlabel("Max batch size")
     plt.ylabel("Mean latency component (s)")
-    plt.title("Latency Breakdown (mean) vs mb")
+    plt.title("Latency Breakdown (mean) vs max batch size")
     plt.legend()
     savefig(os.path.join(outdir, "latency_breakdown_mean_vs_mb.png"))
 
@@ -375,7 +375,7 @@ def plot_cdf_by_mb(runs: List[RunMetrics], outdir: str) -> None:
     if any_plotted:
         plt.xlabel("TTFT (s)")
         plt.ylabel("ECDF")
-        plt.title("TTFT Distribution (ECDF) by mb")
+        plt.title("TTFT Distribution (ECDF) by max batch size")
         plt.legend(ncol=2, fontsize=9)
         savefig(os.path.join(outdir, "cdf_ttft_by_mb.png"))
     else:
@@ -396,7 +396,7 @@ def plot_cdf_by_mb(runs: List[RunMetrics], outdir: str) -> None:
     if any_plotted:
         plt.xlabel("TBT (s)")
         plt.ylabel("ECDF")
-        plt.title("TBT Distribution (ECDF) by mb")
+        plt.title("TBT Distribution (ECDF) by max batch size")
         plt.legend(ncol=2, fontsize=9)
         savefig(os.path.join(outdir, "cdf_tbt_by_mb.png"))
     else:
@@ -423,9 +423,9 @@ def plot_boxplots(runs: List[RunMetrics], outdir: str) -> None:
 
     plt.figure(figsize=(11, 5))
     sns.boxplot(data=all_df, x="mb", y="value", hue="metric", showfliers=False)
-    plt.xlabel("Max batch size (mb)")
+    plt.xlabel("Max batch size")
     plt.ylabel("Latency (s)")
-    plt.title("Latency Boxplot by mb")
+    plt.title("Latency Boxplot by max batch size")
     plt.legend(ncol=3, fontsize=9)
     savefig(os.path.join(outdir, "box_latency_by_mb.png"))
 
@@ -452,8 +452,8 @@ def plot_vram_vs_time(runs: List[RunMetrics], outdir: str) -> None:
         plotted = True
 
     if plotted:
-        plt.xlabel("time since run start (s)")
-        plt.ylabel("vram_used_gib")
+        plt.xlabel("time (s)")
+        plt.ylabel("vram (GiB)")
         plt.title("VRAM Used vs Time (per-request samples)")
         plt.legend(ncol=2, fontsize=9)
         savefig(os.path.join(outdir, "vram_used_timeseries_like.png"))

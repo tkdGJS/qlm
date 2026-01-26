@@ -300,7 +300,7 @@ def plot_kv_ratio_growth(df: pd.DataFrame, outdir: str) -> None:
         plt.figure(figsize=(7.5, 4.2))
         plt.plot(d["mb"], baseline_growth * 100.0, marker="o", label="vs baseline (%)")
         plt.plot(d["mb"], step_growth * 100.0, marker="o", label="step-to-step (%)")
-        plt.xlabel("mb")
+        plt.xlabel("max batch size")
         plt.ylabel("growth (%)")
         plt.title(f"KV Ratio Growth: {name}")
         plt.legend()
@@ -378,7 +378,7 @@ def plot_time_series_like(df_by_mb: Dict[int, pd.DataFrame], outdir: str) -> Non
             plotted = True
 
         if plotted:
-            plt.xlabel(f"time since run start (s) [{time_col}]")
+            plt.xlabel(f"time (s) [{time_col}]")
             plt.ylabel(label)
             plt.title(f"{label} over time (per-request samples)")
             plt.legend(ncol=2, fontsize=9)
