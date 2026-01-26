@@ -8,6 +8,7 @@ from qlm.endpoints.endpoint import Endpoint
 import time
 import itertools
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 class Queue:
     """
@@ -99,6 +100,9 @@ class Queue:
         If the worker can handle the request, the request is popped from the virtual queue engine and added to the worker.
         """
         last_print_time=0
+        #[SH] max_workers 늘리기
+        loop = asyncio.get_running_loop()
+        loop.set_default_executor(ThreadPoolExecutor(max_workers=256))
         while True:
             self.vq_engine.reorder_vqs()
             # === [추가된 로직: 1초마다 상태 출력] ===

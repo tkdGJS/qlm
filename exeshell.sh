@@ -17,5 +17,5 @@ KEEPALIVE_PID=$!
 trap 'kill $KEEPALIVE_PID 2>/dev/null || true' EXIT
 
 # 원하는 두 스크립트 실행
-bash ./run_hol_sweep_dynamic_request.sh
-bash ./run_hol_sweep_dynamic_slotype.sh
+bash ./run_hol_sweep_dynamic_slotype_maxbatch_priority.sh
+bash ./run_hol_sweep_dynamic_slotype_maxbatch.sh
