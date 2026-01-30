@@ -4,7 +4,7 @@ set -euo pipefail
 # ====== 설정 ======
 # sweep 할 값들 (원하는대로 수정)
 #SLEEPS=(0.001 0.005 0.01 0.05 0.1)
-SLEEPS=(0.001)
+SLEEPS=(0.0001 0.001 0.01)
 
 # VQ push 속도 sweep:
 #  - MODE=rps : PUSH_RATE_RPS로 sweep (권장)
@@ -12,12 +12,13 @@ SLEEPS=(0.001)
 PUSH_MODE="interval"
 PUSH_RPS_LIST=(1 2 5 10 20 50) # PUSH_MODE=rps 일 때 사용
 #PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
-PUSH_INTERVAL_LIST=(0.001) # PUSH_MODE=interval 일 때 사용
+PUSH_INTERVAL_LIST=(0.0001 0.001 0.01) # PUSH_MODE=interval 일 때 사용
 #PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
-MAX_BATCH_SIZES=(80 60 40 20)
+MAX_BATCH_SIZES=(100 80 60 40 20)
 
+CHUNKED_PREFILL_VALUES=(0 1)
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 #DRAIN_TIMEOUT_S_DEFAULT=600
 DRAIN_TIMEOUT_S_DEFAULT=30
@@ -170,6 +171,7 @@ run_one() {
   local push_mode="$2"
   local push_val="$3"
   local mb="$4"
+  local chunked_prefill="$5"
 
   local ts
   ts="$(timestamp)"
@@ -181,11 +183,11 @@ run_one() {
     push_tag="pushint_${push_val}"
   fi
 
-  local base="timsort_hol_sleep_${sleep_s}_${push_tag}_mb${mb}_${ts}"
+  local base="timsort_hol_sleep_${sleep_s}_${push_tag}_mb${mb}_chunked_${chunked_prefill}_${ts}"
   local log_file="${OUT_DIR}/${base}.txt"
   local csv_file="${OUT_DIR}/${base}.csv"
 
-  log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
+  log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
 
   log "Pre-rest ${REST_SEC}s..."
   sleep "$REST_SEC"
@@ -204,6 +206,8 @@ run_one() {
       DRAIN_TIMEOUT_S="${DRAIN_TIMEOUT_S_DEFAULT}" \
       PUSH_INTERVAL_S="0" \
       PUSH_RATE_RPS="${push_val}" \
+      CHUNKED_PREFILL="${chunked_prefill}" \
+      VLLM_ENABLE_CHUNKED_PREFILL="${chunked_prefill}" \
       "${BENCH_CMD[@]}" >>"${log_file}"
   else
     QLM_QUEUE_LOOP_SLEEP="${sleep_s}" \
@@ -212,6 +216,8 @@ run_one() {
       DRAIN_TIMEOUT_S="${DRAIN_TIMEOUT_S_DEFAULT}" \
       PUSH_INTERVAL_S="${push_val}" \
       PUSH_RATE_RPS="0" \
+      CHUNKED_PREFILL="${chunked_prefill}" \
+      VLLM_ENABLE_CHUNKED_PREFILL="${chunked_prefill}" \
       "${BENCH_CMD[@]}" >>"${log_file}"
   fi
 
@@ -230,7 +236,7 @@ run_one() {
   log "Post-rest ${REST_SEC}s..."
   sleep "$REST_SEC"
 
-  log "---- Experiment end: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val} ----"
+  log "---- Experiment end: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill} ----"
   echo
 }
 
@@ -263,6 +269,7 @@ main() {
   log "Output dir: ${OUT_DIR}"
   log "CONFIG_FILE: ${CONFIG_FILE} (backup: ${BACKUP_FILE})"
   log "MAX_BATCH_SIZES: ${MAX_BATCH_SIZES[*]}"
+  log "CHUNKED_PREFILL_VALUES: ${CHUNKED_PREFILL_VALUES[*]}"
   log "SLEEPS: ${SLEEPS[*]}"
   log "PUSH_MODE: ${PUSH_MODE}"
   log "PUSH_RPS_LIST: ${PUSH_RPS_LIST[*]}"
@@ -279,16 +286,18 @@ main() {
     log "=== Setting max_batch_size=${mb} in ${CONFIG_FILE} ==="
     set_max_batch_size "$CONFIG_FILE" "$mb"
 
-    for s in "${SLEEPS[@]}"; do
-      if [[ "$PUSH_MODE" == "rps" ]]; then
-        for r in "${PUSH_RPS_LIST[@]}"; do
-          run_one "$s" "rps" "$r" "$mb"
-        done
-      else
-        for itv in "${PUSH_INTERVAL_LIST[@]}"; do
-          run_one "$s" "interval" "$itv" "$mb"
-        done
-      fi
+    for chunked in "${CHUNKED_PREFILL_VALUES[@]}"; do
+      for s in "${SLEEPS[@]}"; do
+        if [[ "$PUSH_MODE" == "rps" ]]; then
+          for r in "${PUSH_RPS_LIST[@]}"; do
+            run_one "$s" "rps" "$r" "$mb" "$chunked"
+          done
+        else
+          for itv in "${PUSH_INTERVAL_LIST[@]}"; do
+            run_one "$s" "interval" "$itv" "$mb" "$chunked"
+          done
+        fi
+      done
     done
   done
 

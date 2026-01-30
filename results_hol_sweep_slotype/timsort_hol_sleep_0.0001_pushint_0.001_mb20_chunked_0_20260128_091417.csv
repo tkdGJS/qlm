@@ -1,0 +1,1 @@
+orig_slo,slo_type,insertion_time,wait_time,prompt_tok,out_tok,total_tok,ttft,tbt_p95,tbt_p99,tbt_slo,tbt_violation,tbt_success_rate_pct,ttlt,diff,violation,total_violation,finished_time,success_rate_pct,success_count,processed_count,kv,run_cnt,wait_cnt,swap_cnt,vram_used_gib,vram_total_gib,vq_id,vq_groups,head_deadline,slack,model,deadlines

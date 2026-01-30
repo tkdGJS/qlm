@@ -1,0 +1,410 @@
+=== Basic Benchmark Test (PREFIX mode) ===
+[LEN] vllm_max_len=None, tokenizer.model_max_length=131072 -> effective=131072
+[LEN] max_prompt_tokens_short=131032, prefix_short_tokens=11 -> max_base_prompt_short=131021
+[LEN] max_prompt_tokens_long =130040,  prefix_long_tokens =16  -> max_base_prompt_long =130024
+Starting server and wait to load model weights
+Server started at localhost:8000 with model meta-llama/Llama-3.2-1B-Instruct
+Waiting for vLLM server to start...
+Worker ea165012-fc4b-4caa-9add-4b5aec5e46e2 registered at http://localhost:8000
+
+[Part 2] Loading dataset from: data/ShareGPT_V3_unfiltered_cleaned_split.json
+dataset1_candidates(first-pair, base<=short-limit): 58765
+dataset2_candidates(first-pair, base<=long-limit)      : 58765
+too_long_long(>long base-limit)                         : 1
+[dataset1_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[dataset2_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[DEBUG] wrote 1 rows -> debug/debug_too_long_for_long_top50.jsonl
+dataset1 chosen: 1000 | base_tok_range ~ 16..16
+dataset2 chosen: 1000 | base_tok_range ~ 2384..96290
+[DEBUG] wrote 50 rows -> debug/debug_dataset1_sample_base.jsonl
+[DEBUG] wrote 50 rows -> debug/debug_dataset2_sample_base.jsonl
+!!! BENCHMARK START TIME: 1769578566.4206443 !!!
+Pushing for 600s (ORDER_MODE=shuffle)
+  push_interval_s=0.010000
+  dataset1: max_tokens=32, prefix=ON
+  dataset2: max_tokens=1024,  prefix=ON
+[VQ0] groups=1 head_deadline=1769578766.433 slack=200.000 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578766.433
+[SORT] algo=timsort calls=1 avg=0.033ms max=0.033ms
+[VQ0] groups=278 head_deadline=1769578567.444 slack=-3.991 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=1348 avg=0.104ms max=1.265ms
+[VQ0] groups=573 head_deadline=1769578567.444 slack=-8.992 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=2702 avg=0.195ms max=1.598ms
+[SORT] algo=timsort calls=3999 avg=0.286ms max=2.689ms
+[VQ0] groups=873 head_deadline=1769578567.444 slack=-14.022 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=5183 avg=0.375ms max=2.689ms
+[VQ0] groups=1172 head_deadline=1769578567.444 slack=-19.024 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=6186 avg=0.454ms max=2.689ms
+[VQ0] groups=1441 head_deadline=1769578567.444 slack=-24.047 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=7184 avg=0.537ms max=3.807ms
+[VQ0] groups=1717 head_deadline=1769578567.444 slack=-29.049 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=8156 avg=0.619ms max=3.807ms
+[VQ0] groups=1997 head_deadline=1769578567.444 slack=-34.050 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=9029 avg=0.743ms max=368.943ms
+[VQ0] groups=2281 head_deadline=1769578567.444 slack=-39.051 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=9922 avg=0.834ms max=368.943ms
+[VQ0] groups=2579 head_deadline=1769578567.444 slack=-44.052 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=10742 avg=0.953ms max=368.943ms
+[VQ0] groups=2853 head_deadline=1769578567.444 slack=-49.055 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=11504 avg=1.064ms max=368.943ms
+[VQ0] groups=3111 head_deadline=1769578567.444 slack=-54.055 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=12143 avg=1.182ms max=368.943ms
+[VQ0] groups=3341 head_deadline=1769578567.444 slack=-59.064 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=12769 avg=1.295ms max=368.943ms
+[VQ0] groups=3577 head_deadline=1769578567.444 slack=-64.065 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=13345 avg=1.405ms max=368.943ms
+[VQ0] groups=3816 head_deadline=1769578567.444 slack=-69.065 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=13920 avg=1.512ms max=368.943ms
+[VQ0] groups=4079 head_deadline=1769578567.444 slack=-74.283 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=14391 avg=1.608ms max=368.943ms
+[VQ0] groups=4314 head_deadline=1769578567.444 slack=-79.286 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=14889 avg=1.726ms max=368.943ms
+[VQ0] groups=4563 head_deadline=1769578567.444 slack=-84.290 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=15318 avg=1.821ms max=368.943ms
+[VQ0] groups=4780 head_deadline=1769578567.444 slack=-89.295 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=15738 avg=1.947ms max=368.943ms
+[VQ0] groups=4992 head_deadline=1769578567.444 slack=-94.306 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=16198 avg=2.063ms max=368.943ms
+[VQ0] groups=5223 head_deadline=1769578567.444 slack=-99.308 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=16632 avg=2.191ms max=368.943ms
+[VQ0] groups=5442 head_deadline=1769578567.444 slack=-104.564 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=17068 avg=2.312ms max=368.943ms
+[VQ0] groups=5662 head_deadline=1769578567.444 slack=-109.566 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=17455 avg=2.427ms max=368.943ms
+[VQ0] groups=5859 head_deadline=1769578567.444 slack=-114.571 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=17825 avg=2.552ms max=368.943ms
+[VQ0] groups=6047 head_deadline=1769578567.444 slack=-119.698 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=18189 avg=2.662ms max=368.943ms
+[VQ0] groups=6232 head_deadline=1769578567.444 slack=-124.699 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=18569 avg=2.787ms max=368.943ms
+[VQ0] groups=6423 head_deadline=1769578567.444 slack=-129.959 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=18905 avg=2.893ms max=368.943ms
+[VQ0] groups=6595 head_deadline=1769578567.444 slack=-134.961 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=19268 avg=3.013ms max=368.943ms
+[VQ0] groups=6779 head_deadline=1769578567.444 slack=-140.152 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=19572 avg=3.130ms max=368.943ms
+[VQ0] groups=6938 head_deadline=1769578567.444 slack=-145.168 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=19870 avg=3.246ms max=368.943ms
+[VQ0] groups=7095 head_deadline=1769578567.444 slack=-150.190 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=20172 avg=3.359ms max=368.943ms
+[VQ0] groups=7255 head_deadline=1769578567.444 slack=-155.200 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=20482 avg=3.471ms max=368.943ms
+[VQ0] groups=7418 head_deadline=1769578567.444 slack=-160.213 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=20773 avg=3.592ms max=368.943ms
+[VQ0] groups=7572 head_deadline=1769578567.444 slack=-165.217 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=21050 avg=3.712ms max=368.943ms
+[VQ0] groups=7726 head_deadline=1769578567.444 slack=-170.222 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=21332 avg=3.818ms max=368.943ms
+[VQ0] groups=7894 head_deadline=1769578567.444 slack=-175.242 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=21590 avg=3.933ms max=368.943ms
+[VQ0] groups=8055 head_deadline=1769578567.444 slack=-180.243 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=21828 avg=4.045ms max=368.943ms
+[VQ0] groups=8226 head_deadline=1769578567.444 slack=-185.397 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=22077 avg=4.156ms max=368.943ms
+[VQ0] groups=8406 head_deadline=1769578567.444 slack=-190.398 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=22308 avg=4.267ms max=368.943ms
+[VQ0] groups=8585 head_deadline=1769578567.444 slack=-195.468 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=22547 avg=4.365ms max=368.943ms
+[VQ0] groups=8778 head_deadline=1769578567.444 slack=-200.480 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=22749 avg=4.464ms max=368.943ms
+[VQ0] groups=8959 head_deadline=1769578567.444 slack=-205.482 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=22954 avg=4.574ms max=368.943ms
+[VQ0] groups=9150 head_deadline=1769578567.444 slack=-210.504 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=23143 avg=4.681ms max=368.943ms
+[VQ0] groups=9335 head_deadline=1769578567.444 slack=-215.508 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=23332 avg=4.788ms max=368.943ms
+[VQ0] groups=9522 head_deadline=1769578567.444 slack=-220.671 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=23521 avg=4.895ms max=368.943ms
+[VQ0] groups=9709 head_deadline=1769578567.444 slack=-225.675 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=23704 avg=5.002ms max=368.943ms
+[VQ0] groups=9891 head_deadline=1769578567.444 slack=-230.681 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=23892 avg=5.109ms max=368.943ms
+[VQ0] groups=10079 head_deadline=1769578567.444 slack=-235.692 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24067 avg=5.228ms max=368.943ms
+[VQ0] groups=10254 head_deadline=1769578567.444 slack=-240.883 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24264 avg=5.326ms max=368.943ms
+[VQ0] groups=10451 head_deadline=1769578567.444 slack=-245.944 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24440 avg=5.434ms max=368.943ms
+[VQ0] groups=10627 head_deadline=1769578567.444 slack=-250.948 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24621 avg=5.529ms max=368.943ms
+[VQ0] groups=10808 head_deadline=1769578567.444 slack=-255.970 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24772 avg=5.631ms max=368.943ms
+[VQ0] groups=10959 head_deadline=1769578567.444 slack=-261.017 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=24945 avg=5.749ms max=368.943ms
+[VQ0] groups=11132 head_deadline=1769578567.444 slack=-266.282 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25102 avg=5.852ms max=368.943ms
+[VQ0] groups=11289 head_deadline=1769578567.444 slack=-271.303 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25252 avg=5.966ms max=368.943ms
+[VQ0] groups=11439 head_deadline=1769578567.444 slack=-276.311 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25413 avg=6.080ms max=368.943ms
+[VQ0] groups=11600 head_deadline=1769578567.444 slack=-281.555 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25564 avg=6.181ms max=368.943ms
+[VQ0] groups=11751 head_deadline=1769578567.444 slack=-286.558 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25714 avg=6.293ms max=368.943ms
+[VQ0] groups=11901 head_deadline=1769578567.444 slack=-291.583 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25854 avg=6.403ms max=368.943ms
+[VQ0] groups=12041 head_deadline=1769578567.444 slack=-296.597 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=25983 avg=6.500ms max=368.943ms
+[VQ0] groups=12170 head_deadline=1769578567.444 slack=-301.759 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26123 avg=6.600ms max=368.943ms
+[VQ0] groups=12310 head_deadline=1769578567.444 slack=-306.779 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26266 avg=6.713ms max=368.943ms
+[VQ0] groups=12453 head_deadline=1769578567.444 slack=-311.952 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26403 avg=6.826ms max=368.943ms
+[VQ0] groups=12590 head_deadline=1769578567.444 slack=-317.226 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26543 avg=6.937ms max=368.943ms
+[VQ0] groups=12730 head_deadline=1769578567.444 slack=-322.311 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26680 avg=7.048ms max=368.943ms
+[VQ0] groups=12867 head_deadline=1769578567.444 slack=-327.510 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26819 avg=7.157ms max=368.943ms
+[VQ0] groups=13006 head_deadline=1769578567.444 slack=-332.606 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=26948 avg=7.264ms max=368.943ms
+[VQ0] groups=13135 head_deadline=1769578567.444 slack=-337.880 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27084 avg=7.372ms max=368.943ms
+[VQ0] groups=13271 head_deadline=1769578567.444 slack=-342.882 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27208 avg=7.479ms max=368.943ms
+[VQ0] groups=13395 head_deadline=1769578567.444 slack=-347.933 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27340 avg=7.589ms max=368.943ms
+[VQ0] groups=13527 head_deadline=1769578567.444 slack=-353.127 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27469 avg=7.697ms max=368.943ms
+[VQ0] groups=13656 head_deadline=1769578567.444 slack=-358.274 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27589 avg=7.802ms max=368.943ms
+[VQ0] groups=13776 head_deadline=1769578567.444 slack=-363.407 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27708 avg=7.907ms max=368.943ms
+[VQ0] groups=13895 head_deadline=1769578567.444 slack=-368.590 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27832 avg=8.012ms max=368.943ms
+[VQ0] groups=14019 head_deadline=1769578567.444 slack=-373.609 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=27946 avg=8.117ms max=368.943ms
+[VQ0] groups=14133 head_deadline=1769578567.444 slack=-378.696 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28065 avg=8.220ms max=368.943ms
+[VQ0] groups=14252 head_deadline=1769578567.444 slack=-383.765 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28193 avg=8.325ms max=368.943ms
+[VQ0] groups=14380 head_deadline=1769578567.444 slack=-388.774 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28313 avg=8.429ms max=368.943ms
+[VQ0] groups=14500 head_deadline=1769578567.444 slack=-393.777 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28437 avg=8.544ms max=368.943ms
+[VQ0] groups=14624 head_deadline=1769578567.444 slack=-399.009 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28553 avg=8.637ms max=368.943ms
+[VQ0] groups=14740 head_deadline=1769578567.444 slack=-404.016 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28672 avg=8.750ms max=368.943ms
+[VQ0] groups=14859 head_deadline=1769578567.444 slack=-409.310 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28788 avg=8.852ms max=368.943ms
+[VQ0] groups=14975 head_deadline=1769578567.444 slack=-414.512 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=28903 avg=8.954ms max=368.943ms
+[VQ0] groups=15090 head_deadline=1769578567.444 slack=-419.617 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29020 avg=9.058ms max=368.943ms
+[VQ0] groups=15207 head_deadline=1769578567.444 slack=-424.617 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29130 avg=9.168ms max=368.943ms
+[VQ0] groups=15317 head_deadline=1769578567.444 slack=-429.797 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29244 avg=9.268ms max=368.943ms
+[VQ0] groups=15431 head_deadline=1769578567.444 slack=-434.797 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29343 avg=9.367ms max=368.943ms
+[VQ0] groups=15530 head_deadline=1769578567.444 slack=-440.059 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29453 avg=9.466ms max=368.943ms
+[VQ0] groups=15640 head_deadline=1769578567.444 slack=-445.060 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29568 avg=9.567ms max=368.943ms
+[VQ0] groups=15755 head_deadline=1769578567.444 slack=-450.077 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29673 avg=9.665ms max=368.943ms
+[VQ0] groups=15860 head_deadline=1769578567.444 slack=-455.086 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29781 avg=9.764ms max=368.943ms
+[VQ0] groups=15968 head_deadline=1769578567.444 slack=-460.087 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29891 avg=9.863ms max=368.943ms
+[VQ0] groups=16078 head_deadline=1769578567.444 slack=-465.097 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=29982 avg=9.957ms max=368.943ms
+[VQ0] groups=16169 head_deadline=1769578567.444 slack=-470.155 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30073 avg=10.047ms max=368.943ms
+[VQ0] groups=16260 head_deadline=1769578567.444 slack=-475.173 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30181 avg=10.147ms max=368.943ms
+[VQ0] groups=16368 head_deadline=1769578567.444 slack=-480.177 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30277 avg=10.245ms max=368.943ms
+[VQ0] groups=16464 head_deadline=1769578567.444 slack=-485.273 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30382 avg=10.347ms max=368.943ms
+[VQ0] groups=16569 head_deadline=1769578567.444 slack=-490.597 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30484 avg=10.443ms max=368.943ms
+[VQ0] groups=16671 head_deadline=1769578567.444 slack=-495.611 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30588 avg=10.540ms max=368.943ms
+[VQ0] groups=16775 head_deadline=1769578567.444 slack=-500.641 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30691 avg=10.645ms max=368.943ms
+[VQ0] groups=16878 head_deadline=1769578567.444 slack=-505.820 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30788 avg=10.741ms max=368.943ms
+[VQ0] groups=16975 head_deadline=1769578567.444 slack=-510.822 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30893 avg=10.837ms max=368.943ms
+[VQ0] groups=17080 head_deadline=1769578567.444 slack=-515.830 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=30993 avg=10.932ms max=368.943ms
+[VQ0] groups=17180 head_deadline=1769578567.444 slack=-520.838 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31094 avg=11.036ms max=368.943ms
+[VQ0] groups=17281 head_deadline=1769578567.444 slack=-526.140 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31191 avg=11.131ms max=368.943ms
+[VQ0] groups=17379 head_deadline=1769578567.444 slack=-531.162 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31293 avg=11.227ms max=368.943ms
+[VQ0] groups=17481 head_deadline=1769578567.444 slack=-536.193 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31389 avg=11.329ms max=368.943ms
+[VQ0] groups=17576 head_deadline=1769578567.444 slack=-541.241 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31482 avg=11.424ms max=368.943ms
+[VQ0] groups=17669 head_deadline=1769578567.444 slack=-546.252 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31587 avg=11.519ms max=368.943ms
+[VQ0] groups=17774 head_deadline=1769578567.444 slack=-551.280 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31684 avg=11.623ms max=368.943ms
+[VQ0] groups=17871 head_deadline=1769578567.444 slack=-556.429 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31779 avg=11.717ms max=368.943ms
+[VQ0] groups=17966 head_deadline=1769578567.444 slack=-561.445 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31873 avg=11.811ms max=368.943ms
+[VQ0] groups=18060 head_deadline=1769578567.444 slack=-566.467 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=31968 avg=11.914ms max=368.943ms
+[VQ0] groups=18155 head_deadline=1769578567.444 slack=-571.790 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=32062 avg=12.008ms max=368.943ms
+[VQ0] groups=18249 head_deadline=1769578567.444 slack=-576.811 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=32156 avg=12.102ms max=368.943ms
+[VQ0] groups=18343 head_deadline=1769578567.444 slack=-581.827 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=32250 avg=12.205ms max=368.943ms
+[VQ0] groups=18437 head_deadline=1769578567.444 slack=-587.138 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=32342 avg=12.299ms max=368.943ms
+[VQ0] groups=18529 head_deadline=1769578567.444 slack=-592.171 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+[SORT] algo=timsort calls=32430 avg=12.393ms max=368.943ms
+[VQ0] groups=18617 head_deadline=1769578567.444 slack=-597.261 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Successfully pushed 18651 requests (logged 500).
+Now waiting for processing...
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=32533 avg=12.496ms max=368.943ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-602.425 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=32641 avg=12.599ms max=372.981ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-607.437 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=32750 avg=12.710ms max=372.981ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-612.756 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=32860 avg=12.811ms max=372.981ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-617.756 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=32967 avg=12.919ms max=372.981ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-623.009 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+[SORT] algo=timsort calls=33077 avg=13.019ms max=372.981ms
+[VQ0] groups=18651 head_deadline=1769578567.444 slack=-628.025 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769578567.444, 1769578567.456, 1769578567.487, 1769578567.498, 1769578567.509
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18651]
+Drain timeout reached. Exiting.

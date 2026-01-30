@@ -1,0 +1,595 @@
+=== Basic Benchmark Test (PREFIX mode) ===
+[LEN] vllm_max_len=None, tokenizer.model_max_length=131072 -> effective=131072
+[LEN] max_prompt_tokens_short=131032, prefix_short_tokens=11 -> max_base_prompt_short=131021
+[LEN] max_prompt_tokens_long =130040,  prefix_long_tokens =16  -> max_base_prompt_long =130024
+Starting server and wait to load model weights
+Server started at localhost:8000 with model meta-llama/Llama-3.2-1B-Instruct
+Waiting for vLLM server to start...
+Worker f82db5a6-f06d-4e58-a3bb-a894e8e66d99 registered at http://localhost:8000
+
+[Part 2] Loading dataset from: data/ShareGPT_V3_unfiltered_cleaned_split.json
+dataset1_candidates(first-pair, base<=short-limit): 58765
+dataset2_candidates(first-pair, base<=long-limit)      : 58765
+too_long_long(>long base-limit)                         : 1
+[dataset1_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[dataset2_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[DEBUG] wrote 1 rows -> debug/debug_too_long_for_long_top50.jsonl
+dataset1 chosen: 1000 | base_tok_range ~ 16..16
+dataset2 chosen: 1000 | base_tok_range ~ 2384..96290
+[DEBUG] wrote 50 rows -> debug/debug_dataset1_sample_base.jsonl
+[DEBUG] wrote 50 rows -> debug/debug_dataset2_sample_base.jsonl
+!!! BENCHMARK START TIME: 1769515436.7123628 !!!
+Pushing for 600s (ORDER_MODE=shuffle)
+  push_interval_s=0.001000
+  dataset1: max_tokens=32, prefix=ON
+  dataset2: max_tokens=1024,  prefix=ON
+[VQ0] groups=1 head_deadline=1769515636.725 slack=200.000 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515636.725
+[Warning] stream error (attempt 1/2): Error code: 400 - {'object': 'error', 'message': "This model's maximum context length is 8192 tokens. However, you requested 9210 tokens (8186 in the messages, 1024 in the completion). Please reduce the length of the messages or completion.", 'type': 'BadRequestError', 'param': None, 'code': 400}
+Error in adding request: Error code: 400 - {'object': 'error', 'message': "This model's maximum context length is 8192 tokens. However, you requested 9210 tokens (8186 in the messages, 1024 in the completion). Please reduce the length of the messages or completion.", 'type': 'BadRequestError', 'param': None, 'code': 400}
+[SORT] algo=timsort calls=1 avg=0.032ms max=0.032ms
+[VQ0] groups=115 head_deadline=1769515440.301 slack=-1.432 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.301, 1769515440.353, 1769515440.474, 1769515440.546, 1769515440.618
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769515436.9470 | Wait Time: 0.0364 | prompt_tok= 27 out_tok= 0 total_tok= 27 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=1.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 5.3330 | Diff: 4.3694 | Violation: 4.3694 | TotalViolation: 4.3694 | Finished Time: 1769515443.040573 | SuccessRate: 0.00% (0/1) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.56GiB/15.00GiB
+[SORT] algo=timsort calls=174 avg=0.116ms max=0.573ms
+[VQ0] groups=251 head_deadline=1769515440.353 slack=-6.425 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.353, 1769515440.474, 1769515440.546, 1769515440.618, 1769515440.632
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769515437.8927 | Wait Time: 0.0450 | prompt_tok= 27 out_tok= 0 total_tok= 27 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=1.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 10.4247 | Diff: 9.4697 | Violation: 9.4697 | TotalViolation: 13.8391 | Finished Time: 1769515448.3679998 | SuccessRate: 33.33% (1/3) | KV=0.456 run=33 wait=3 swap=0 VRAM=10.70GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769515437.6855 | Wait Time: 0.0334 | prompt_tok= 2664 out_tok= 0 total_tok= 2664 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 10.6322 | Diff: -189.3344 | Violation: 0.0000 | TotalViolation: 13.8391 | Finished Time: 1769515448.369042 | SuccessRate: 50.00% (1/3) | KV=0.061 run=8 wait=2 swap=0 VRAM=10.70GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769515437.1371 | Wait Time: 0.0339 | prompt_tok= 27 out_tok= 8 total_tok= 35 | TTFT: 5.1501 | TBT_p95=6.1847 | TBT_p99=6.1847 | TBT_SLO=1.00 | TBT_Violation=5.1847 | TBT_SuccessRate=0.00% TTLT: 11.9492 | Diff: 4.1840 | Violation: 4.1840 | TotalViolation: 18.0231 | Finished Time: 1769515449.1545348 | SuccessRate: 25.00% (1/4) | KV=0.061 run=8 wait=2 swap=0 VRAM=7.39GiB/15.00GiB
+[SORT] algo=timsort calls=312 avg=0.176ms max=0.707ms
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769515438.3040 | Wait Time: 0.0328 | prompt_tok= 27 out_tok= 18 total_tok= 45 | TTFT: 10.0072 | TBT_p95=0.1514 | TBT_p99=0.1514 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=50.00% TTLT: 11.5656 | Diff: 9.0400 | Violation: 9.0400 | TotalViolation: 27.0630 | Finished Time: 1769515449.944167 | SuccessRate: 20.00% (1/5) | KV=0.456 run=33 wait=3 swap=0 VRAM=10.70GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769515438.1431 | Wait Time: 0.0357 | prompt_tok= 27 out_tok= 25 total_tok= 52 | TTFT: 10.1890 | TBT_p95=0.1168 | TBT_p99=0.1316 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 12.2674 | Diff: 9.2247 | Violation: 9.2247 | TotalViolation: 36.2877 | Finished Time: 1769515450.4515328 | SuccessRate: 16.67% (1/6) | KV=0.456 run=33 wait=3 swap=0 VRAM=10.70GiB/15.00GiB
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+@       $       †Ï(  ∞Ï(  Ä      4       †(  ∞(                         ±       ˚(   €(  ˇˇˇˇˇˇˇˇ    ˇˇˇˇ        a       `œ(  ‡Ó(  @       A        (  Ä  (         !       ¿Œ(  `œ(  ê       4       `‡(  ˇˇˇˇ           Û(  Ä       Ò       @Ï(   ÷(                          a       `œ(  ‡Ô(  @       !       @(  Ä  (  @       $       ¿Ï(   Ltd.   ê       4       êŸ(  †Ÿ(                         1        ˚(  @Ï(                  †      D       @f
+(                                                  Ò      ∞V(  ¿Ù(          Å       `Ì(   Ó(          $       @Ó(  584497   2017   A       `Ì(  ‡Ó(          $        Ô(   Root CA†       D       ‡Œ(                                                  Ò        Ï(  Ä  (                                                                                                                                                  ∞       D       Ä(  –Ï(  PÓ(  Ô(  (          –      D       ı(                                                  ·       ÷(  ††(          $       êÿ(        @       $       PÚ(          `       $       ‡U (          Ä       $       0
+(          †       $       (                  Å       ∞¯(   ∞(          A       pÛ(  ∞¯(          $       –¯(        `       $       0Ú(  ¡x±ØŒ∆…@      D       ¿À(                                                  a       0ˆ(  Pµ(         !       –Ú(  "(  @       $       Ú(        –      T       p˙(  o∆'æDê±≥V{éC$}ÑYÓch≤∆^á–H®ê≠ΩS¢⁄ﬁ:ê¶`_h2µÜAﬂá[,{≈˛|z⁄       Q       0π(  Ä  (  Ä≤∂                                         p      T        ˜(  ro10U
+certsign sa10Ucertsign root ca g2       ±      ∞V(  †d
+(                                                                                                                                                  ∞       $       êı(  ˙(  –       $       ∞ı(  6  (         $       (                  !       †Ï(  0ˆ([Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[VQ0] groups=357 head_deadline=1769515440.644 slack=-11.393 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[SORT] algo=timsort calls=630 avg=0.287ms max=2.609ms
+Error in adding request: Connection error.
+[VQ0] groups=898 head_deadline=1769515440.644 slack=-16.423 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=1159 avg=0.456ms max=2.609ms
+[VQ0] groups=1451 head_deadline=1769515440.644 slack=-21.432 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=1744 avg=0.648ms max=2.775ms
+[VQ0] groups=2020 head_deadline=1769515440.644 slack=-26.445 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=2293 avg=0.854ms max=3.632ms
+[VQ0] groups=2576 head_deadline=1769515440.644 slack=-31.445 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=2783 avg=1.219ms max=449.366ms
+[VQ0] groups=3001 head_deadline=1769515440.644 slack=-36.446 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=3248 avg=1.406ms max=449.366ms
+[VQ0] groups=3465 head_deadline=1769515440.644 slack=-41.455 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=3639 avg=1.712ms max=449.366ms
+[VQ0] groups=3850 head_deadline=1769515440.644 slack=-46.459 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=4070 avg=1.941ms max=449.366ms
+[VQ0] groups=4227 head_deadline=1769515440.644 slack=-51.468 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=4393 avg=2.193ms max=449.366ms
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  [VQ0] groups=4575 head_deadline=1769515440.644 slack=-56.475 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=4776 avg=2.460ms max=449.366ms
+[VQ0] groups=4936 head_deadline=1769515440.644 slack=-61.490 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=5136 avg=2.757ms max=449.366ms
+[VQ0] groups=5285 head_deadline=1769515440.644 slack=-66.498 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=5473 avg=2.980ms max=449.366ms
+[VQ0] groups=5601 head_deadline=1769515440.644 slack=-71.500 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=5761 avg=3.279ms max=449.366ms
+[VQ0] groups=5904 head_deadline=1769515440.644 slack=-76.506 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=6049 avg=3.523ms max=449.366ms
+[VQ0] groups=6192 head_deadline=1769515440.644 slack=-81.799 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=6328 avg=3.799ms max=449.366ms
+[VQ0] groups=6473 head_deadline=1769515440.644 slack=-86.804 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=6607 avg=4.028ms max=449.366ms
+[VQ0] groups=6735 head_deadline=1769515440.644 slack=-91.814 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=6869 avg=4.285ms max=449.366ms
+[VQ0] groups=7006 head_deadline=1769515440.644 slack=-97.088 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=7128 avg=4.564ms max=449.366ms
+[VQ0] groups=7272 head_deadline=1769515440.644 slack=-102.098 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=7388 avg=4.800ms max=449.366ms
+[VQ0] groups=7522 head_deadline=1769515440.644 slack=-107.300 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=7627 avg=5.060ms max=449.366ms
+[VQ0] groups=7757 head_deadline=1769515440.644 slack=-112.522 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=7871 avg=5.315ms max=449.366ms
+[VQ0] groups=8009 head_deadline=1769515440.644 slack=-117.741 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=8110 avg=5.560ms max=449.366ms
+[VQ0] groups=8239 head_deadline=1769515440.644 slack=-122.760 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=8327 avg=5.790ms max=449.366ms
+[VQ0] groups=8441 head_deadline=1769515440.644 slack=-128.020 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=8530 avg=6.018ms max=449.366ms
+[VQ0] groups=8662 head_deadline=1769515440.644 slack=-133.021 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=8751 avg=6.243ms max=449.366ms
+[VQ0] groups=8866 head_deadline=1769515440.644 slack=-138.031 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=8948 avg=6.464ms max=449.366ms
+[VQ0] groups=9056 head_deadline=1769515440.644 slack=-143.032 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=9132 avg=6.705ms max=449.366ms
+[VQ0] groups=9243 head_deadline=1769515440.644 slack=-148.043 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=9324 avg=6.918ms max=449.366ms
+[VQ0] groups=9433 head_deadline=1769515440.644 slack=-153.213 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=9512 avg=7.151ms max=449.366ms
+[VQ0] groups=9628 head_deadline=1769515440.644 slack=-158.293 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=9701 avg=7.379ms max=449.366ms
+[VQ0] groups=9810 head_deadline=1769515440.644 slack=-163.301 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=9880 avg=7.602ms max=449.366ms
+[VQ0] groups=9988 head_deadline=1769515440.644 slack=-168.315 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10060 avg=7.817ms max=449.366ms
+[VQ0] groups=10167 head_deadline=1769515440.644 slack=-173.326 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10235 avg=8.027ms max=449.366ms
+[VQ0] groups=10325 head_deadline=1769515440.644 slack=-178.467 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10377 avg=8.231ms max=449.366ms
+[VQ0] groups=10504 head_deadline=1769515440.644 slack=-183.474 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10572 avg=8.406ms max=449.366ms
+[VQ0] groups=10674 head_deadline=1769515440.644 slack=-188.521 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10729 avg=8.631ms max=449.366ms
+[VQ0] groups=10852 head_deadline=1769515440.644 slack=-193.673 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=10930 avg=8.777ms max=449.366ms
+[VQ0] groups=11040 head_deadline=1769515440.644 slack=-198.682 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11097 avg=8.969ms max=449.366ms
+[VQ0] groups=11186 head_deadline=1769515440.644 slack=-203.691 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11247 avg=9.166ms max=449.366ms
+[VQ0] groups=11347 head_deadline=1769515440.644 slack=-209.007 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11397 avg=9.386ms max=449.366ms
+[VQ0] groups=11503 head_deadline=1769515440.644 slack=-214.023 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11549 avg=9.573ms max=449.366ms
+[VQ0] groups=11634 head_deadline=1769515440.644 slack=-219.031 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11679 avg=9.757ms max=449.366ms
+[VQ0] groups=11769 head_deadline=1769515440.644 slack=-224.048 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11818 avg=9.940ms max=449.366ms
+[VQ0] groups=11914 head_deadline=1769515440.644 slack=-229.226 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=11962 avg=10.149ms max=449.366ms
+[VQ0] groups=12055 head_deadline=1769515440.644 slack=-234.230 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12104 avg=10.330ms max=449.366ms
+[VQ0] groups=12195 head_deadline=1769515440.644 slack=-239.376 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12243 avg=10.531ms max=449.366ms
+[VQ0] groups=12343 head_deadline=1769515440.644 slack=-244.678 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12389 avg=10.726ms max=449.366ms
+[VQ0] groups=12485 head_deadline=1769515440.644 slack=-249.684 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12530 avg=10.899ms max=449.366ms
+[VQ0] groups=12609 head_deadline=1769515440.644 slack=-254.795 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12655 avg=11.090ms max=449.366ms
+[VQ0] groups=12750 head_deadline=1769515440.644 slack=-259.888 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12797 avg=11.280ms max=449.366ms
+[VQ0] groups=12885 head_deadline=1769515440.644 slack=-264.901 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=12934 avg=11.449ms max=449.366ms
+[VQ0] groups=13012 head_deadline=1769515440.644 slack=-269.930 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13060 avg=11.638ms max=449.366ms
+[VQ0] groups=13146 head_deadline=1769515440.644 slack=-275.125 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13188 avg=11.823ms max=449.366ms
+[VQ0] groups=13274 head_deadline=1769515440.644 slack=-280.407 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13312 avg=11.980ms max=449.366ms
+[VQ0] groups=13400 head_deadline=1769515440.644 slack=-285.428 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13431 avg=12.160ms max=449.366ms
+[VQ0] groups=13526 head_deadline=1769515440.644 slack=-290.438 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13562 avg=12.338ms max=449.366ms
+[VQ0] groups=13648 head_deadline=1769515440.644 slack=-295.444 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13686 avg=12.495ms max=449.366ms
+[VQ0] groups=13763 head_deadline=1769515440.644 slack=-300.510 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13804 avg=12.670ms max=449.366ms
+[VQ0] groups=13891 head_deadline=1769515440.644 slack=-305.512 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=13929 avg=12.844ms max=449.366ms
+[VQ0] groups=14012 head_deadline=1769515440.644 slack=-310.539 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14052 avg=13.016ms max=449.366ms
+[VQ0] groups=14135 head_deadline=1769515440.644 slack=-315.786 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14169 avg=13.190ms max=449.366ms
+[VQ0] groups=14253 head_deadline=1769515440.644 slack=-320.811 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14290 avg=13.359ms max=449.366ms
+[VQ0] groups=14368 head_deadline=1769515440.644 slack=-325.813 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14407 avg=13.528ms max=449.366ms
+[VQ0] groups=14481 head_deadline=1769515440.644 slack=-330.816 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14519 avg=13.679ms max=449.366ms
+[VQ0] groups=14595 head_deadline=1769515440.644 slack=-335.816 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14635 avg=13.846ms max=449.366ms
+[VQ0] groups=14716 head_deadline=1769515440.644 slack=-340.830 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14751 avg=14.012ms max=449.366ms
+[VQ0] groups=14824 head_deadline=1769515440.644 slack=-345.841 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14861 avg=14.178ms max=449.366ms
+[VQ0] groups=14938 head_deadline=1769515440.644 slack=-350.913 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=14972 avg=14.341ms max=449.366ms
+[VQ0] groups=15038 head_deadline=1769515440.644 slack=-355.963 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15073 avg=14.483ms max=449.366ms
+[VQ0] groups=15159 head_deadline=1769515440.644 slack=-361.256 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15196 avg=14.624ms max=449.366ms
+[VQ0] groups=15275 head_deadline=1769515440.644 slack=-366.388 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15305 avg=14.782ms max=449.366ms
+[VQ0] groups=15384 head_deadline=1769515440.644 slack=-371.594 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15412 avg=14.938ms max=449.366ms
+[VQ0] groups=15493 head_deadline=1769515440.644 slack=-376.653 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15519 avg=15.095ms max=449.366ms
+[VQ0] groups=15602 head_deadline=1769515440.644 slack=-381.861 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15622 avg=15.248ms max=449.366ms
+[VQ0] groups=15695 head_deadline=1769515440.644 slack=-386.916 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15716 avg=15.386ms max=449.366ms
+[VQ0] groups=15804 head_deadline=1769515440.644 slack=-392.116 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15825 avg=15.542ms max=449.366ms
+[VQ0] groups=15913 head_deadline=1769515440.644 slack=-397.390 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=15934 avg=15.692ms max=449.366ms
+[VQ0] groups=16019 head_deadline=1769515440.644 slack=-402.611 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16039 avg=15.842ms max=449.366ms
+[VQ0] groups=16123 head_deadline=1769515440.644 slack=-407.632 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16144 avg=15.993ms max=449.366ms
+[VQ0] groups=16224 head_deadline=1769515440.644 slack=-412.759 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16245 avg=16.141ms max=449.366ms
+[VQ0] groups=16333 head_deadline=1769515440.644 slack=-417.760 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16353 avg=16.286ms max=449.366ms
+[VQ0] groups=16433 head_deadline=1769515440.644 slack=-422.776 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16452 avg=16.432ms max=449.366ms
+[VQ0] groups=16534 head_deadline=1769515440.644 slack=-427.780 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16554 avg=16.578ms max=449.366ms
+[VQ0] groups=16633 head_deadline=1769515440.644 slack=-432.832 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16654 avg=16.723ms max=449.366ms
+[VQ0] groups=16734 head_deadline=1769515440.644 slack=-437.834 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16755 avg=16.868ms max=449.366ms
+[VQ0] groups=16833 head_deadline=1769515440.644 slack=-442.921 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16853 avg=17.010ms max=449.366ms
+[VQ0] groups=16935 head_deadline=1769515440.644 slack=-447.932 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=16954 avg=17.155ms max=449.366ms
+[VQ0] groups=17037 head_deadline=1769515440.644 slack=-452.940 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17057 avg=17.295ms max=449.366ms
+[VQ0] groups=17134 head_deadline=1769515440.644 slack=-457.985 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17154 avg=17.436ms max=449.366ms
+[VQ0] groups=17234 head_deadline=1769515440.644 slack=-463.041 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17255 avg=17.576ms max=449.366ms
+[VQ0] groups=17337 head_deadline=1769515440.644 slack=-468.048 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17357 avg=17.717ms max=449.366ms
+[VQ0] groups=17432 head_deadline=1769515440.644 slack=-473.061 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17450 avg=17.857ms max=449.366ms
+[VQ0] groups=17524 head_deadline=1769515440.644 slack=-478.077 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17543 avg=17.996ms max=449.366ms
+[VQ0] groups=17618 head_deadline=1769515440.644 slack=-483.096 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17637 avg=18.133ms max=449.366ms
+[VQ0] groups=17711 head_deadline=1769515440.644 slack=-488.107 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17731 avg=18.269ms max=449.366ms
+[VQ0] groups=17806 head_deadline=1769515440.644 slack=-493.124 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17824 avg=18.407ms max=449.366ms
+[VQ0] groups=17902 head_deadline=1769515440.644 slack=-498.147 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=17919 avg=18.544ms max=449.366ms
+[VQ0] groups=17992 head_deadline=1769515440.644 slack=-503.148 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18011 avg=18.680ms max=449.366ms
+[VQ0] groups=18081 head_deadline=1769515440.644 slack=-508.238 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18099 avg=18.816ms max=449.366ms
+[VQ0] groups=18175 head_deadline=1769515440.644 slack=-513.283 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18193 avg=18.950ms max=449.366ms
+[VQ0] groups=18267 head_deadline=1769515440.644 slack=-518.301 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18285 avg=19.082ms max=449.366ms
+[VQ0] groups=18354 head_deadline=1769515440.644 slack=-523.545 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18372 avg=19.215ms max=449.366ms
+[VQ0] groups=18445 head_deadline=1769515440.644 slack=-528.680 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18463 avg=19.349ms max=449.366ms
+[VQ0] groups=18537 head_deadline=1769515440.644 slack=-533.950 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18554 avg=19.480ms max=449.366ms
+[VQ0] groups=18627 head_deadline=1769515440.644 slack=-538.985 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18645 avg=19.612ms max=449.366ms
+[VQ0] groups=18718 head_deadline=1769515440.644 slack=-544.148 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18736 avg=19.744ms max=449.366ms
+[VQ0] groups=18806 head_deadline=1769515440.644 slack=-549.175 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18824 avg=19.874ms max=449.366ms
+[VQ0] groups=18896 head_deadline=1769515440.644 slack=-554.263 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18913 avg=20.003ms max=449.366ms
+[VQ0] groups=18978 head_deadline=1769515440.644 slack=-559.334 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=18998 avg=20.134ms max=449.366ms
+[VQ0] groups=19072 head_deadline=1769515440.644 slack=-564.675 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19088 avg=20.264ms max=449.366ms
+[VQ0] groups=19161 head_deadline=1769515440.644 slack=-569.742 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19180 avg=20.394ms max=449.366ms
+[VQ0] groups=19247 head_deadline=1769515440.644 slack=-574.765 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19264 avg=20.521ms max=449.366ms
+[VQ0] groups=19342 head_deadline=1769515440.644 slack=-579.776 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19361 avg=20.631ms max=449.366ms
+[VQ0] groups=19432 head_deadline=1769515440.644 slack=-584.804 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19449 avg=20.756ms max=449.366ms
+[VQ0] groups=19517 head_deadline=1769515440.644 slack=-589.814 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19534 avg=20.882ms max=449.366ms
+[VQ0] groups=19600 head_deadline=1769515440.644 slack=-594.833 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19617 avg=21.007ms max=449.366ms
+Successfully pushed 19730 requests (logged 500).
+Now waiting for processing...
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-599.982 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19712 avg=21.142ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-605.001 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19812 avg=21.274ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-610.019 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=19911 avg=21.407ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-615.043 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=20009 avg=21.539ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-620.049 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=20105 avg=21.672ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+[VQ0] groups=19623 head_deadline=1769515440.644 slack=-625.068 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769515440.644, 1769515440.658, 1769515440.672, 1769515440.794, 1769515440.835
+[SORT] algo=timsort calls=20203 avg=21.801ms max=449.366ms
+Status: [Worker Load: inf] / [Queue Waiting Groups: 19623]
+Drain timeout reached. Exiting.
