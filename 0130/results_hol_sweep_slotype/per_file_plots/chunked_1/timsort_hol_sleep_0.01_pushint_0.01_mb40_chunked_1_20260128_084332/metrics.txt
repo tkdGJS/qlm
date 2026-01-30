@@ -1,0 +1,8 @@
+file=timsort_hol_sleep_0.01_pushint_0.01_mb40_chunked_1_20260128_084332.csv
+sleep=0.01
+pushint=0.01
+mb=40
+chunked=1
+n_total=0
+n_short=0
+hol_corr(short_queue_delay, blocking_depth)=nan
