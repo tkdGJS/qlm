@@ -313,6 +313,8 @@ class Worker:
                 if b is None:
                     return none
                 return f"{b / (1024**2):.1f}MiB"
+
+
             
             tbt_sorted = sorted(tbt_samples)
             tbt_p95 = _percentile(tbt_sorted, 0.95)
@@ -349,6 +351,18 @@ class Worker:
                 f", in_t={_fmt(snap.kvo_in_time_s, '{:.3f}')})"
             )
 
+            # snap_part 바로 아래에 추가
+            lm = getattr(snap, "lmcache_metrics", None) or {}
+            
+            lm_part = (
+                f" | LMCACHE("
+                f"local={_fmt_bytes_to_mib(lm.get('lmcache:local_cache_usage'))}"
+                f" hit={_fmt(lm.get('lmcache:retrieve_hit_rate'), '{:.3f}')}"
+                f" ttr_sum={_fmt(lm.get('lmcache:time_to_retrieve_sum'), '{:.4f}')}"
+                f" ttr_cnt={_fmt(lm.get('lmcache:time_to_retrieve_count'), '{:.0f}')}"
+                f")"
+            )
+
             # [로그 메시지 생성]
             log_message = (
                 f"[DEBUG] OrigSLO: {original_slo:.2f} | "
@@ -369,6 +383,7 @@ class Worker:
                 f"Finished Time: {time.time()} | "
                 f"SuccessRate: {attainment_ratio:.2f}% ({self.success_count}/{self.processed_count})"
                 + snap_part
+                + lm_part
 
             )
 
