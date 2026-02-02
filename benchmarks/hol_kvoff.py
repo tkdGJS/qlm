@@ -58,7 +58,7 @@ def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"--max-model-len\s+(\d+)", txt)
+        m = re.search(r"VLLM_MAX_MODEL_LEN(?:\s+|=)(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -83,7 +83,7 @@ def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"--max-num-batched-tokens(?:\s+|=)(\d+)", txt)
+        m = re.search(r"VLLM_MAX_NUM_BATCHED_TOKENS(?:\s+|=)(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -109,7 +109,7 @@ def read_vllm_max_num_seqs_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"--max-num-seqs(?:\s+|=)(\d+)", txt)
+        m = re.search(r"VLLM_MAX_NUM_SEQS(?:\s+|=)(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -244,7 +244,7 @@ async def basic_test():
             max_model_len=max_model_len,
             gpu_index=0,
             )
-
+    print("parsed:", max_model_len, max_num_seqs, max_num_batched_tokens)
 
     queue_run_task = asyncio.create_task(q.run_queue())
     queue_run_task.add_done_callback(_print_task_exception)

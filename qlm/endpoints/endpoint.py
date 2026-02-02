@@ -14,7 +14,7 @@ class Endpoint:
         """
         project_dir = os.environ['QLMPROJDIR']
 
-        self.process = subprocess.Popen(['bash', f'{project_dir}/qlm/endpoints/start_vllm.sh', \
+        self.process = subprocess.Popen(['bash', f'{project_dir}/qlm/endpoints/start_vllm_kvoff.sh', \
                 '--model', self.model, \
                 '--port', str(self.port)],\
                 preexec_fn=os.setsid,

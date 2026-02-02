@@ -307,6 +307,12 @@ class Worker:
                 if b is None:
                     return none
                 return f"{b / (1024**3):.2f}GiB"
+
+
+            def _fmt_bytes_to_mib(b, none="NA"):
+                if b is None:
+                    return none
+                return f"{b / (1024**2):.1f}MiB"
             
             tbt_sorted = sorted(tbt_samples)
             tbt_p95 = _percentile(tbt_sorted, 0.95)
@@ -328,12 +334,19 @@ class Worker:
                 )
             
             tbt_part = f"TBT_p95={_fmt(tbt_p95)} | TBT_p99={_fmt(tbt_p99)} | "
+            snap = self.monitor.snapshot()
             snap_part = (
                 f" | KV={_fmt(snap.kv_cache_usage_perc, '{:.3f}')}"
                 f" run={_fmt(snap.num_running, '{:.0f}')}"
                 f" wait={_fmt(snap.num_waiting, '{:.0f}')}"
                 f" swap={_fmt(snap.num_swapped, '{:.0f}')}"
                 f" VRAM={_fmt_bytes_to_gb(snap.vram_used_bytes)}/{_fmt_bytes_to_gb(snap.vram_total_bytes)}"
+                f" | KVO(out_cnt={_fmt(snap.kvo_out_count, '{:.0f}')}"
+                f", out={_fmt_bytes_to_mib(snap.kvo_out_bytes)}"
+                f", out_t={_fmt(snap.kvo_out_time_s, '{:.3f}')}"
+                f" / in_cnt={_fmt(snap.kvo_in_count, '{:.0f}')}"
+                f", in={_fmt_bytes_to_mib(snap.kvo_in_bytes)}"
+                f", in_t={_fmt(snap.kvo_in_time_s, '{:.3f}')})"
             )
 
             # [로그 메시지 생성]
