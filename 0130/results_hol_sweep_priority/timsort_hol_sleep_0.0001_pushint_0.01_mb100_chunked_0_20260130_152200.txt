@@ -1,0 +1,565 @@
+=== Basic Benchmark Test (PREFIX mode) ===
+[LEN] vllm_max_len=None, tokenizer.model_max_length=131072 -> effective=131072
+[LEN] max_prompt_tokens_short=131032, prefix_short_tokens=11 -> max_base_prompt_short=131021
+[LEN] max_prompt_tokens_long =130040,  prefix_long_tokens =16  -> max_base_prompt_long =130024
+Starting server and wait to load model weights
+Server started at localhost:8000 with model meta-llama/Llama-3.2-1B-Instruct
+Waiting for vLLM server to start...
+Worker 2559d81a-70ca-4727-94bb-fb76100cd323 registered at http://localhost:8000
+
+[Part 2] Loading dataset from: data/ShareGPT_V3_unfiltered_cleaned_split.json
+dataset1_candidates(first-pair, base<=short-limit): 58765
+dataset2_candidates(first-pair, base<=long-limit)      : 58765
+too_long_long(>long base-limit)                         : 1
+[dataset1_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[dataset2_candidates base tok lens] n=58765 min=1 p50=31 p90=677 p99=2861 max=96290
+[DEBUG] wrote 1 rows -> debug/debug_too_long_for_long_top50.jsonl
+dataset1 chosen: 1000 | base_tok_range ~ 16..16
+dataset2 chosen: 1000 | base_tok_range ~ 2384..96290
+[DEBUG] wrote 50 rows -> debug/debug_dataset1_sample_base.jsonl
+[DEBUG] wrote 50 rows -> debug/debug_dataset2_sample_base.jsonl
+!!! BENCHMARK START TIME: 1769786765.6434698 !!!
+Pushing for 600s (ORDER_MODE=shuffle)
+  push_interval_s=0.010000
+  dataset1: max_tokens=32, prefix=ON
+  dataset2: max_tokens=1024,  prefix=ON
+[VQ0] groups=1 head_deadline=1769786965.656 slack=200.000 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786965.656
+[Warning] stream error (attempt 1/2): Error code: 400 - {'object': 'error', 'message': "This model's maximum context length is 8192 tokens. However, you requested 9210 tokens (8186 in the messages, 1024 in the completion). Please reduce the length of the messages or completion.", 'type': 'BadRequestError', 'param': None, 'code': 400}
+Error in adding request: Error code: 400 - {'object': 'error', 'message': "This model's maximum context length is 8192 tokens. However, you requested 9210 tokens (8186 in the messages, 1024 in the completion). Please reduce the length of the messages or completion.", 'type': 'BadRequestError', 'param': None, 'code': 400}
+[SORT] algo=timsort calls=1 avg=0.027ms max=0.027ms
+[VQ0] groups=118 head_deadline=1769786769.241 slack=-1.426 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786769.241, 1769786769.287, 1769786769.401, 1769786769.467, 1769786769.538
+[SORT] algo=timsort calls=231 avg=0.129ms max=1.078ms
+[VQ0] groups=358 head_deadline=1769786769.241 slack=-6.433 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786769.241, 1769786769.287, 1769786769.401, 1769786769.467, 1769786769.538
+[SORT] algo=timsort calls=460 avg=0.211ms max=1.078ms
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769786766.6561 | Wait Time: 0.0385 | prompt_tok= 2664 out_tok= 0 total_tok= 2664 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=200.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 10.9983 | Diff: -188.9632 | Violation: 0.0000 | TotalViolation: 19.0421 | Finished Time: 1769786778.653994 | SuccessRate: 50.00% (2/4) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.4414 | Wait Time: 0.0350 | prompt_tok= 27 out_tok= 0 total_tok= 27 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=1.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 10.2207 | Diff: 9.2557 | Violation: 9.2557 | TotalViolation: 22.6726 | Finished Time: 1769786779.642929 | SuccessRate: 33.33% (2/5) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.1420 | Wait Time: 0.0327 | prompt_tok= 27 out_tok= 8 total_tok= 35 | TTFT: 4.5977 | TBT_p95=7.0245 | TBT_p99=7.0245 | TBT_SLO=1.00 | TBT_Violation=6.0245 | TBT_SuccessRate=0.00% TTLT: 13.0988 | Diff: 3.6304 | Violation: 3.6304 | TotalViolation: 22.6726 | Finished Time: 1769786779.6526108 | SuccessRate: 40.00% (2/5) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[DEBUG] OrigSLO: 200.00 | slo_type: 1 | Insertion Time: 1769786766.4858 | Wait Time: 0.0379 | prompt_tok= 4467 out_tok= 2 total_tok= 4469 | TTFT: 11.1764 | TBT_p95=0.1246 | TBT_p99=0.1246 | TBT_SLO=200.00 | TBT_Violation=0.0000 | TBT_SuccessRate=50.00% TTLT: 11.4064 | Diff: -188.5556 | Violation: 0.0000 | TotalViolation: 42.4432 | Finished Time: 1769786780.758409 | SuccessRate: 50.00% (2/7) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.4559 | Wait Time: 0.0373 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.1677 | TBT_p95=0.6437 | TBT_p99=0.6765 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=66.67% TTLT: 13.2722 | Diff: 9.2050 | Violation: 9.2050 | TotalViolation: 84.9542 | Finished Time: 1769786780.8017414 | SuccessRate: 25.00% (2/12) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.7597 | Wait Time: 0.0431 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.8852 | TBT_p95=0.4864 | TBT_p99=0.6802 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.00% TTLT: 13.9125 | Diff: 9.9283 | Violation: 9.9283 | TotalViolation: 84.9542 | Finished Time: 1769786780.8019433 | SuccessRate: 33.33% (2/12) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.3436 | Wait Time: 0.0359 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 11.2882 | TBT_p95=0.6729 | TBT_p99=0.6876 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=80.00% TTLT: 14.4212 | Diff: 10.3241 | Violation: 10.3241 | TotalViolation: 131.5766 | Finished Time: 1769786780.8266237 | SuccessRate: 16.67% (2/17) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.8196 | Wait Time: 0.0382 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.8041 | TBT_p95=0.5336 | TBT_p99=0.6804 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=83.33% TTLT: 13.8665 | Diff: 9.8423 | Violation: 9.8423 | TotalViolation: 140.3488 | Finished Time: 1769786780.83318 | SuccessRate: 28.57% (2/18) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.9758 | Wait Time: 0.0421 | prompt_tok= 27 out_tok= 29 total_tok= 56 | TTFT: 9.7711 | TBT_p95=0.6659 | TBT_p99=0.7445 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=85.71% TTLT: 12.7508 | Diff: 8.8132 | Violation: 8.8132 | TotalViolation: 143.9888 | Finished Time: 1769786780.8383486 | SuccessRate: 22.22% (2/19) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.9088 | Wait Time: 0.0321 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.8532 | TBT_p95=0.6537 | TBT_p99=0.6797 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=87.50% TTLT: 12.8708 | Diff: 8.8853 | Violation: 8.8853 | TotalViolation: 194.5363 | Finished Time: 1769786780.9133725 | SuccessRate: 13.33% (2/25) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.0266 | Wait Time: 0.0369 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.7353 | TBT_p95=0.5937 | TBT_p99=0.6715 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=88.89% TTLT: 12.7694 | Diff: 8.7721 | Violation: 8.7721 | TotalViolation: 194.5363 | Finished Time: 1769786780.9137003 | SuccessRate: 11.11% (2/25) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.0387 | Wait Time: 0.0339 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.6965 | TBT_p95=0.6733 | TBT_p99=7.0579 | TBT_SLO=1.00 | TBT_Violation=6.0579 | TBT_SuccessRate=80.00% TTLT: 14.8359 | Diff: 3.7303 | Violation: 3.7303 | TotalViolation: 194.5363 | Finished Time: 1769786780.914093 | SuccessRate: 8.33% (2/25) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.8737 | Wait Time: 0.0329 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.7737 | TBT_p95=0.6491 | TBT_p99=0.6697 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=81.82% TTLT: 13.9028 | Diff: 9.8066 | Violation: 9.8066 | TotalViolation: 194.5363 | Finished Time: 1769786780.9143023 | SuccessRate: 14.29% (2/25) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.7428 | Wait Time: 0.0304 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.9941 | TBT_p95=0.7250 | TBT_p99=7.0135 | TBT_SLO=1.00 | TBT_Violation=6.0135 | TBT_SuccessRate=82.35% TTLT: 15.1453 | Diff: 4.0244 | Violation: 4.0244 | TotalViolation: 232.5346 | Finished Time: 1769786780.9647493 | SuccessRate: 7.69% (2/30) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.29GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.9938 | Wait Time: 0.0393 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.6432 | TBT_p95=0.6362 | TBT_p99=0.7049 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=83.33% TTLT: 13.7845 | Diff: 9.6825 | Violation: 9.6825 | TotalViolation: 236.3968 | Finished Time: 1769786780.968824 | SuccessRate: 12.50% (2/31) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.6902 | Wait Time: 0.0407 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.0625 | TBT_p95=0.7093 | TBT_p99=0.7242 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=84.21% TTLT: 13.1822 | Diff: 9.1032 | Violation: 9.1032 | TotalViolation: 236.3968 | Finished Time: 1769786780.9690177 | SuccessRate: 8.00% (2/31) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.5397 | Wait Time: 0.0422 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 11.1140 | TBT_p95=0.6129 | TBT_p99=0.6615 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=85.00% TTLT: 14.3768 | Diff: 10.1562 | Violation: 10.1562 | TotalViolation: 236.3968 | Finished Time: 1769786780.969284 | SuccessRate: 6.67% (2/31) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.0479 | Wait Time: 0.0479 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.5881 | TBT_p95=0.6112 | TBT_p99=0.6657 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=85.71% TTLT: 13.7481 | Diff: 9.6359 | Violation: 9.6359 | TotalViolation: 262.1792 | Finished Time: 1769786780.9896479 | SuccessRate: 10.00% (2/35) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.9238 | Wait Time: 0.0334 | prompt_tok= 27 out_tok= 26 total_tok= 53 | TTFT: 9.8312 | TBT_p95=0.6840 | TBT_p99=0.7678 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=86.36% TTLT: 13.0352 | Diff: 8.8646 | Violation: 8.8646 | TotalViolation: 279.6765 | Finished Time: 1769786781.0130293 | SuccessRate: 5.56% (2/37) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.6744 | Wait Time: 0.0919 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.9921 | TBT_p95=0.6949 | TBT_p99=7.0153 | TBT_SLO=1.00 | TBT_Violation=6.0153 | TBT_SuccessRate=82.61% TTLT: 15.0145 | Diff: 4.0839 | Violation: 4.0839 | TotalViolation: 279.6765 | Finished Time: 1769786781.013759 | SuccessRate: 18.18% (2/37) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.29GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.1626 | Wait Time: 0.0435 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.5891 | TBT_p95=0.6685 | TBT_p99=0.7858 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=83.33% TTLT: 12.8053 | Diff: 8.6327 | Violation: 8.6327 | TotalViolation: 308.6477 | Finished Time: 1769786781.0271778 | SuccessRate: 5.41% (2/40) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.8391 | Wait Time: 0.0507 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.8675 | TBT_p95=0.7198 | TBT_p99=7.0156 | TBT_SLO=1.00 | TBT_Violation=6.0156 | TBT_SuccessRate=80.00% TTLT: 15.0818 | Diff: 3.9182 | Violation: 3.9182 | TotalViolation: 331.8445 | Finished Time: 1769786781.0412943 | SuccessRate: 6.25% (2/43) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[VQ0] groups=459 head_deadline=1769786769.287 slack=-11.762 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786769.287, 1769786769.401, 1769786769.467, 1769786769.538, 1769786769.550
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.9097 | Wait Time: 0.1491 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.7132 | TBT_p95=0.7325 | TBT_p99=7.0660 | TBT_SLO=1.00 | TBT_Violation=6.0660 | TBT_SuccessRate=76.92% TTLT: 14.9097 | Diff: 3.8623 | Violation: 3.8623 | TotalViolation: 340.4600 | Finished Time: 1769786781.0550437 | SuccessRate: 6.45% (2/44) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.2229 | Wait Time: 0.0341 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.5273 | TBT_p95=0.6057 | TBT_p99=0.6673 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=77.78% TTLT: 12.6479 | Diff: 8.5614 | Violation: 8.5614 | TotalViolation: 340.4600 | Finished Time: 1769786781.0555425 | SuccessRate: 8.70% (2/44) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.1547 | Wait Time: 0.0457 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.5697 | TBT_p95=0.7073 | TBT_p99=7.0436 | TBT_SLO=1.00 | TBT_Violation=6.0436 | TBT_SuccessRate=75.00% TTLT: 14.7798 | Diff: 3.6154 | Violation: 3.6154 | TotalViolation: 340.4600 | Finished Time: 1769786781.0610936 | SuccessRate: 5.88% (2/44) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+.—IWåÄt∂⁄/–8ç{p!uÚ0<˙èÆ›⁄c´ÎO¬éK~œËˇµw.Ù≤{J‡L%pç)†·S$ÏŸÓø≥Jå?â£aQﬁ¨áîÙcqÏ.‚o[òÅ·â\4ylvÔ;êbyÊ€§ö/&≈–·ﬁŸé˚∑˜®˜«Âòè6ïÁ‚7ñ6uû˚r±õº˘IÿÅ›¥*÷AÈ¨vï
+ÿﬂ’Ω5/(l“ò¡®	dwnG7∫Œ¨Y^hùr÷â≈A)>Y>›&ı$…ßZ£L@F°ôµß:QnÜ;û}rßxYÌ>Qxèç–/≤>{JKs¸∆Í‡P|Cìt≥ tÁé–0‘[q6¥∫¡00\H∑Ç;ò¶}`ä¢£)ÇÃ∫ΩÉ¢ÉA°÷Ò¬∂®|Ü;F®H*à‹vövøj•=èÎ8Ûdﬁ»+
+(ˇ˜€‚B‘"–']·y˛Ápà≠NÊŸã:∆›'Qnˇºdı3CO £B0@0Uˇ0Uˇ0ˇ0Uy¥YÊ{∂Â‰sÄà»XˆÈõn       –#Ë/  Ä  Ë/  )¨au\än¯ÇÂi/’ˆVKπ∏sY”!ó~ÁLq˚≤“`≠9®Í!VÖÒPYÎŒ‡YÈ∫…ÔÜùèÑÄˆ‰Èëê‹õbEfï“|o¬Í;ÔœÀ÷Æ'Ò©∞»Æ˝}~ö˙"ÎˇŸÍë+"±èÚä4[Xÿ¸…Tπ∏&Ãäà3âL-Ñ<ÇﬂÓñW∫,ª˜ƒ∑«N;Çæ1»"ssí—¬Ä§993#ÇL<üÜ≤Uòæ)Üå"õû‚k;W:ÇpM‹	«âÀ
+MlË]é…ÔŒ´«ªµ+NE÷J–&ÃÂr j•ï„°˜§Ì…,_•˚ˇ¨(.æ◊{ª„q{ê”^FS|7Bå”ƒñú’ôµ*‡ïÄHÆL9ŒÃG§Rï+∫∏˚≠“3S}ÂMm’°±«BoÊ@'5\£(∑çÁç3êÁ#ü˚PúylF’¥≥ñn~õñ:∏R-?÷[·˚¬Ñ˛$®£â⁄¨j·*±®Ca[”‹;çvÚ-Ëçuﬂ3l=S˚{ÀA_ˇ‹¢–a8·ñ∏¨]ã7◊u’3¿ôÆùA¡ruÑæAB_g$Hî—õ'æ?π∏OÅtQ·z∑Ìù#‚æ‡’(<1û›zlè∆∆ﬁGé?(ûœ•T4wΩÏâõÈCﬂ[€_˛éW¢Õ@ù~b"⁄ﬁ'†	      D       ÄyË/                                                  !       P¢Ë/  †åË/        d       vË/                                                                                        P÷Ë/  ‡ÔË/                   wË/                                                                                                                                 êyË/  ¿       T      0ÇB†O“+èıd»3ûO4Xf#p`0	*ÜHÜ˜ 0G10	UCN10U
+UniTrust1%0#UUCA Extended Validation Root0150313000000Z381231000000Z0G10	UCN10U
+UniTrust1%0#UUCA Extended Validation Root0Ç"0	*ÜHÜ˜ Ç 0Ç
+Ç ©	(∞ô‡d™Czs±ë†u>®˙„8 zÏâj ã≈∞õ3ZÜ∆XÜ’¡ÖªO∆ú@M æÓiñ∏≠Å0ö|íÎ+öH–∏v>ñ» ª“∞Òèÿ¨EFˇ™g`¥w~j<Rz=<ÖÑ–v
+˜jﬂr„4|WNV>yÒ™);l˙¯èmM»5ﬂÆÎ‹$ÓyEßÖ∂àﬁà]%|ódg	ŸøZÜÛ	ÏX23Ûwd∞v‰5Ú±l§*£s¸	2SÁŸ≥,.v.°£ﬁ~jà	ËÚä¯≤ÕÁ‚s@ìª—?·¸î≥%Ô|¶◊—Øüˇñöıë{òw‘~Ë“bµï9„ÛÒmeÑäcT≈Ä∂‡ûK}G&ß]—àû◊√2D˙ÇJ
+hT8SÃ§ 3dQY£Çëz^Ï¬Û*Êb⁄*€Yb%J*ÅGCpá“˙ì)zHMÎî«pMØg’Q±Ä ¥z¶êN‡ÔAáØj•^ã˚œP≤öTØ√â∫X-ı0ò±6r9~I˝)ßLy‰W€îπSçF≥ïaWVØ[aXo6Pÿ¨+ïÕ64ebf’Ä_ _-†x
+h÷,◊Èo+“Jì¸ûokgˇàÒN•iJR7Í∆ç“ƒô—Ç+;∫5u˜QQXÛ»›‰¥ £B0@0UŸt:‰0=˜‹~Zü4ö˜·0Uˇ0[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.8368 | Wait Time: 0.0398 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.7941 | TBT_p95=0.7197 | TBT_p99=0.7853 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.86% TTLT: 14.1503 | Diff: 9.8339 | Violation: 9.8339 | TotalViolation: 358.9334 | Finished Time: 1769786781.0766141 | SuccessRate: 5.00% (2/46) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.7976 | Wait Time: 0.0684 | prompt_tok= 27 out_tok= 31 total_tok= 58 | TTFT: 4.8933 | TBT_p95=0.7157 | TBT_p99=7.0189 | TBT_SLO=1.00 | TBT_Violation=6.0189 | TBT_SuccessRate=72.73% TTLT: 15.0786 | Diff: 3.9618 | Violation: 3.9618 | TotalViolation: 371.6967 | Finished Time: 1769786781.0858848 | SuccessRate: 6.90% (2/48) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.31GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.1253 | Wait Time: 0.0372 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.5088 | TBT_p95=0.5872 | TBT_p99=0.6158 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=73.53% TTLT: 13.9077 | Diff: 9.5460 | Violation: 9.5460 | TotalViolation: 371.6967 | Finished Time: 1769786781.086032 | SuccessRate: 4.44% (2/48) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.8628 | Wait Time: 0.0281 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.8993 | TBT_p95=0.6672 | TBT_p99=0.6695 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=74.29% TTLT: 13.1800 | Diff: 8.9274 | Violation: 8.9274 | TotalViolation: 371.6967 | Finished Time: 1769786781.0862105 | SuccessRate: 4.35% (2/48) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.3183 | Wait Time: 0.0682 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.2928 | TBT_p95=0.6311 | TBT_p99=0.6751 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.00% TTLT: 13.5373 | Diff: 9.3610 | Violation: 9.3610 | TotalViolation: 371.6967 | Finished Time: 1769786781.100951 | SuccessRate: 7.14% (2/48) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.0432 | Wait Time: 0.0364 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.7133 | TBT_p95=0.6670 | TBT_p99=0.7801 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.68% TTLT: 12.9423 | Diff: 8.7497 | Violation: 8.7497 | TotalViolation: 371.6967 | Finished Time: 1769786781.1058671 | SuccessRate: 5.13% (2/48) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.2026 | Wait Time: 0.0346 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.5607 | TBT_p95=0.6117 | TBT_p99=0.6928 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.32% TTLT: 12.7362 | Diff: 8.5953 | Violation: 8.5953 | TotalViolation: 385.3978 | Finished Time: 1769786781.11567 | SuccessRate: 6.06% (2/50) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.1869 | Wait Time: 0.0350 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.5805 | TBT_p95=0.6737 | TBT_p99=0.7330 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.92% TTLT: 12.8259 | Diff: 8.6155 | Violation: 8.6155 | TotalViolation: 422.8287 | Finished Time: 1769786781.1414654 | SuccessRate: 4.55% (2/54) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.6993 | Wait Time: 0.0664 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 5.0084 | TBT_p95=0.8962 | TBT_p99=7.0452 | TBT_SLO=1.00 | TBT_Violation=6.0452 | TBT_SuccessRate=75.00% TTLT: 15.3427 | Diff: 4.0748 | Violation: 4.0748 | TotalViolation: 422.8287 | Finished Time: 1769786781.1474295 | SuccessRate: 4.08% (2/54) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.29GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.1840 | Wait Time: 0.0347 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.5527 | TBT_p95=0.8582 | TBT_p99=7.0465 | TBT_SLO=1.00 | TBT_Violation=6.0465 | TBT_SuccessRate=73.17% TTLT: 14.8671 | Diff: 3.5874 | Violation: 3.5874 | TotalViolation: 432.2212 | Finished Time: 1769786781.1518366 | SuccessRate: 4.17% (2/55) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.7382 | Wait Time: 0.0381 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.0089 | TBT_p95=0.7514 | TBT_p99=0.9709 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=73.81% TTLT: 13.3609 | Diff: 9.0470 | Violation: 9.0470 | TotalViolation: 432.2212 | Finished Time: 1769786781.15229 | SuccessRate: 3.70% (2/55) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.0099 | Wait Time: 0.0407 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.6251 | TBT_p95=0.5872 | TBT_p99=0.6449 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=74.42% TTLT: 14.0698 | Diff: 9.6658 | Violation: 9.6658 | TotalViolation: 432.2212 | Finished Time: 1769786781.161657 | SuccessRate: 3.92% (2/55) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.5158 | Wait Time: 0.0425 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 11.1397 | TBT_p95=0.6704 | TBT_p99=0.7984 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.00% TTLT: 14.4816 | Diff: 10.1822 | Violation: 10.1822 | TotalViolation: 432.2212 | Finished Time: 1769786781.1665142 | SuccessRate: 4.76% (2/55) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.0663 | Wait Time: 0.0362 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.5900 | TBT_p95=0.6213 | TBT_p99=0.6672 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.56% TTLT: 14.0128 | Diff: 9.6262 | Violation: 9.6262 | TotalViolation: 432.2212 | Finished Time: 1769786781.166747 | SuccessRate: 4.00% (2/55) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.5107 | Wait Time: 0.0344 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.1416 | TBT_p95=0.8865 | TBT_p99=1.0970 | TBT_SLO=1.00 | TBT_Violation=0.0970 | TBT_SuccessRate=73.91% TTLT: 13.5350 | Diff: 9.1760 | Violation: 9.1760 | TotalViolation: 441.2102 | Finished Time: 1769786781.1707444 | SuccessRate: 4.26% (2/56) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+∞Ò†.          $       –Ò†.  584497   2017   A       †.  pÚ†.          $       êÚ†.   Root CA†       D       –—†.                                                  Ò       êÔ†.  Ä  †.                                                                                                                                                  ∞       D       Ù†.  `†.  ‡Ò†.  †Ú†.  †Û†.          –      D       `˛†.                                                  !       ∞ﬂ†.  Ä†.  ‡      Ñ       ¿â†.  Û†.                ††.                                                          .        Ä       ë       ´†.  Ä  †.         !       ˚†.   €†.  @       4       ê†.      ˇˇˇˇˇˇˇˇˇˇˇˇ˛ˇˇˇ    p       4       ‡¯†.          ¿¯†.  ¿˜†.  †       D       P“†.                                                  a       Äı†.  r†.         A       ∞˙†.  ¸†.         !       ∞¸†.  Ä  †.  @      T        ÷†.          ÄRéP2                                         ê      T       `˙†.  ro10U
+certsign sa10Ucertsign root ca g2       1      ¿t	†.  Ä†.                                                                                                                                                  ∞       4       ê†.  ê˚†. [DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.0811 | Wait Time: 0.0425 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.6659 | TBT_p95=0.6881 | TBT_p99=0.8790 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=74.47% TTLT: 13.0032 | Diff: 8.7084 | Violation: 8.7084 | TotalViolation: 451.3985 | Finished Time: 1769786781.1720135 | SuccessRate: 3.77% (2/57) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.6776 | Wait Time: 0.0428 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.9670 | TBT_p95=0.6337 | TBT_p99=0.6670 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.00% TTLT: 14.4046 | Diff: 10.0097 | Violation: 10.0097 | TotalViolation: 460.8592 | Finished Time: 1769786781.1898572 | SuccessRate: 3.85% (2/58) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.0298 | Wait Time: 0.0373 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 10.6162 | TBT_p95=0.6908 | TBT_p99=0.7481 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.47% TTLT: 13.9223 | Diff: 9.6535 | Violation: 9.6535 | TotalViolation: 460.8592 | Finished Time: 1769786781.195346 | SuccessRate: 5.71% (2/58) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.2665 | Wait Time: 0.0458 | prompt_tok= 27 out_tok= 31 total_tok= 58 | TTFT: 10.3466 | TBT_p95=0.6772 | TBT_p99=0.9281 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.92% TTLT: 13.8392 | Diff: 9.3925 | Violation: 9.3925 | TotalViolation: 460.8592 | Finished Time: 1769786781.1956277 | SuccessRate: 3.64% (2/58) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.5021 | Wait Time: 0.0360 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 11.1522 | TBT_p95=0.6694 | TBT_p99=0.7960 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=77.36% TTLT: 14.6328 | Diff: 10.1882 | Violation: 10.1882 | TotalViolation: 460.8592 | Finished Time: 1769786781.6852572 | SuccessRate: 3.51% (2/58) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786765.7546 | Wait Time: 0.0782 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.9285 | TBT_p95=0.8124 | TBT_p99=7.0418 | TBT_SLO=1.00 | TBT_Violation=6.0418 | TBT_SuccessRate=75.93% TTLT: 15.1984 | Diff: 4.0067 | Violation: 4.0067 | TotalViolation: 460.8592 | Finished Time: 1769786781.7139845 | SuccessRate: 4.88% (2/58) | KV=0.000 run=0 wait=0 swap=0 VRAM=6.29GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786767.8057 | Wait Time: 0.0355 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 9.9535 | TBT_p95=0.6584 | TBT_p99=0.8354 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=76.36% TTLT: 13.3291 | Diff: 8.9891 | Violation: 8.9891 | TotalViolation: 460.8592 | Finished Time: 1769786781.738292 | SuccessRate: 3.57% (2/58) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.8876 | Wait Time: 0.0414 | prompt_tok= 27 out_tok= 0 total_tok= 27 | TTFT: None | TBT_p95=NA | TBT_p99=NA | TBT_SLO=1.00 | TBT_Violation=NA | TBT_SuccessRate=NA% TTLT: 10.7451 | Diff: 9.7865 | Violation: 9.7865 | TotalViolation: 464.5132 | Finished Time: 1769786781.8045084 | SuccessRate: 0.00% (2/59) | KV=0.251 run=21 wait=1 swap=0 VRAM=8.58GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786766.1089 | Wait Time: 0.0355 | prompt_tok= 27 out_tok= 32 total_tok= 59 | TTFT: 4.6185 | TBT_p95=1.4440 | TBT_p99=7.0185 | TBT_SLO=1.00 | TBT_Violation=6.0185 | TBT_SuccessRate=75.00% TTLT: 15.6099 | Diff: 3.6540 | Violation: 3.6540 | TotalViolation: 464.5132 | Finished Time: 1769786781.8337116 | SuccessRate: 3.39% (2/59) | KV=0.000 run=0 wait=0 swap=0 VRAM=7.09GiB/15.00GiB
+[DEBUG] OrigSLO: 1.00 | slo_type: 0 | Insertion Time: 1769786768.5498 | Wait Time: 13.6345 | prompt_tok= 27 out_tok= 7 total_tok= 34 | TTFT: 0.2292 | TBT_p95=0.1222 | TBT_p99=0.1222 | TBT_SLO=1.00 | TBT_Violation=0.0000 | TBT_SuccessRate=75.44% TTLT: 0.9677 | Diff: 12.8638 | Violation: 12.8638 | TotalViolation: 477.3769 | Finished Time: 1769786783.1641555 | SuccessRate: 3.33% (2/60) | KV=0.981 run=33 wait=11 swap=0 VRAM=12.96GiB/15.00GiB
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+1 | 42,7 | 75,1 | 43,7 | 58,1 | 26,6 | 101 | 90,6 | 90,7 | 55,1 | 0 | 59,3 | 64,9 | 101 |\n| 47,6 | 110 | 23,2 | 75,9 | 57,4 | 6,89 | 38,2 | 56 | 85,4 | 53 | 74,9 | 63,4 | 22,1 | 65,4 | 80,8 | 13 | 69,3 | 100 | 83,8 | 81,9 | 64,4 | 90,5 | 54 | 82,2 | 58,8 | 53 | 42,8 | 59,3 | 0 | 36,1 | 70,4 |\n| 21,7 | 82,4 | 39,2 | 49 | 21,9 | 38,7 | 53 | 55 | 50 | 27,7 | 61,8 | 68,9 | 14,4 | 62,8 | 57,6 | 30,2 | 58,2 | 72 | 68,6 | 49,7 | 44 | 68,6 | 44,7 | 46,7 | 27,1 | 25,7 | 14,7 | 64,9 | 36,1 | 0 | 38,3 |\n| 49,9 | 87,3 | 62,2 | 63,5 | 31 | 70,5 | 91,1 | 89,2 | 40,2 | 53,2 | 88,1 | 104 | 51,6 | 95,5 | 74,7 | 60,1 | 86,7 | 77,8 | 92,1 | 52,8 | 67,9 | 85,1 | 76,7 | 20,1 | 11,7 | 18,6 | 45,6 | 101 | 70,4 | 38,3 | 0 |","max_tokens":1024,"stream":true,"priority":0}    ó4/  ë      ∞o4/    4/   ï4/  –Ç4/  @             ¿4/  Pë4/          $       Pë4/  ë4/  @   [Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[Warning] stream error (attempt 1/2): peer closed connection without sending complete message body (incomplete chunked read)
+[SORT] algo=timsort calls=523 avg=0.246ms max=1.078ms
+[Warning] stream error (attempt 1/2): Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+Error in adding request: Connection error.
+[VQ0] groups=574 head_deadline=1769786770.318 slack=-15.741 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Error in adding request: Connection error.
+[SORT] algo=timsort calls=1775 avg=0.371ms max=1.686ms
+ƒ0  @JNƒ0   JNƒ0  ¿INƒ0  ÄINƒ0  ÄHNƒ0   CNƒ0  ¿DNƒ0  ¿HNƒ0   ANƒ0  @ANƒ0  ÄANƒ0  ¿«Nƒ0   »Nƒ0  ¿,Gƒ0  Äú8–0  @E–0   Éy“0  ¿#uƒ0  @“hƒ0  ¿’I–0  Ä‘I–0  ¿‘I–0  @◊I–0  @h;ƒ0  ¿÷I–0  Ä”I–0   ‘I–0  @‘I–0   ◊I–0  ¿”I–0  ¿2ƒ0  ¿M–0   ?–0  ¿ºhƒ0  Äéhƒ0  Ä‚$ƒ0  ¿‹$ƒ0  ¿€$ƒ0  Ä‰$ƒ0  @Ô$ƒ0  Äˇ$ƒ0  ¿¯$ƒ0  ¿¿$ƒ0   Ë$ƒ0  ¿‡rƒ0  @∑pƒ0  ¿<uƒ0  @;uƒ0  ¿––0  Ä'Iƒ0  @2Iƒ0  Ä
+Iƒ0  ¿
+Iƒ0  ÄIƒ0   
+Iƒ0  ¿Iƒ0  Ä“Lƒ0  ÄIƒ0  ¿Iƒ0  Ä"Iƒ0  ÄIƒ0  ÄIƒ0  ¿%Iƒ0  @Iƒ0  @*Iƒ0  @Ï6–0   Ï6–0  @¯6–0  @ÀLƒ0  ÄÀLƒ0  ¿ÀLƒ0   ÃLƒ0  @ÃLƒ0  ÄÃLƒ0  ¿ÃLƒ0   ÕLƒ0  @ÕLƒ0  ÄÕLƒ0  ¿ÕLƒ0   ŒLƒ0  @ŒLƒ0   nƒ0  @S~ƒ0  ¿æpƒ0  ¿1–0   5–0  @ı6–0  ¿Ì6–0   ˆ6–0  @Ì6–0   Ì6–0  ¿Ï6–0   ˜6–0  ÄŒLƒ0  ¿ŒLƒ0  @>Gƒ0  ¿"Nƒ0   <Gƒ0   ,Gƒ0   Gƒ0  ÄGƒ0  ¿ÄDƒ0  ¿K–0  ¿K–0   K–0  ¿õDƒ0   ≥Dƒ0  @∑Dƒ0  ÄøDƒ0   ¡Fƒ0  @¡Fƒ0  Ä¡Fƒ0  ¿¡Fƒ0   ¬Fƒ0  @¬Fƒ0  Ä¬Fƒ0  ¿¬Fƒ0  Ä0Y–0   Ú5ƒ0  ¿·5ƒ0  @»5ƒ0  Äƒ5ƒ0  ¿ı5ƒ0  Ä›5ƒ0  ¿˛5ƒ0   „5ƒ0   ¡5ƒ0   Œ5ƒ0  Äı5ƒ0   Û5ƒ0  ÄÈ5ƒ0   €5ƒ0  Ä–5ƒ0  @˜5ƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ÄWlƒ0  @bF–0  @oF–0  ¿yF–0  ÄzF–0   {F–0  @=Dƒ0   >Dƒ0  Ä>Dƒ0  ¿>Dƒ0   ?Dƒ0  @?Dƒ0  Ä?Dƒ0  ¿?Dƒ0  @ÄDƒ0  ÄÄDƒ0  Äjdƒ0   M–0  ÄM–0   M–0  ¿)M–0  ¿M–0  Ä•K–0  ÄπK–0  Ä¥K–0  ÄÜK–0  ¿≥K–0  ¿ãK–0   £K–0  ¿àK–0   âK–0  ¿ﬂGƒ0  @ÎGƒ0  ¿$Iƒ0  @Iƒ0  ÄIƒ0  @oIƒ0  ¿}Iƒ0   qIƒ0  Ä¨U–0  ¿3Gƒ0  ¿2Gƒ0   Gƒ0   )Gƒ0  Ä'Gƒ0  @Gƒ0  ¿ Gƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ÄÆDƒ0  ¿ÆDƒ0  ÄƒGƒ0   „I–0  ¿‹I–0  Ä„I–0  @ÃFƒ0  ¿ŸFƒ0  Ä$Gƒ0   ﬂFƒ0  @-Gƒ0  @ΩAƒ0  ÄRHƒ0  ¿Vaƒ0  ÄRaƒ0  ÄWaƒ0  @Waƒ0  ¿Waƒ0  @Xaƒ0   Yaƒ0  ÄYaƒ0  ¿aaƒ0   Zaƒ0  ¿Xaƒ0   [aƒ0  @caƒ0  @_aƒ0   \aƒ0  ¿`aƒ0  ¿ÂFƒ0  ¿ÁFƒ0  ÄÏFƒ0  ¿ÈFƒ0   ıFƒ0  Ä‹Fƒ0  @¯Fƒ0   Gƒ0  Ä9Gƒ0   YHƒ0   QHƒ0  ÄÈFƒ0  @˝Fƒ0  ¿ÊFƒ0   ï ƒ0   á ƒ0  @é ƒ0  ¿Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0   Nƒ0  ¿Nƒ0  @h!ƒ0  ¿Ë)ƒ0  ¿tƒ0  @“'ƒ0  ¿z9ƒ0  ¿[9ƒ0  @]9ƒ0   O9ƒ0   V9ƒ0  ÄB9ƒ0  ¿V9ƒ0  Äq9ƒ0   ]9ƒ0  ¿K9ƒ0   g9ƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   Nƒ0  @Nƒ0  ÄNƒ0  ¿Nƒ0   cR–0  ¿eiƒ0  ¿giƒ0  Ätlƒ0  ¿E-ƒ0  ¿ﬁ$ƒ0  ÄΩy“0  @Ëfƒ0  @faƒ0  @…*ƒ0  Äπ0ƒ0   é;ƒ0  @:–0  ¿–0  Ä–0   ¯3–0  @ƒFƒ0  Ä»Fƒ0  @…Fƒ0  ¿…Fƒ0  Ä Fƒ0  ¿ Fƒ0   ÀFƒ0  @ÀFƒ0  ÄÀFƒ0  @$K–0   -K–0  Ä´Dƒ0  @¨Dƒ0  ¿¨Dƒ0  @ÿ'ƒ0  @≠Dƒ0  Ä≠Dƒ0  ¿≠Dƒ0  ¿˚|ƒ0  ¿é^–0   iUƒ0  ¿hUƒ0  @iUƒ0  ¿iUƒ0   kUƒ0  @kUƒ0  @lUƒ0  ÄlUƒ0   mUƒ0  ÄmUƒ0  ¿øDƒ0  @¿Dƒ0  Ä¿Dƒ0  @¡Dƒ0  ¿¡Dƒ0  Ä¬Dƒ0  ¿¬Dƒ0  Ä√Dƒ0  ¿rF–0  ¿wF–0  @yF–0  @ÃGƒ0  @É8ƒ0  @%qƒ0  @4qƒ0  Ä5qƒ0  @,qƒ0  ¿ˇå“0  @¡}“0   Bƒ0  ¿¬6–0  @È6–0   È6–0  @Ù6–0  Ä ‚—0  ÄÖ–0  @÷5ƒ0  ÄúDƒ0   ùDƒ0   ’Fƒ0  ÄùDƒ0  @ûDƒ0  ¿ûDƒ0   üDƒ0  @üDƒ0   ¸ƒ0  @úDƒ0  @•Dƒ0  @¶Dƒ0  Ä¶Dƒ0  ¿¶Dƒ0   ßDƒ0  Ä K–0  @7,ƒ0   8,ƒ0  @9,ƒ0  @:,ƒ0  ¿:,ƒ0  @‚)ƒ0  ÄÊ)ƒ0  ÄÁ)ƒ0  ¿Á)ƒ0  @˚Gƒ0  ¿ÔGƒ0   ’Gƒ0  Ä›.–0  ¿ó[–0  ¿ñ[–0  ¿ãÈ—0                                                                                                                                                                                                                                                                                                                  1       NQ2   NQ2  ¿dà8tU  ¿dà8tU                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [VQ0] groups=823 head_deadline=1769786770.318 slack=-20.741 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=2990 avg=0.457ms max=1.973ms
+[VQ0] groups=1097 head_deadline=1769786770.318 slack=-25.743 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=4058 avg=0.540ms max=2.368ms
+[VQ0] groups=1382 head_deadline=1769786770.318 slack=-30.746 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=5224 avg=0.631ms max=2.368ms
+[VQ0] groups=1657 head_deadline=1769786770.318 slack=-35.748 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=6254 avg=0.714ms max=2.941ms
+[VQ0] groups=1932 head_deadline=1769786770.318 slack=-40.750 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=7355 avg=0.806ms max=3.348ms
+[VQ0] groups=2201 head_deadline=1769786770.318 slack=-45.751 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=8366 avg=0.903ms max=3.942ms
+[VQ0] groups=2472 head_deadline=1769786770.318 slack=-50.886 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=9186 avg=1.032ms max=403.122ms
+[VQ0] groups=2763 head_deadline=1769786770.318 slack=-55.888 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=9985 avg=1.150ms max=403.122ms
+[VQ0] groups=3009 head_deadline=1769786770.318 slack=-61.062 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=10691 avg=1.256ms max=403.122ms
+[VQ0] groups=3257 head_deadline=1769786770.318 slack=-66.063 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=11403 avg=1.385ms max=403.122ms
+[VQ0] groups=3488 head_deadline=1769786770.318 slack=-71.076 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=12109 avg=1.509ms max=403.122ms
+[VQ0] groups=3703 head_deadline=1769786770.318 slack=-76.133 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=12665 avg=1.614ms max=403.122ms
+[VQ0] groups=3920 head_deadline=1769786770.318 slack=-81.367 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=13314 avg=1.727ms max=403.122ms
+[VQ0] groups=4152 head_deadline=1769786770.318 slack=-86.630 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=13871 avg=1.854ms max=403.122ms
+[VQ0] groups=4369 head_deadline=1769786770.318 slack=-91.645 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=14348 avg=1.948ms max=403.122ms
+[VQ0] groups=4569 head_deadline=1769786770.318 slack=-96.705 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=14849 avg=2.065ms max=403.122ms
+[VQ0] groups=4815 head_deadline=1769786770.318 slack=-101.714 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=15279 avg=2.193ms max=403.122ms
+[VQ0] groups=5048 head_deadline=1769786770.318 slack=-106.720 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=15768 avg=2.306ms max=403.122ms
+[VQ0] groups=5282 head_deadline=1769786770.318 slack=-111.723 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=16218 avg=2.412ms max=403.122ms
+[VQ0] groups=5503 head_deadline=1769786770.318 slack=-116.995 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=16625 avg=2.531ms max=403.122ms
+[VQ0] groups=5700 head_deadline=1769786770.318 slack=-122.007 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=17010 avg=2.664ms max=403.122ms
+[VQ0] groups=5893 head_deadline=1769786770.318 slack=-127.015 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=17390 avg=2.780ms max=403.122ms
+[VQ0] groups=6092 head_deadline=1769786770.318 slack=-132.203 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=17748 avg=2.891ms max=403.122ms
+[VQ0] groups=6277 head_deadline=1769786770.318 slack=-137.207 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=18136 avg=3.005ms max=403.122ms
+[VQ0] groups=6450 head_deadline=1769786770.318 slack=-142.219 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=18462 avg=3.126ms max=403.122ms
+[VQ0] groups=6628 head_deadline=1769786770.318 slack=-147.225 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=18798 avg=3.235ms max=403.122ms
+[VQ0] groups=6785 head_deadline=1769786770.318 slack=-152.352 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=19088 avg=3.365ms max=403.122ms
+[VQ0] groups=6945 head_deadline=1769786770.318 slack=-157.365 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=19415 avg=3.483ms max=403.122ms
+[VQ0] groups=7113 head_deadline=1769786770.318 slack=-162.372 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=19729 avg=3.613ms max=403.122ms
+[VQ0] groups=7265 head_deadline=1769786770.318 slack=-167.440 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=20044 avg=3.727ms max=403.122ms
+[VQ0] groups=7426 head_deadline=1769786770.318 slack=-172.444 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=20351 avg=3.839ms max=403.122ms
+[VQ0] groups=7582 head_deadline=1769786770.318 slack=-177.683 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=20634 avg=3.960ms max=403.122ms
+[VQ0] groups=7742 head_deadline=1769786770.318 slack=-182.685 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=20917 avg=4.080ms max=403.122ms
+[VQ0] groups=7880 head_deadline=1769786770.318 slack=-187.699 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=21203 avg=4.189ms max=403.122ms
+[VQ0] groups=8038 head_deadline=1769786770.318 slack=-192.866 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=21478 avg=4.306ms max=403.122ms
+[VQ0] groups=8200 head_deadline=1769786770.318 slack=-198.143 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=21751 avg=4.423ms max=403.122ms
+[VQ0] groups=8349 head_deadline=1769786770.318 slack=-203.149 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=21997 avg=4.537ms max=403.122ms
+[VQ0] groups=8494 head_deadline=1769786770.318 slack=-208.167 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=22229 avg=4.637ms max=403.122ms
+[VQ0] groups=8650 head_deadline=1769786770.318 slack=-213.179 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=22467 avg=4.749ms max=403.122ms
+[VQ0] groups=8807 head_deadline=1769786770.318 slack=-218.185 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=22712 avg=4.860ms max=403.122ms
+[VQ0] groups=8971 head_deadline=1769786770.318 slack=-223.187 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=22944 avg=4.972ms max=403.122ms
+[VQ0] groups=9122 head_deadline=1769786770.318 slack=-228.201 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=23155 avg=5.081ms max=403.122ms
+[VQ0] groups=9282 head_deadline=1769786770.318 slack=-233.207 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=23368 avg=5.191ms max=403.122ms
+[VQ0] groups=9440 head_deadline=1769786770.318 slack=-238.217 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=23577 avg=5.300ms max=403.122ms
+[VQ0] groups=9613 head_deadline=1769786770.318 slack=-243.301 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=23774 avg=5.411ms max=403.122ms
+[VQ0] groups=9789 head_deadline=1769786770.318 slack=-248.306 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=23966 avg=5.520ms max=403.122ms
+[VQ0] groups=9964 head_deadline=1769786770.318 slack=-253.550 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=24152 avg=5.628ms max=403.122ms
+[VQ0] groups=10139 head_deadline=1769786770.318 slack=-258.643 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=24334 avg=5.736ms max=403.122ms
+[VQ0] groups=10317 head_deadline=1769786770.318 slack=-263.795 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=24493 avg=5.852ms max=403.122ms
+[VQ0] groups=10473 head_deadline=1769786770.318 slack=-268.854 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=24677 avg=5.936ms max=403.122ms
+[VQ0] groups=10662 head_deadline=1769786770.318 slack=-274.111 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=24848 avg=6.054ms max=403.122ms
+[VQ0] groups=10828 head_deadline=1769786770.318 slack=-279.123 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25021 avg=6.148ms max=403.122ms
+[VQ0] groups=11025 head_deadline=1769786770.318 slack=-284.135 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25207 avg=6.245ms max=403.122ms
+[VQ0] groups=11178 head_deadline=1769786770.318 slack=-289.146 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25366 avg=6.361ms max=403.122ms
+[VQ0] groups=11327 head_deadline=1769786770.318 slack=-294.165 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25517 avg=6.465ms max=403.122ms
+[VQ0] groups=11488 head_deadline=1769786770.318 slack=-299.323 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25678 avg=6.582ms max=403.122ms
+[VQ0] groups=11643 head_deadline=1769786770.318 slack=-304.328 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25823 avg=6.682ms max=403.122ms
+[VQ0] groups=11770 head_deadline=1769786770.318 slack=-309.446 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=25963 avg=6.784ms max=403.122ms
+[VQ0] groups=11912 head_deadline=1769786770.318 slack=-314.470 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26091 avg=6.884ms max=403.122ms
+[VQ0] groups=12052 head_deadline=1769786770.318 slack=-319.513 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26236 avg=6.995ms max=403.122ms
+[VQ0] groups=12197 head_deadline=1769786770.318 slack=-324.515 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26384 avg=7.097ms max=403.122ms
+[VQ0] groups=12341 head_deadline=1769786770.318 slack=-329.722 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26528 avg=7.207ms max=403.122ms
+[VQ0] groups=12487 head_deadline=1769786770.318 slack=-334.727 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26669 avg=7.307ms max=403.122ms
+[VQ0] groups=12624 head_deadline=1769786770.318 slack=-339.742 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26793 avg=7.413ms max=403.122ms
+[VQ0] groups=12757 head_deadline=1769786770.318 slack=-345.046 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=26935 avg=7.524ms max=403.122ms
+[VQ0] groups=12898 head_deadline=1769786770.318 slack=-350.208 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27076 avg=7.635ms max=403.122ms
+[VQ0] groups=13040 head_deadline=1769786770.318 slack=-355.209 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27215 avg=7.735ms max=403.122ms
+[VQ0] groups=13168 head_deadline=1769786770.318 slack=-360.213 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27344 avg=7.842ms max=403.122ms
+[VQ0] groups=13292 head_deadline=1769786770.318 slack=-365.217 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27468 avg=7.948ms max=403.122ms
+[VQ0] groups=13415 head_deadline=1769786770.318 slack=-370.222 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27600 avg=8.045ms max=403.122ms
+[VQ0] groups=13540 head_deadline=1769786770.318 slack=-375.334 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27725 avg=8.151ms max=403.122ms
+[VQ0] groups=13674 head_deadline=1769786770.318 slack=-380.495 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27851 avg=8.258ms max=403.122ms
+[VQ0] groups=13799 head_deadline=1769786770.318 slack=-385.507 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=27970 avg=8.354ms max=403.122ms
+[VQ0] groups=13925 head_deadline=1769786770.318 slack=-390.760 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28099 avg=8.460ms max=403.122ms
+[VQ0] groups=14055 head_deadline=1769786770.318 slack=-395.765 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28224 avg=8.564ms max=403.122ms
+[VQ0] groups=14185 head_deadline=1769786770.318 slack=-400.768 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28355 avg=8.670ms max=403.122ms
+[VQ0] groups=14300 head_deadline=1769786770.318 slack=-406.029 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28470 avg=8.772ms max=403.122ms
+[VQ0] groups=14425 head_deadline=1769786770.318 slack=-411.079 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28595 avg=8.878ms max=403.122ms
+[VQ0] groups=14547 head_deadline=1769786770.318 slack=-416.344 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28715 avg=8.971ms max=403.122ms
+[VQ0] groups=14663 head_deadline=1769786770.318 slack=-421.458 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28834 avg=9.074ms max=403.122ms
+[VQ0] groups=14789 head_deadline=1769786770.318 slack=-426.485 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=28953 avg=9.187ms max=403.122ms
+[VQ0] groups=14905 head_deadline=1769786770.318 slack=-431.487 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29070 avg=9.289ms max=403.122ms
+[VQ0] groups=15024 head_deadline=1769786770.318 slack=-436.564 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29188 avg=9.392ms max=403.122ms
+[VQ0] groups=15129 head_deadline=1769786770.318 slack=-441.615 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29302 avg=9.484ms max=403.122ms
+[VQ0] groups=15252 head_deadline=1769786770.318 slack=-446.631 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29419 avg=9.587ms max=403.122ms
+[VQ0] groups=15366 head_deadline=1769786770.318 slack=-451.889 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29531 avg=9.688ms max=403.122ms
+[VQ0] groups=15478 head_deadline=1769786770.318 slack=-457.134 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29643 avg=9.791ms max=403.122ms
+[VQ0] groups=15590 head_deadline=1769786770.318 slack=-462.227 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29755 avg=9.893ms max=403.122ms
+[VQ0] groups=15702 head_deadline=1769786770.318 slack=-467.242 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29867 avg=9.994ms max=403.122ms
+[VQ0] groups=15798 head_deadline=1769786770.318 slack=-472.481 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=29964 avg=10.081ms max=403.122ms
+[VQ0] groups=15910 head_deadline=1769786770.318 slack=-477.766 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30073 avg=10.183ms max=403.122ms
+[VQ0] groups=16018 head_deadline=1769786770.318 slack=-483.033 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30179 avg=10.282ms max=403.122ms
+[VQ0] groups=16123 head_deadline=1769786770.318 slack=-488.154 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30287 avg=10.383ms max=403.122ms
+[VQ0] groups=16231 head_deadline=1769786770.318 slack=-493.349 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30398 avg=10.484ms max=403.122ms
+[VQ0] groups=16338 head_deadline=1769786770.318 slack=-498.581 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30501 avg=10.583ms max=403.122ms
+[VQ0] groups=16447 head_deadline=1769786770.318 slack=-503.604 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30607 avg=10.683ms max=403.122ms
+[VQ0] groups=16555 head_deadline=1769786770.318 slack=-508.910 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30714 avg=10.775ms max=403.122ms
+[VQ0] groups=16664 head_deadline=1769786770.318 slack=-514.098 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30817 avg=10.873ms max=403.122ms
+[VQ0] groups=16764 head_deadline=1769786770.318 slack=-519.132 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=30918 avg=10.972ms max=403.122ms
+[VQ0] groups=16867 head_deadline=1769786770.318 slack=-524.146 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31020 avg=11.069ms max=403.122ms
+[VQ0] groups=16966 head_deadline=1769786770.318 slack=-529.242 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31118 avg=11.165ms max=403.122ms
+[VQ0] groups=17073 head_deadline=1769786770.318 slack=-534.273 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31222 avg=11.262ms max=403.122ms
+[VQ0] groups=17178 head_deadline=1769786770.318 slack=-539.323 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31325 avg=11.358ms max=403.122ms
+[VQ0] groups=17273 head_deadline=1769786770.318 slack=-544.349 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31422 avg=11.454ms max=403.122ms
+[VQ0] groups=17374 head_deadline=1769786770.318 slack=-549.376 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31525 avg=11.551ms max=403.122ms
+[VQ0] groups=17481 head_deadline=1769786770.318 slack=-554.411 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31625 avg=11.649ms max=403.122ms
+[VQ0] groups=17575 head_deadline=1769786770.318 slack=-559.424 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31721 avg=11.745ms max=403.122ms
+[VQ0] groups=17668 head_deadline=1769786770.318 slack=-564.444 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31814 avg=11.841ms max=403.122ms
+[VQ0] groups=17764 head_deadline=1769786770.318 slack=-569.450 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=31909 avg=11.937ms max=403.122ms
+[VQ0] groups=17858 head_deadline=1769786770.318 slack=-574.466 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=32004 avg=12.031ms max=403.122ms
+[VQ0] groups=17957 head_deadline=1769786770.318 slack=-579.504 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=32102 avg=12.126ms max=403.122ms
+[VQ0] groups=18054 head_deadline=1769786770.318 slack=-584.509 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=32199 avg=12.230ms max=403.122ms
+[VQ0] groups=18148 head_deadline=1769786770.318 slack=-589.805 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+[SORT] algo=timsort calls=32295 avg=12.324ms max=403.122ms
+[VQ0] groups=18240 head_deadline=1769786770.318 slack=-594.946 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Successfully pushed 18377 requests (logged 500).
+Now waiting for processing...
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32383 avg=12.417ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-599.975 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32494 avg=12.520ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-604.980 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32605 avg=12.621ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-609.985 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32711 avg=12.730ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-615.141 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32822 avg=12.830ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-620.157 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+[SORT] algo=timsort calls=32934 avg=12.938ms max=403.122ms
+[VQ0] groups=18252 head_deadline=1769786770.318 slack=-625.483 model=meta-llama/Llama-3.2-1B-Instruct
+  deadlines: 1769786770.318, 1769786770.329, 1769786770.341, 1769786770.449, 1769786770.531
+Status: [Worker Load: inf] / [Queue Waiting Groups: 18252]
+Drain timeout reached. Exiting.

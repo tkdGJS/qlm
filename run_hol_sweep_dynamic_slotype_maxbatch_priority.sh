@@ -18,7 +18,7 @@ PUSH_INTERVAL_LIST=(0.0001 0.001 0.01) # PUSH_MODE=interval 일 때 사용
 # (추가) max_batch_size sweep: 20~120, 20씩
 MAX_BATCH_SIZES=(100 80 60 40 20)
 
-CHUNKED_PREFILL_VALUES=(0 1)
+CHUNKED_PREFILL_VALUES=(1 0)
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 #DRAIN_TIMEOUT_S_DEFAULT=600
 DRAIN_TIMEOUT_S_DEFAULT=30
