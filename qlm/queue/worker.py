@@ -386,15 +386,18 @@ class Worker:
         except Exception as e:
             print(f"Error in adding request: {e}")
 
-    def _read_metrics(self, metric_name):
+#    def _read_metrics(self, metric_name):
+    def _read_metrics(self, metric_name, default: float = 0.0):
         """
         Reads all metrics from the worker and checks for a match with the metric name.
         """
-        metrics = requests.get(f"{self.address}/metrics")
+#        metrics = requests.get(f"{self.address}/metrics")
+        metrics = requests.get(f"{self.address}/metrics", timeout=2.0)
 
         for line in metrics.text.splitlines():
             if line.startswith(metric_name):
                 return float(line.split()[-1])
+        return float(default)
 
     def get_backpressure(self):
         """
@@ -402,18 +405,11 @@ class Worker:
         Includes running, queued and swapped requests.
         return: The backpressure of the worker.
         """
-
-        try:
-            running_requests = self._read_metrics("vllm:num_requests_running")
-            queued_requests = self._read_metrics("vllm:num_requests_waiting")
-            swapped_requests = self._read_metrics("vllm:num_requests_swapped")
-
-            backpressure = running_requests + queued_requests + swapped_requests
-
-            return backpressure
-        except Exception as e:
-            # If the worker is not reachable, return infinite backpressure
-            return INF
+        # NOTE: vLLM 버전에 따라 swapped metric이 없을 수 있음 → default=0으로 처리
+        running_requests = self._read_metrics("vllm:num_requests_running", default=0.0)
+        queued_requests  = self._read_metrics("vllm:num_requests_waiting", default=0.0)
+        swapped_requests = self._read_metrics("vllm:num_requests_swapped", default=0.0)
+        return running_requests + queued_requests + swapped_requests
 
     def __hash__(self):
         return hash(self.worker_id)
