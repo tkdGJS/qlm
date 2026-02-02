@@ -39,16 +39,16 @@ def summarize_lengths(name: str, lens: List[int]) -> None:
 
 def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
     """
-    하드코딩 피하려고 start_vllm_swap.sh.sh에서 --max-model-len 값을 파싱.
-    (프로젝트가 Endpoint -> start_vllm_swap.sh.sh로 vLLM 띄우는 구조라 이게 현실적으로 잘 맞음)
+    하드코딩 피하려고 start_vllm.sh에서 --max-model-len 값을 파싱.
+    (프로젝트가 Endpoint -> start_vllm.sh로 vLLM 띄우는 구조라 이게 현실적으로 잘 맞음)
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_kvoff.sh"))
     # 실행 위치에 따라 상대경로도 시도
-    candidates.append("start_vllm_swap.sh.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
+    candidates.append("start_vllm_kvoff.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_kvoff.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
@@ -66,14 +66,14 @@ def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
 
 def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
     """
-    start_vllm_swap.sh.sh에서 --max-num-batched-tokens 값을 파싱.
+    start_vllm.sh에서 --max-num-batched-tokens 값을 파싱.
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
-    candidates.append("start_vllm_swap.sh.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_kvoff.sh"))
+    candidates.append("start_vllm_kvoff.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_kvoff.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
@@ -92,14 +92,14 @@ def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
 
 def read_vllm_max_num_seqs_from_start_sh() -> Optional[int]:
     """
-    start_vllm_swap.sh.sh에서 --max-num-seqs 값을 파싱.
+    start_vllm.sh에서 --max-num-seqs 값을 파싱.
     """
     candidates = []
     proj = os.environ.get("QLMPROJDIR")
     if proj:
-        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_swap.sh.sh"))
-    candidates.append("start_vllm_swap.sh.sh")
-    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_swap.sh.sh"))
+        candidates.append(os.path.join(proj, "qlm", "endpoints", "start_vllm_kvoff.sh"))
+    candidates.append("start_vllm_kvoff.sh")
+    candidates.append(os.path.join("qlm", "endpoints", "start_vllm_kvoff.sh"))
 
     for p in candidates:
         if not os.path.exists(p):
@@ -482,7 +482,7 @@ async def basic_test():
         max_toks = wi["max_tokens"]
         slo_type = 0 if wi["dataset"] == "dataset1" else 1
         slo = sample_slo(slo_type)
-        priority = -10 if slo_type == 0 else 0  # dataset1 먼저
+
         # 안전: 최종 프롬프트가 컨텍스트를 넘지 않는지 한 번 더 체크(느리면 주석 가능)
         # (여기서는 max_prompt_tokens_{short/long}을 넘으면 skip)
         if wi["dataset"] == "dataset1":
@@ -499,7 +499,6 @@ async def basic_test():
             slo=slo,
             max_tokens=max_toks,   # <-- execution time 분리 핵심 (패치 필요)
             slo_type=slo_type,
-            priority=priority,
         )
         pushed_count += 1
         if len(pushed_log) < PUSH_LOG_LIMIT:

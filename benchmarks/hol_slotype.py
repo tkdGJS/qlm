@@ -184,7 +184,7 @@ async def basic_test():
     MAX_TOKENS_LONG  = int(os.environ.get("MAX_TOKENS_LONG", "1024"))    # dataset2
 
     # dataset1/2를 “입력 길이”로도 어느 정도 구분하고 싶으면 아래 기준 사용
-    SHORT_MAX_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MAX_BASE_PROMPT_TOKENS", "128"))
+    SHORT_MAX_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MAX_BASE_PROMPT_TOKENS", "1024"))
     SHORT_MIN_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MIN_BASE_PROMPT_TOKENS", "16"))  # 너무 1토큰만 모이는 것 방지
 
     LONG_MIN_BASE_PROMPT_TOKENS  = int(os.environ.get("LONG_MIN_BASE_PROMPT_TOKENS", "1024"))

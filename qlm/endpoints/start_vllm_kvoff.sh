@@ -50,8 +50,10 @@ MAX_MODEL_LEN="${VLLM_MAX_MODEL_LEN:-8192}"
 MAX_NUM_SEQS="${VLLM_MAX_NUM_SEQS:-128}"
 MAX_NUM_BATCHED_TOKENS="${VLLM_MAX_NUM_BATCHED_TOKENS:-131072}"
 GPU_MEMORY_UTILIZATION="${VLLM_GPU_MEMORY_UTILIZATION:-0.9}"
+KVOFFLOADING_SIZE="${VLLM_KVOFFLOADING_SIZE:-32}"
+KVOFFLOADING_BACKEND="${VLLM_KVOFFLOADING_BACKEND:-native}"
 #PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-swap}"
-PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-None}"
+#PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-None}"
 #SWAP_SPACE="${VLLM_SWAP_SPACE:-16}"
 #SCHEDULING_POLICY="${VLLM_SCHEDULING_POLICY:-priority}"
 SCHEDULING_POLICY="${VLLM_SCHEDULING_POLICY:-fcfs}"
@@ -70,6 +72,8 @@ echo "[start_vllm] max_model_len=${MAX_MODEL_LEN}"
 echo "[start_vllm] max_num_seqs=${MAX_NUM_SEQS}"
 echo "[start_vllm] max_num_batched_tokens=${MAX_NUM_BATCHED_TOKENS}"
 echo "[start_vllm] gpu_memory_utilization=${GPU_MEMORY_UTILIZATION}"
+echo "[start_vllm] kv-offloading-size=${KVOFFLOADING_SIZE}"
+echo "[start_vllm] kv-offloading-backend=${KVOFFLOADING_BACKEND}"
 echo "[start_vllm] scheduling_policy=${SCHEDULING_POLICY}"
 echo "[start_vllm] chunked_prefill=${ENABLE_CHUNKED_PREFILL}"
 echo "[start_vllm] extra_args=${EXTRA_ARGS}"
@@ -81,7 +85,9 @@ exec vllm serve "${MODEL}" \
   --max-num-seqs "${MAX_NUM_SEQS}" \
   --max-num-batched-tokens "${MAX_NUM_BATCHED_TOKENS}" \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}" \
-  --preemption-mode "${PREEMPTION_MODE}" \
+  --disable-hybrid-kv-cache-manager \
+  --kv-offloading-size "${KVOFFLOADING_SIZE}" \
+  --kv-offloading-backend "${KVOFFLOADING_BACKEND}" \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}

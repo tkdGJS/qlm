@@ -4,7 +4,8 @@ set -euo pipefail
 # ====== 설정 ======
 # sweep 할 값들 (원하는대로 수정)
 #SLEEPS=(0.001 0.005 0.01 0.05 0.1)
-SLEEPS=(0.0001 0.001 0.01)
+#SLEEPS=(0.0001 0.001 0.01)
+SLEEPS=(0.0001)
 
 # VQ push 속도 sweep:
 #  - MODE=rps : PUSH_RATE_RPS로 sweep (권장)
@@ -12,12 +13,14 @@ SLEEPS=(0.0001 0.001 0.01)
 PUSH_MODE="interval"
 PUSH_RPS_LIST=(1 2 5 10 20 50) # PUSH_MODE=rps 일 때 사용
 #PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
-PUSH_INTERVAL_LIST=(0.0001 0.001 0.01) # PUSH_MODE=interval 일 때 사용
+PUSH_INTERVAL_LIST=(0.001 0.01 0.1) # PUSH_MODE=interval 일 때 사용
 #PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
-MAX_BATCH_SIZES=(100 80 60 40 20)
+#MAX_BATCH_SIZES=(100 80 60 40 20)
+MAX_BATCH_SIZES=(100 80 60)
 
+#CHUNKED_PREFILL_VALUES=(0 1)
 CHUNKED_PREFILL_VALUES=(1 0)
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 #DRAIN_TIMEOUT_S_DEFAULT=600
@@ -26,10 +29,10 @@ DRAIN_TIMEOUT_S_DEFAULT=30
 SORT_ALGO="timsort"
 SORT_PROFILE="1"
 
-BENCH_CMD=(python benchmarks/hol_priority.py)
+BENCH_CMD=(python benchmarks/hol_slotype.py)
 
 # 로그/CSV 저장 폴더 (원하면 변경)
-OUT_DIR="results_hol_sweep_priority"
+OUT_DIR="results_hol_sweep_slotype"
 mkdir -p "$OUT_DIR"
 
 # 실험 전/후 휴식(초)
@@ -82,10 +85,10 @@ kill_vllm_on_port() {
 
 kill_hol_related_user() {
   log "Killing HOL-related python processes (user=$(id -un))"
-  pkill -u "$(id -u)" -TERM -f 'benchmarks/hol_priority.py' || true
+  pkill -u "$(id -u)" -TERM -f 'benchmarks/hol_slotype.py' || true
   pkill -u "$(id -u)" -TERM -f 'qlm\.|Queue\(|VirtualQueue' || true
   sleep 2
-  pkill -u "$(id -u)" -KILL -f 'benchmarks/hol_priority.py' || true
+  pkill -u "$(id -u)" -KILL -f 'benchmarks/hol_slotype.py' || true
   pkill -u "$(id -u)" -KILL -f 'qlm\.|Queue\(|VirtualQueue' || true
 }
 
