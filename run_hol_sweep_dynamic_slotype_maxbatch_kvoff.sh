@@ -32,7 +32,7 @@ SORT_PROFILE="1"
 BENCH_CMD=(python benchmarks/hol_kvoff.py)
 
 # 로그/CSV 저장 폴더 (원하면 변경)
-OUT_DIR="results_hol_sweep_slotype"
+OUT_DIR="results_hol_sweep_kvoff"
 mkdir -p "$OUT_DIR"
 
 # 실험 전/후 휴식(초)
@@ -85,10 +85,10 @@ kill_vllm_on_port() {
 
 kill_hol_related_user() {
   log "Killing HOL-related python processes (user=$(id -un))"
-  pkill -u "$(id -u)" -TERM -f 'benchmarks/hol_slotype.py' || true
+  pkill -u "$(id -u)" -TERM -f 'benchmarks/hol_kvoff.py' || true
   pkill -u "$(id -u)" -TERM -f 'qlm\.|Queue\(|VirtualQueue' || true
   sleep 2
-  pkill -u "$(id -u)" -KILL -f 'benchmarks/hol_slotype.py' || true
+  pkill -u "$(id -u)" -KILL -f 'benchmarks/hol_kvoff.py' || true
   pkill -u "$(id -u)" -KILL -f 'qlm\.|Queue\(|VirtualQueue' || true
 }
 
