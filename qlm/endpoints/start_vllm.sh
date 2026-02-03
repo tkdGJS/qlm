@@ -22,8 +22,8 @@ while true; do
     echo
     echo "Env overrides:"
     echo "  VLLM_DTYPE=half|bfloat16|float16..."
-    echo "  VLLM_MAX_MODEL_LEN=32768"
-    echo "  VLLM_MAX_NUM_SEQS=256"
+    echo "  VLLM_MAX_MODEL_LEN=8192"
+    echo "  VLLM_MAX_NUM_SEQS=128"
     echo "  VLLM_MAX_NUM_BATCHED_TOKENS=131072"
     echo "  VLLM_GPU_MEMORY_UTILIZATION=0.9"
     echo "  VLLM_PREEMPTION_MODE=swap|recompute"
@@ -51,7 +51,7 @@ MAX_NUM_SEQS="${VLLM_MAX_NUM_SEQS:-128}"
 MAX_NUM_BATCHED_TOKENS="${VLLM_MAX_NUM_BATCHED_TOKENS:-131072}"
 GPU_MEMORY_UTILIZATION="${VLLM_GPU_MEMORY_UTILIZATION:-0.9}"
 #PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-swap}"
-PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-None}"
+#PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-None}"
 #SWAP_SPACE="${VLLM_SWAP_SPACE:-16}"
 #SCHEDULING_POLICY="${VLLM_SCHEDULING_POLICY:-priority}"
 SCHEDULING_POLICY="${VLLM_SCHEDULING_POLICY:-fcfs}"
@@ -81,7 +81,6 @@ exec vllm serve "${MODEL}" \
   --max-num-seqs "${MAX_NUM_SEQS}" \
   --max-num-batched-tokens "${MAX_NUM_BATCHED_TOKENS}" \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}" \
-  --preemption-mode "${PREEMPTION_MODE}" \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}

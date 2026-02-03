@@ -343,25 +343,48 @@ class Worker:
                 f" wait={_fmt(snap.num_waiting, '{:.0f}')}"
                 f" swap={_fmt(snap.num_swapped, '{:.0f}')}"
                 f" VRAM={_fmt_bytes_to_gb(snap.vram_used_bytes)}/{_fmt_bytes_to_gb(snap.vram_total_bytes)}"
-                f" | KVO(out_cnt={_fmt(snap.kvo_out_count, '{:.0f}')}"
-                f", out={_fmt_bytes_to_mib(snap.kvo_out_bytes)}"
-                f", out_t={_fmt(snap.kvo_out_time_s, '{:.3f}')}"
-                f" / in_cnt={_fmt(snap.kvo_in_count, '{:.0f}')}"
-                f", in={_fmt_bytes_to_mib(snap.kvo_in_bytes)}"
-                f", in_t={_fmt(snap.kvo_in_time_s, '{:.3f}')})"
+#                f" | KVO(out_cnt={_fmt(snap.kvo_out_count, '{:.0f}')}"
+#                f", out={_fmt_bytes_to_mib(snap.kvo_out_bytes)}"
+#                f", out_t={_fmt(snap.kvo_out_time_s, '{:.3f}')}"
+#                f" / in_cnt={_fmt(snap.kvo_in_count, '{:.0f}')}"
+#                f", in={_fmt_bytes_to_mib(snap.kvo_in_bytes)}"
+#                f", in_t={_fmt(snap.kvo_in_time_s, '{:.3f}')})"
             )
 
+            # ---- LMCache metrics: 가능한 것 전부 출력 (없어도 동작) ----
+            lm = getattr(snap, "lmcache_metrics", None)
+            if isinstance(lm, dict) and lm:
+                def _fmt_lm(k: str, v):
+                    if v is None:
+                        return "NA"
+                    # bytes/usage류는 MiB로
+                    if ("usage" in k) or ("bytes" in k) or k.endswith("_bytes"):
+                        return _fmt_bytes_to_mib(v)
+                    # count류는 정수로
+                    if k.endswith("_count") or k.startswith("lmcache:num_") or k.endswith("_requests") or k.endswith("_successes") or k.endswith("_errors"):
+                        return _fmt(v, "{:.0f}")
+                    # rate류는 소수로
+                    if ("hit_rate" in k) or ("reuse_rate" in k) or ("fill_rate" in k) or k.endswith("_rate"):
+                        return _fmt(v, "{:.4f}")
+                    # 나머지는 짧게
+                    return _fmt(v, "{:.6g}")
+
+                lm_items = " ".join(f"{k}={_fmt_lm(k, v)}" for k, v in sorted(lm.items()))
+                lm_part = f" | LMCACHE[{lm_items}]"
+            else:
+                lm_part = " | LMCACHE[NA]"
+            # -----------------------------------------------------------
             # snap_part 바로 아래에 추가
-            lm = getattr(snap, "lmcache_metrics", None) or {}
-            
-            lm_part = (
-                f" | LMCACHE("
-                f"local={_fmt_bytes_to_mib(lm.get('lmcache:local_cache_usage'))}"
-                f" hit={_fmt(lm.get('lmcache:retrieve_hit_rate'), '{:.3f}')}"
-                f" ttr_sum={_fmt(lm.get('lmcache:time_to_retrieve_sum'), '{:.4f}')}"
-                f" ttr_cnt={_fmt(lm.get('lmcache:time_to_retrieve_count'), '{:.0f}')}"
-                f")"
-            )
+#            lm = getattr(snap, "lmcache_metrics", None) or {}
+#            
+#            lm_part = (
+#                f" | LMCACHE("
+#                f"local={_fmt_bytes_to_mib(lm.get('lmcache:local_cache_usage'))}"
+#                f" hit={_fmt(lm.get('lmcache:retrieve_hit_rate'), '{:.3f}')}"
+#                f" ttr_sum={_fmt(lm.get('lmcache:time_to_retrieve_sum'), '{:.4f}')}"
+#                f" ttr_cnt={_fmt(lm.get('lmcache:time_to_retrieve_count'), '{:.0f}')}"
+#                f")"
+#            )
 
             # [로그 메시지 생성]
             log_message = (

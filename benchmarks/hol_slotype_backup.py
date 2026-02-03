@@ -58,7 +58,7 @@ def read_vllm_max_model_len_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"VLLM_MAX_MODEL_LEN(?:\s+|=)(\d+)", txt)
+        m = re.search(r"--max-model-len\s+(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -83,7 +83,7 @@ def read_vllm_max_num_batched_tokens_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"VLLM_MAX_NUM_BATCHED_TOKENS(?:\s+|=)(\d+)", txt)
+        m = re.search(r"--max-num-batched-tokens(?:\s+|=)(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -109,7 +109,7 @@ def read_vllm_max_num_seqs_from_start_sh() -> Optional[int]:
         except Exception:
             continue
 
-        m = re.search(r"VLLM_MAX_NUM_SEQS(?:\s+|=)(\d+)", txt)
+        m = re.search(r"--max-num-seqs(?:\s+|=)(\d+)", txt)
         if m:
             return int(m.group(1))
 
@@ -184,13 +184,10 @@ async def basic_test():
     MAX_TOKENS_LONG  = int(os.environ.get("MAX_TOKENS_LONG", "1024"))    # dataset2
 
     # dataset1/2를 “입력 길이”로도 어느 정도 구분하고 싶으면 아래 기준 사용
-    SHORT_MAX_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MAX_BASE_PROMPT_TOKENS", "128"))
+    SHORT_MAX_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MAX_BASE_PROMPT_TOKENS", "1024"))
     SHORT_MIN_BASE_PROMPT_TOKENS = int(os.environ.get("SHORT_MIN_BASE_PROMPT_TOKENS", "16"))  # 너무 1토큰만 모이는 것 방지
 
     LONG_MIN_BASE_PROMPT_TOKENS  = int(os.environ.get("LONG_MIN_BASE_PROMPT_TOKENS", "1024"))
-    # long dataset도 base_prompt 토큰 "최대치"를 별도로 걸고 싶을 때 사용 (기본: 컨텍스트 한계까지 허용)
-    # 예) LONG_MAX_BASE_PROMPT_TOKENS=4096
-    LONG_MAX_BASE_PROMPT_TOKENS_RAW = os.environ.get("LONG_MAX_BASE_PROMPT_TOKENS", "2048")
 
     # SLO 기본안
     SLO_TTFT_INTERACTIVE_S = float(os.environ.get("SLO_TTFT_INTERACTIVE_S", "1"))
@@ -224,20 +221,8 @@ async def basic_test():
     max_base_prompt_short = max(1, max_prompt_tokens_short - prefix_short_tokens)
     max_base_prompt_long  = max(1, max_prompt_tokens_long  - prefix_long_tokens)
 
-    # long base_prompt 최대치(환경변수) 적용: 컨텍스트 한계를 넘지 않도록 min()
-    if LONG_MAX_BASE_PROMPT_TOKENS_RAW.strip() != "":
-        try:
-            long_max_user = int(LONG_MAX_BASE_PROMPT_TOKENS_RAW)
-        except Exception:
-            long_max_user = None
-    else:
-        long_max_user = None
-    LONG_MAX_BASE_PROMPT_TOKENS = min(long_max_user, max_base_prompt_long) if long_max_user else max_base_prompt_long
-
-
     print(f"[LEN] max_prompt_tokens_short={max_prompt_tokens_short}, prefix_short_tokens={prefix_short_tokens} -> max_base_prompt_short={max_base_prompt_short}")
     print(f"[LEN] max_prompt_tokens_long ={max_prompt_tokens_long},  prefix_long_tokens ={prefix_long_tokens}  -> max_base_prompt_long ={max_base_prompt_long}")
-    print(f"[LEN] long base_prompt window: min={LONG_MIN_BASE_PROMPT_TOKENS}, max={LONG_MAX_BASE_PROMPT_TOKENS}")
 
     # vLLM endpoint/queue 준비
     endpoint = Endpoint(address="localhost", port=8000, model=model_name)
@@ -259,7 +244,7 @@ async def basic_test():
             max_model_len=max_model_len,
             gpu_index=0,
             )
-    print("parsed:", max_model_len, max_num_seqs, max_num_batched_tokens)
+
 
     queue_run_task = asyncio.create_task(q.run_queue())
     queue_run_task.add_done_callback(_print_task_exception)
@@ -287,8 +272,7 @@ async def basic_test():
     # 괴물 프롬프트 빠른 판별을 위해 "max_base_prompt + 1"까지만 토큰화
     # (full encode보다 훨씬 빠름)
     trunc_check_short = max_base_prompt_short
-    #trunc_check_long  = max_base_prompt_long
-    trunc_check_long  = LONG_MAX_BASE_PROMPT_TOKENS
+    trunc_check_long  = max_base_prompt_long
 
     for item in raw:
         item_id = item.get("id")
@@ -304,10 +288,8 @@ async def basic_test():
             if base_p and ans:
                 # base_prompt 토큰만 우선 체크(빠르게)
                 tl = token_len(tokenizer, base_p, trunc_max=trunc_check_long)
-#                # tl이 max_base_prompt_long+1이면 "초과"임
-#                if tl <= max_base_prompt_long:
-                # tl이 LONG_MAX_BASE_PROMPT_TOKENS+1이면 "초과"임
-                if tl <= LONG_MAX_BASE_PROMPT_TOKENS:
+                # tl이 max_base_prompt_long+1이면 "초과"임
+                if tl <= max_base_prompt_long:
                     dataset2_candidates.append({
                         "id": item_id,
                         "pair": "0-1",
@@ -383,11 +365,7 @@ async def basic_test():
         print(f"[WARN] dataset1 short_pool 부족 -> fallback shortest {len(chosen1)}")
 
     # dataset2: 긴 base_prompt + 첫 왕복만
-#    long_pool = [x for x in dataset2_candidates if x["base_tok_len"] >= LONG_MIN_BASE_PROMPT_TOKENS]
-    long_pool = [
-        x for x in dataset2_candidates
-        if LONG_MIN_BASE_PROMPT_TOKENS <= x["base_tok_len"] <= LONG_MAX_BASE_PROMPT_TOKENS
-    ]
+    long_pool = [x for x in dataset2_candidates if x["base_tok_len"] >= LONG_MIN_BASE_PROMPT_TOKENS]
     long_pool.sort(key=lambda r: r["base_tok_len"], reverse=True)
     chosen2 = long_pool[:min(TARGET_COUNT, len(long_pool))]
 

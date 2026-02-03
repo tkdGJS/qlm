@@ -139,12 +139,12 @@ class VLLMSnapshot:
     vram_total_bytes: Optional[int]
 
     # KV offloading (누적 카운터: /metrics에서 그대로 가져옴)
-    kvo_out_count: Optional[float]   # gpu_to_cpu (swap-out/offload)
-    kvo_in_count: Optional[float]    # cpu_to_gpu (swap-in)
-    kvo_out_bytes: Optional[float]
-    kvo_in_bytes: Optional[float]
-    kvo_out_time_s: Optional[float]
-    kvo_in_time_s: Optional[float]
+#    kvo_out_count: Optional[float]   # gpu_to_cpu (swap-out/offload)
+#    kvo_in_count: Optional[float]    # cpu_to_gpu (swap-in)
+#    kvo_out_bytes: Optional[float]
+#    kvo_in_bytes: Optional[float]
+#    kvo_out_time_s: Optional[float]
+#    kvo_in_time_s: Optional[float]
 
     # LMCache metrics (전체를 dict로 수집)
     # - Counter/Gauge: metric_name -> value
@@ -249,9 +249,9 @@ class VLLMHTTPMonitor:
         except Exception:
             return {
                 "kv": None, "running": None, "waiting": None, "swapped": None,
-                "kvo_out_count": None, "kvo_in_count": None,
-                "kvo_out_bytes": None, "kvo_in_bytes": None,
-                "kvo_out_time_s": None, "kvo_in_time_s": None,
+#                "kvo_out_count": None, "kvo_in_count": None,
+#                "kvo_out_bytes": None, "kvo_in_bytes": None,
+#                "kvo_out_time_s": None, "kvo_in_time_s": None,
                 "lmcache_metrics": {},
             }
 
@@ -263,32 +263,32 @@ class VLLMHTTPMonitor:
         waiting = self._parse_gauge(txt, "vllm:num_requests_waiting")
         swapped = self._parse_gauge(txt, "vllm:num_requests_swapped")
 
-        # 0~100으로 나오는 경우를 대비해 정규화
-        if kv is not None and kv > 1.0:
-            kv = kv / 100.0
-
-        # KV offloading (누적)
-        kvo_out_count = self._parse_labeled(txt, "vllm:kv_offload_size_count",
-                                            ['transfer_type="gpu_to_cpu"'])
-        kvo_in_count  = self._parse_labeled(txt, "vllm:kv_offload_size_count",
-                                            ['transfer_type="cpu_to_gpu"'])
-        kvo_out_bytes = self._parse_labeled(txt, "vllm:kv_offload_total_bytes",
-                                            ['transfer_type="gpu_to_cpu"'])
-        kvo_in_bytes  = self._parse_labeled(txt, "vllm:kv_offload_total_bytes",
-                                            ['transfer_type="cpu_to_gpu"'])
-        kvo_out_time  = self._parse_labeled(txt, "vllm:kv_offload_total_time",
-                                            ['transfer_type="gpu_to_cpu"'])
-        kvo_in_time   = self._parse_labeled(txt, "vllm:kv_offload_total_time",
-                                            ['transfer_type="cpu_to_gpu"'])
+#        # 0~100으로 나오는 경우를 대비해 정규화
+#        if kv is not None and kv > 1.0:
+#            kv = kv / 100.0
+#
+#        # KV offloading (누적)
+#        kvo_out_count = self._parse_labeled(txt, "vllm:kv_offload_size_count",
+#                                            ['transfer_type="gpu_to_cpu"'])
+#        kvo_in_count  = self._parse_labeled(txt, "vllm:kv_offload_size_count",
+#                                            ['transfer_type="cpu_to_gpu"'])
+#        kvo_out_bytes = self._parse_labeled(txt, "vllm:kv_offload_total_bytes",
+#                                            ['transfer_type="gpu_to_cpu"'])
+#        kvo_in_bytes  = self._parse_labeled(txt, "vllm:kv_offload_total_bytes",
+#                                            ['transfer_type="cpu_to_gpu"'])
+#        kvo_out_time  = self._parse_labeled(txt, "vllm:kv_offload_total_time",
+#                                            ['transfer_type="gpu_to_cpu"'])
+#        kvo_in_time   = self._parse_labeled(txt, "vllm:kv_offload_total_time",
+#                                            ['transfer_type="cpu_to_gpu"'])
 
         # LMCache metrics (if LMCache is integrated + multiproc configured, they appear in the same /metrics)
         lmcache_metrics = self._read_lmcache_metrics(txt)
 
         return {
             "kv": kv, "running": running, "waiting": waiting, "swapped": swapped,
-            "kvo_out_count": kvo_out_count, "kvo_in_count": kvo_in_count,
-            "kvo_out_bytes": kvo_out_bytes, "kvo_in_bytes": kvo_in_bytes,
-            "kvo_out_time_s": kvo_out_time, "kvo_in_time_s": kvo_in_time,
+#            "kvo_out_count": kvo_out_count, "kvo_in_count": kvo_in_count,
+#            "kvo_out_bytes": kvo_out_bytes, "kvo_in_bytes": kvo_in_bytes,
+#            "kvo_out_time_s": kvo_out_time, "kvo_in_time_s": kvo_in_time,
             "lmcache_metrics": lmcache_metrics,
         }
 
@@ -303,11 +303,11 @@ class VLLMHTTPMonitor:
             num_swapped=m["swapped"],
             vram_used_bytes=used,
             vram_total_bytes=total,
-            kvo_out_count=m["kvo_out_count"],
-            kvo_in_count=m["kvo_in_count"],
-            kvo_out_bytes=m["kvo_out_bytes"],
-            kvo_in_bytes=m["kvo_in_bytes"],
-            kvo_out_time_s=m["kvo_out_time_s"],
-            kvo_in_time_s=m["kvo_in_time_s"],
+#            kvo_out_count=m["kvo_out_count"],
+#            kvo_in_count=m["kvo_in_count"],
+#            kvo_out_bytes=m["kvo_out_bytes"],
+#            kvo_in_bytes=m["kvo_in_bytes"],
+#            kvo_out_time_s=m["kvo_out_time_s"],
+#            kvo_in_time_s=m["kvo_in_time_s"],
             lmcache_metrics=m["lmcache_metrics"],
         )

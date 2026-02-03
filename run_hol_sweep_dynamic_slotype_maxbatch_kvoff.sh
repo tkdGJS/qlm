@@ -18,7 +18,7 @@ PUSH_INTERVAL_LIST=(0.001 0.01 0.1) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
 #MAX_BATCH_SIZES=(100 80 60 40 20)
-MAX_BATCH_SIZES=(100 80 60)
+MAX_BATCH_SIZES=(100)
 
 #CHUNKED_PREFILL_VALUES=(0 1)
 CHUNKED_PREFILL_VALUES=(1)
@@ -189,6 +189,10 @@ run_one() {
   local base="timsort_hol_sleep_${sleep_s}_${push_tag}_mb${mb}_chunked_${chunked_prefill}_${ts}"
   local log_file="${OUT_DIR}/${base}.txt"
   local csv_file="${OUT_DIR}/${base}.csv"
+
+  rm -rf /tmp/lmcache_prometheus
+  mkdir -p /tmp/lmcache_prometheus
+  export PROMETHEUS_MULTIPROC_DIR=/tmp/lmcache_prometheus
 
   log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
 
