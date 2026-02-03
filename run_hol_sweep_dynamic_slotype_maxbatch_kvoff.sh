@@ -191,8 +191,11 @@ run_one() {
   local csv_file="${OUT_DIR}/${base}.csv"
 
   rm -rf /tmp/lmcache_prometheus
+  rm -rf /tmp/lmcache_disk
   mkdir -p /tmp/lmcache_prometheus
+  mkdir -p /tmp/lmcache_disk
   export PROMETHEUS_MULTIPROC_DIR=/tmp/lmcache_prometheus
+  export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
 
   log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
 

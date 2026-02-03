@@ -79,6 +79,15 @@ echo "[start_vllm] scheduling_policy=${SCHEDULING_POLICY}"
 echo "[start_vllm] chunked_prefill=${ENABLE_CHUNKED_PREFILL}"
 echo "[start_vllm] extra_args=${EXTRA_ARGS}"
 
+# LMCache 쪽
+export LMCACHE_CHUNK_SIZE=256
+export LMCACHE_LOCAL_CPU=True
+export LMCACHE_MAX_LOCAL_CPU_SIZE=4.0
+
+# 로컬 디스크 4GB (경로는 SSD 권장)
+export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
+export LMCACHE_MAX_LOCAL_DISK_SIZE=4.0
+
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \
   --dtype="${DTYPE}" \
