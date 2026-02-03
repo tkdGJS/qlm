@@ -1,0 +1,8 @@
+file=timsort_hol_sleep_0.001_pushint_0.01_mb20_chunked_1_20260131_084605.csv
+sleep=0.001
+pushint=0.01
+mb=20
+chunked=1
+n_total=2079
+n_short=1836
+hol_corr(short_queue_delay, blocking_depth)=0.7727087187936796

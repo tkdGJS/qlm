@@ -1,0 +1,3 @@
+t_s,throughput_rps,swap_cnt,run_cnt,wait_cnt,vram_used_gib,vram_used_ratio,swap_active
+0.0,,,,,,,0
+1.0,1.5,0.0,8.5,2.5,7.4275,0.49516666666666664,0
