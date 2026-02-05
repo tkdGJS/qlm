@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any, Tuple, List
 import time
 import httpx
 
@@ -11,6 +11,11 @@ try:
 except Exception:
     _NVML_OK = False
 
+try:
+    import zmq  # pip install pyzmq
+    _ZMQ_OK = True
+except Exception:
+    _ZMQ_OK = False
 
 # LMCache metric catalog (from LMCache "Metrics Reference" docs).
 # We record:
@@ -137,6 +142,11 @@ class VLLMSnapshot:
     num_swapped: Optional[float]
     vram_used_bytes: Optional[int]
     vram_total_bytes: Optional[int]
+    # vLLM metrics that may appear when enabled (e.g., MFU, kv_cache_metrics)
+    vllm_extra_metrics: Dict[str, float]
+
+    # KV events (ZMQ) - just counts (optional)
+    kv_events_total: Optional[int]
 
     # KV offloading (누적 카운터: /metrics에서 그대로 가져옴)
 #    kvo_out_count: Optional[float]   # gpu_to_cpu (swap-out/offload)
@@ -153,17 +163,75 @@ class VLLMSnapshot:
 
 
 class VLLMHTTPMonitor:
-    def __init__(self, metrics_url: str, gpu_index: int = 0, timeout_s: float = 0.5):
+#    def __init__(self, metrics_url: str, gpu_index: int = 0, timeout_s: float = 0.5):
+    def __init__(
+        self,
+        metrics_url: str,
+        gpu_index: int = 0,
+        timeout_s: float = 0.5,
+        kv_events_endpoint: Optional[str] = None,
+    ):
         self.metrics_url = metrics_url
         self.gpu_index = gpu_index
         self.timeout_s = timeout_s
         self._nvml_inited = False
+        self._kv_events_endpoint = kv_events_endpoint
+        self._kv_events_total = 0
+
+        # Optional ZMQ subscriber (KV events)
+        self._zmq_ctx = None
+        self._zmq_sock = None
+        if kv_events_endpoint and _ZMQ_OK:
+            self._zmq_ctx = zmq.Context.instance()
+            self._zmq_sock = self._zmq_ctx.socket(zmq.SUB)
+            self._zmq_sock.connect(kv_events_endpoint)
+            self._zmq_sock.setsockopt(zmq.SUBSCRIBE, b"")  # subscribe all topics
+            # don't block snapshot() if no message
+            self._zmq_sock.setsockopt(zmq.RCVTIMEO, 0)
 
     def _nvml_init(self):
         if not _NVML_OK or self._nvml_inited:
             return
         pynvml.nvmlInit()
         self._nvml_inited = True
+
+    @staticmethod
+    def _parse_prefixed_metrics(text: str, prefixes: List[str]) -> Dict[str, float]:
+        """
+        Best-effort parse of prometheus exposition to collect metrics by name prefix.
+        Captures both:
+          - name value
+          - name{...} value  (stored as 'name{...}' key to avoid losing label dimension)
+        """
+        out: Dict[str, float] = {}
+        for line in text.splitlines():
+            if not line or line[0] == "#":
+                continue
+            if " " not in line:
+                continue
+            name_part, value_part = line.rsplit(" ", 1)
+            if not any(name_part.startswith(p) for p in prefixes):
+                continue
+            try:
+                out[name_part] = float(value_part)
+            except Exception:
+                continue
+        return out
+
+    def _drain_kv_events(self) -> Optional[int]:
+        """
+        Drain any available KV events from ZMQ socket (non-blocking) and return total count.
+        """
+        if not self._zmq_sock:
+            return None
+        while True:
+            try:
+                _ = self._zmq_sock.recv(flags=zmq.NOBLOCK)
+                self._kv_events_total += 1
+            except Exception:
+                break
+        return self._kv_events_total
+
 
     def _read_vram(self) -> Tuple[Optional[int], Optional[int]]:
         if not _NVML_OK:
@@ -253,6 +321,8 @@ class VLLMHTTPMonitor:
 #                "kvo_out_bytes": None, "kvo_in_bytes": None,
 #                "kvo_out_time_s": None, "kvo_in_time_s": None,
                 "lmcache_metrics": {},
+                "vllm_extra_metrics": {},
+
             }
 
         kv = self._parse_gauge(txt, "vllm:kv_cache_usage_perc")
@@ -262,7 +332,17 @@ class VLLMHTTPMonitor:
         running = self._parse_gauge(txt, "vllm:num_requests_running")
         waiting = self._parse_gauge(txt, "vllm:num_requests_waiting")
         swapped = self._parse_gauge(txt, "vllm:num_requests_swapped")
-
+        # vLLM extra metrics (MFU / kv_cache_metrics / flops etc.)
+        # - MFU: typically contains "mfu" / "flops"
+        # - kv_cache_metrics: often "vllm:kv_block_" prefix
+        vllm_extra_metrics = self._parse_prefixed_metrics(
+            txt,
+            prefixes=[
+                "vllm:mfu",
+                "vllm:flops",
+                "vllm:kv_block_",
+            ],
+        
 #        # 0~100으로 나오는 경우를 대비해 정규화
 #        if kv is not None and kv > 1.0:
 #            kv = kv / 100.0
@@ -290,11 +370,13 @@ class VLLMHTTPMonitor:
 #            "kvo_out_bytes": kvo_out_bytes, "kvo_in_bytes": kvo_in_bytes,
 #            "kvo_out_time_s": kvo_out_time, "kvo_in_time_s": kvo_in_time,
             "lmcache_metrics": lmcache_metrics,
+            "vllm_extra_metrics": vllm_extra_metrics,
         }
 
     def snapshot(self) -> VLLMSnapshot:
         m = self._read_metrics()
         used, total = self._read_vram()
+        kv_events_total = self._drain_kv_events()
         return VLLMSnapshot(
             ts=time.time(),
             kv_cache_usage_perc=m["kv"],
@@ -303,6 +385,8 @@ class VLLMHTTPMonitor:
             num_swapped=m["swapped"],
             vram_used_bytes=used,
             vram_total_bytes=total,
+            vllm_extra_metrics=m["vllm_extra_metrics"],
+            kv_events_total=kv_events_total,
 #            kvo_out_count=m["kvo_out_count"],
 #            kvo_in_count=m["kvo_in_count"],
 #            kvo_out_bytes=m["kvo_out_bytes"],

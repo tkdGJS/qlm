@@ -13,7 +13,7 @@ SLEEPS=(0.001)
 PUSH_MODE="interval"
 PUSH_RPS_LIST=(1 2 5 10 20 50) # PUSH_MODE=rps 일 때 사용
 #PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
-PUSH_INTERVAL_LIST=(0.001 0.01 0.1) # PUSH_MODE=interval 일 때 사용
+PUSH_INTERVAL_LIST=(0.1) # PUSH_MODE=interval 일 때 사용
 #PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
