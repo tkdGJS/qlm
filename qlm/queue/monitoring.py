@@ -342,6 +342,7 @@ class VLLMHTTPMonitor:
                 "vllm:flops",
                 "vllm:kv_block_",
             ],
+        )
         
 #        # 0~100으로 나오는 경우를 대비해 정규화
 #        if kv is not None and kv > 1.0:
