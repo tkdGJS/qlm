@@ -13,7 +13,7 @@ SLEEPS=(0.001)
 PUSH_MODE="interval"
 PUSH_RPS_LIST=(1 2 5 10 20 50) # PUSH_MODE=rps 일 때 사용
 #PUSH_INTERVAL_LIST=(1.0 0.5 0.1 0.05 0.01 0.005 0.001) # PUSH_MODE=interval 일 때 사용
-PUSH_INTERVAL_LIST=(0.001 0.01 0.1) # PUSH_MODE=interval 일 때 사용
+PUSH_INTERVAL_LIST=(0.1) # PUSH_MODE=interval 일 때 사용
 #PUSH_INTERVAL_LIST=(0.01) # PUSH_MODE=interval 일 때 사용
 
 # (추가) max_batch_size sweep: 20~120, 20씩
@@ -236,11 +236,11 @@ run_one() {
   reboot_like_cleanup
 
   require_cmd python3
-  if [[ -f "log2csv_monitoring_slotype.py" ]]; then
+  if [[ -f "log2csv_monitoring_slotype_lmcache_cols.py" ]]; then
     log "Converting log -> csv: ${csv_file}"
-    python3 log2csv_monitoring_slotype.py "${log_file}" -o "${csv_file}"
+    python3 log2csv_monitoring_slotype_lmcache_cols.py "${log_file}" -o "${csv_file}"
   else
-    log "WARNING: log2csv_monitoring_slotype.py not found in current directory. Skipping csv conversion."
+    log "WARNING: log2csv_monitoring_slotype_lmcache_cols.py not found in current directory. Skipping csv conversion."
   fi
 
   log "Post-rest ${REST_SEC}s..."

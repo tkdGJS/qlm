@@ -86,7 +86,8 @@ export LMCACHE_MAX_LOCAL_CPU_SIZE=4.0
 
 # 로컬 디스크 4GB (경로는 SSD 권장)
 export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
-export LMCACHE_MAX_LOCAL_DISK_SIZE=4.0
+export LMCACHE_ENABLE_CHUNK_STATISTICS=true
+export LMCACHE_ENABLE_KV_EVENTS=true
 
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \
@@ -99,5 +100,7 @@ exec vllm serve "${MODEL}" \
   --kv-offloading-size "${KVOFFLOADING_SIZE}" \
   --kv-offloading-backend "${KVOFFLOADING_BACKEND}" \
   --scheduling-policy "${SCHEDULING_POLICY}" \
+  --kv-events-config '{"enable_kv_cache_events": true, "publisher": "zmq", "endpoint": "tcp://*:5557"}' \
+  --enable-mfu-metrics \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}

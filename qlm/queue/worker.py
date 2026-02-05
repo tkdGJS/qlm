@@ -337,6 +337,44 @@ class Worker:
             
             tbt_part = f"TBT_p95={_fmt(tbt_p95)} | TBT_p99={_fmt(tbt_p99)} | "
             snap = self.monitor.snapshot()
+
+            # ---- vLLM extra metrics (MFU / kv_cache_metrics 등): 가능한 것만 짧게 요약 출력 ----
+            extra = getattr(snap, "vllm_extra_metrics", None)
+            kv_events_total = getattr(snap, "kv_events_total", None)
+
+            def _pick_first_metric(d, prefixes):
+                if not isinstance(d, dict) or not d:
+                    return None, None
+                for p in prefixes:
+                    # exact match first
+                    if p in d:
+                        return p, d[p]
+                    # prefix match (labels 포함된 key: name{...} 형태 포함)
+                    for k in d.keys():
+                        if k.startswith(p):
+                            return k, d[k]
+                return None, None
+
+            mfu_k, mfu_v = _pick_first_metric(extra, ["vllm:mfu", "vllm:mfu_util", "vllm:mfu_utilization", "vllm:model_flo", "vllm:flops"])
+            # kv_cache_metrics 쪽은 vllm:kv_block_* 형태가 흔함
+            kvblk_items = []
+            if isinstance(extra, dict) and extra:
+                # 너무 길어지지 않게 상위 몇 개만
+                for k in sorted(extra.keys()):
+                    if k.startswith("vllm:kv_block_"):
+                        kvblk_items.append(f"{k}={_fmt(extra[k], '{:.6g}', 'NA')}")
+                    if len(kvblk_items) >= 6:
+                        break
+
+            extra_part = ""
+            if mfu_k is not None:
+                extra_part += f" | MFU({_fmt(mfu_v, '{:.4f}', 'NA')})"
+            if kvblk_items:
+                extra_part += " | KVBLK[" + " ".join(kvblk_items) + "]"
+            if kv_events_total is not None:
+                extra_part += f" | KV_EVENTS={_fmt(kv_events_total, '{:.0f}', 'NA')}"
+
+
             snap_part = (
                 f" | KV={_fmt(snap.kv_cache_usage_perc, '{:.3f}')}"
                 f" run={_fmt(snap.num_running, '{:.0f}')}"
@@ -407,6 +445,7 @@ class Worker:
                 f"SuccessRate: {attainment_ratio:.2f}% ({self.success_count}/{self.processed_count})"
                 + snap_part
                 + lm_part
+                + extra_part
 
             )
 
