@@ -381,6 +381,7 @@ class Worker:
                 f" wait={_fmt(snap.num_waiting, '{:.0f}')}"
                 f" swap={_fmt(snap.num_swapped, '{:.0f}')}"
                 f" VRAM={_fmt_bytes_to_gb(snap.vram_used_bytes)}/{_fmt_bytes_to_gb(snap.vram_total_bytes)}"
+                + extra_part
 #                f" | KVO(out_cnt={_fmt(snap.kvo_out_count, '{:.0f}')}"
 #                f", out={_fmt_bytes_to_mib(snap.kvo_out_bytes)}"
 #                f", out_t={_fmt(snap.kvo_out_time_s, '{:.3f}')}"
@@ -445,7 +446,6 @@ class Worker:
                 f"SuccessRate: {attainment_ratio:.2f}% ({self.success_count}/{self.processed_count})"
                 + snap_part
                 + lm_part
-                + extra_part
 
             )
 
