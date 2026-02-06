@@ -196,6 +196,7 @@ run_one() {
   mkdir -p /tmp/lmcache_disk
   export PROMETHEUS_MULTIPROC_DIR=/tmp/lmcache_prometheus
   export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
+  export QLM_KV_EVENTS_ENDPOINT="tcp://127.0.0.1:5557"
 
   log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
 

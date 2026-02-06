@@ -88,6 +88,7 @@ export LMCACHE_MAX_LOCAL_CPU_SIZE=4.0
 export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
 export LMCACHE_ENABLE_CHUNK_STATISTICS=true
 export LMCACHE_ENABLE_KV_EVENTS=true
+export VLLM_DEBUG_MFU_METRICS=1
 
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \
@@ -102,5 +103,6 @@ exec vllm serve "${MODEL}" \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   --kv-events-config '{"enable_kv_cache_events": true, "publisher": "zmq", "endpoint": "tcp://*:5557"}' \
   --enable-mfu-metrics \
+  --enable-logging-iteration-details \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}
