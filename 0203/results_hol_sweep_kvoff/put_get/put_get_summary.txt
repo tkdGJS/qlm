@@ -1,0 +1,6 @@
+file: timsort_hol_sleep_0.001_pushint_0.001_mb100_chunked_1_20260203_021313.txt.csv
+time_window: 0..600.0s
+cpu_put_total = 257
+storage_put_total = 257
+storage_get_total = 65
+cpu_get_total = 65
