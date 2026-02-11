@@ -34,16 +34,16 @@ SORT_PROFILE="1"
 BENCH_CMD=(python benchmarks/hol_kvoff.py)
 
 # 로그/CSV 저장 폴더 (원하면 변경)
-OUT_DIR="results_hol_sweep_kvoff"
+OUT_DIR="results_hol_sweep_kvoff_blk"
 mkdir -p "$OUT_DIR"
 
 # 실험 전/후 휴식(초)
 REST_SEC=300
 # ===== blktrace/blkparse 설정 =====
 TRACE_IO=1
-TRACE_MOUNT="/tmp/lmcache_disk" # lmcache disk dir가 있는 파일시스템 기준으로 디바이스 자동 탐지
-TRACE_DEV=""                    # 비우면 자동탐지, 직접 지정하려면 "/dev/nvme0n1" 같이 지정
-TRACE_DIR="${OUT_DIR}/blktrace" # 결과 저장 폴더
+TRACE_MOUNT="/tmp/lmcache/lmcache_disk" # lmcache disk dir가 있는 파일시스템 기준으로 디바이스 자동 탐지
+TRACE_DEV=""                            # 비우면 자동탐지, 직접 지정하려면 "/dev/nvme0n1" 같이 지정
+TRACE_DIR="${OUT_DIR}/blktrace"         # 결과 저장 폴더
 
 # ===== NVMe filesystem fill sweep 설정 =====
 # NOTE: ENABLE_FS_SWEEP=1이면, 매 run_one()마다 아래 디바이스를 **umount -> mkfs.ext4 -> mount** 한 뒤,
@@ -51,17 +51,17 @@ TRACE_DIR="${OUT_DIR}/blktrace" # 결과 저장 폴더
 #       (매번 디바이스 내용이 삭제됩니다. 반드시 실험 전용 디바이스를 지정하세요.)
 ENABLE_FS_SWEEP=1
 NVME_DEV="/dev/nvme3n1"
-NVME_MNT="/mnt/lmcache"
-LMCACHE_DISK_DIR="${NVME_MNT}/lmcache_disk"   # LMCache가 실제로 쓰는 디렉토리
-DUMPFILE_NAME="dumpfile.bin"                 # fill 용 더미 파일
-FILL_SAFETY_MIB=512                          # 메타/오차 여유분 (MiB)
+NVME_MNT="/tmp/lmcache"
+LMCACHE_DISK_DIR="${NVME_MNT}/lmcache_disk" # LMCache가 실제로 쓰는 디렉토리
+DUMPFILE_NAME="dumpfile.bin"                # fill 용 더미 파일
+FILL_SAFETY_MIB=512                         # 메타/오차 여유분 (MiB)
 
 # (요청) fill% sweep
-FILL_PCTS=(70 80 90)
+#FILL_PCTS=(70 80 90)
+FILL_PCTS=(10)
 
 # blktrace용 mount 기준도 NVMe로 변경 (자동 디바이스 탐지에 사용)
 TRACE_MOUNT="${NVME_MNT}"
-
 
 resolve_trace_dev() {
   local mountp="$1"
@@ -167,13 +167,13 @@ fill_fs_to_pct() {
   read -r total used avail usep < <(df_mib "$mnt")
 
   # target_used_mib = total * pct/100 - safety
-  local target_used=$(( (total * pct) / 100 ))
-  if (( target_used > FILL_SAFETY_MIB )); then
-    target_used=$(( target_used - FILL_SAFETY_MIB ))
+  local target_used=$(((total * pct) / 100))
+  if ((target_used > FILL_SAFETY_MIB)); then
+    target_used=$((target_used - FILL_SAFETY_MIB))
   fi
 
-  local need=$(( target_used - used ))
-  if (( need <= 0 )); then
+  local need=$((target_used - used))
+  if ((need <= 0)); then
     log "FS fill: already >= target (used=${used}MiB, target≈${target_used}MiB). Skipping fill."
     return 0
   fi
@@ -209,7 +209,6 @@ prepare_nvme_fs() {
   sudo -n mkdir -p "${LMCACHE_DISK_DIR}"
   sudo -n chmod 777 "${LMCACHE_DISK_DIR}" || true
 }
-
 
 # DRAM cache drop 시도 여부(권한 필요할 수 있음)
 DROP_CACHES=1
@@ -377,7 +376,7 @@ run_one() {
   else
     rm -rf /tmp/lmcache_disk
     mkdir -p /tmp/lmcache_disk
-    export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
+    export LMCACHE_LOCAL_DISK="file:///tmp/lmcache/lmcache_disk/"
   fi
   export QLM_KV_EVENTS_ENDPOINT="tcp://127.0.0.1:5557"
 
@@ -535,7 +534,6 @@ main() {
       done
     done
   done
-
 
   log "All experiments completed."
 }

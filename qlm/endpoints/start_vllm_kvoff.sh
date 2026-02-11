@@ -98,7 +98,6 @@ exec vllm serve "${MODEL}" \
   --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1", "kv_role":"kv_both"}' \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   --kv-events-config '{"enable_kv_cache_events": true, "publisher": "zmq", "endpoint": "tcp://*:5557"}' \
-  --prefix-caching-hash-algo sha256_cbor \
   --enable-mfu-metrics \
   --enable-logging-iteration-details \
   ${CHUNK_FLAG} \
