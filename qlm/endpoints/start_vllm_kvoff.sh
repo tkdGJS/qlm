@@ -80,14 +80,12 @@ echo "[start_vllm] chunked_prefill=${ENABLE_CHUNKED_PREFILL}"
 echo "[start_vllm] extra_args=${EXTRA_ARGS}"
 
 # LMCache 쪽
-export LMCACHE_CHUNK_SIZE=256
-export LMCACHE_LOCAL_CPU=True
-export LMCACHE_MAX_LOCAL_CPU_SIZE=4.0
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export LMCACHE_CONFIG_FILE="${LMCACHE_CONFIG_FILE:-${SCRIPT_DIR}/lmcache.yaml}"
 
-# 로컬 디스크 4GB (경로는 SSD 권장)
-export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
-export LMCACHE_ENABLE_CHUNK_STATISTICS=true
-export LMCACHE_ENABLE_KV_EVENTS=true
+# (선택) python hash 랜덤성 줄이려면
+export PYTHONHASHSEED="${PYTHONHASHSEED:-0}"
+export VLLM_DEBUG_MFU_METRICS=1
 
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \
@@ -97,10 +95,11 @@ exec vllm serve "${MODEL}" \
   --max-num-batched-tokens "${MAX_NUM_BATCHED_TOKENS}" \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}" \
   --disable-hybrid-kv-cache-manager \
-  --kv-offloading-size "${KVOFFLOADING_SIZE}" \
-  --kv-offloading-backend "${KVOFFLOADING_BACKEND}" \
+  --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1", "kv_role":"kv_both"}' \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   --kv-events-config '{"enable_kv_cache_events": true, "publisher": "zmq", "endpoint": "tcp://*:5557"}' \
+  --prefix-caching-hash-algo sha256_cbor \
   --enable-mfu-metrics \
+  --enable-logging-iteration-details \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}

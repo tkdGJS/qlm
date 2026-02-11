@@ -65,7 +65,11 @@ class Worker:
         self.openai_api_key = "EMPTY"
         # === 모니터/예산 설정 ===
         self.metrics_url = f"{self.address}/metrics"
-        self.monitor = VLLMHTTPMonitor(metrics_url=self.metrics_url, gpu_index=gpu_index)
+        #self.monitor = VLLMHTTPMonitor(metrics_url=self.metrics_url, gpu_index=gpu_index)
+        kv_events_ep = os.environ.get("QLM_KV_EVENTS_ENDPOINT")  # ex) tcp://127.0.0.1:5557
+        self.monitor = VLLMHTTPMonitor(
+            metrics_url=self.metrics_url, gpu_index=gpu_index, kv_events_endpoint=kv_events_ep
+        )
 
         self.max_num_batched_tokens = max_num_batched_tokens
         self.max_num_seqs = max_num_seqs

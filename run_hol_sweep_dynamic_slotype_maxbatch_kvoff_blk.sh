@@ -36,7 +36,65 @@ OUT_DIR="results_hol_sweep_kvoff"
 mkdir -p "$OUT_DIR"
 
 # 실험 전/후 휴식(초)
-REST_SEC=30
+REST_SEC=300
+# ===== blktrace/blkparse 설정 =====
+TRACE_IO=1
+TRACE_MOUNT="/tmp/lmcache_disk" # lmcache disk dir가 있는 파일시스템 기준으로 디바이스 자동 탐지
+TRACE_DEV=""                    # 비우면 자동탐지, 직접 지정하려면 "/dev/nvme0n1" 같이 지정
+TRACE_DIR="${OUT_DIR}/blktrace" # 결과 저장 폴더
+
+resolve_trace_dev() {
+  local mountp="$1"
+
+  # 사용자가 TRACE_DEV를 지정하면 그걸 우선 사용
+  if [[ -n "${TRACE_DEV}" ]]; then
+    echo "${TRACE_DEV}"
+    return 0
+  fi
+
+  # mountp가 올라간 파티션/디바이스 확인
+  local part
+  part="$(df -P "$mountp" 2>/dev/null | awk 'END{print $1}')"
+  if [[ -z "${part}" || ! -e "${part}" ]]; then
+    echo "ERROR: cannot resolve device for mountpoint=${mountp} (df returned: ${part})" >&2
+    return 1
+  fi
+
+  # 파티션이면 부모 디바이스(PKNAME)로 올림 (/dev/nvme0n1p2 -> /dev/nvme0n1)
+  local pk
+  pk="$(lsblk -no PKNAME "${part}" 2>/dev/null || true)"
+  if [[ -n "${pk}" ]]; then
+    echo "/dev/${pk}"
+  else
+    # lsblk가 못 찾으면 파티션 그대로 사용 (환경 따라 이게 더 잘 될 때도 있음)
+    echo "${part}"
+  fi
+}
+
+start_blktrace() {
+  local dev="$1"
+  local prefix="$2"
+  log "Starting blktrace: dev=${dev}, prefix=${prefix}"
+  # sudo 필요. (비밀번호 프롬프트 없이 되게 -n 사용)
+  sudo -n blktrace -d "${dev}" -o "${prefix}" >/dev/null 2>&1 &
+  BLKTRACE_PID=$!
+}
+
+stop_blktrace() {
+  local pid="$1"
+  if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null; then
+    log "Stopping blktrace (pid=${pid})"
+    sudo -n kill -INT "${pid}" >/dev/null 2>&1 || true
+    wait "${pid}" 2>/dev/null || true
+  fi
+}
+
+run_blkparse() {
+  local prefix="$1"
+  log "Running blkparse: input_prefix=${prefix}"
+  # 출력 텍스트는 같은 prefix에 .blkparse.txt로 저장
+  blkparse -i "${prefix}" -o "${prefix}.blkparse.txt"
+}
 
 # DRAM cache drop 시도 여부(권한 필요할 수 있음)
 DROP_CACHES=1
@@ -194,22 +252,35 @@ run_one() {
   rm -rf /tmp/lmcache_disk
   mkdir -p /tmp/lmcache_prometheus
   mkdir -p /tmp/lmcache_disk
+
+  #여기 mount
+
   export PROMETHEUS_MULTIPROC_DIR=/tmp/lmcache_prometheus
   export LMCACHE_LOCAL_DISK="file:///tmp/lmcache_disk/"
   export QLM_KV_EVENTS_ENDPOINT="tcp://127.0.0.1:5557"
 
   log "---- Experiment start: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill}, DRAIN_TIMEOUT_S=${DRAIN_TIMEOUT_S_DEFAULT} ----"
-
-  log "Pre-rest ${REST_SEC}s..."
-  sleep "$REST_SEC"
-
+  # 1) 먼저 정리해서 (rm -rf /tmp/lmcache_disk 포함) 트레이스에 cleanup IO가 섞이지 않게
   reboot_like_cleanup
 
-  log "Running benchmark -> ${log_file}"
+  # 2) blktrace 시작
+  local blktrace_pid=""
+  local trace_prefix=""
+  if [[ "$TRACE_IO" == "1" ]]; then
+    mkdir -p "${TRACE_DIR}"
+    local trace_dev
+    trace_dev="$(resolve_trace_dev "${TRACE_MOUNT}")"
+    trace_prefix="${TRACE_DIR}/${base}"
+    start_blktrace "${trace_dev}" "${trace_prefix}"
+    blktrace_pid="${BLKTRACE_PID}"
+  fi
 
-  # 환경변수 세팅 후 실행, 로그는 파일로 저장
-  # - DRAIN_TIMEOUT_S는 항상 적용
-  # - RPS 모드에서는 PUSH_INTERVAL_S=0으로 강제(hol.py에서 RPS 적용 조건 보장)
+  # 3) (실험 시작 전) 5분 idle
+  log "Pre-rest ${REST_SEC}s (included in blktrace)..."
+  sleep "$REST_SEC"
+
+  # 4) 벤치 실행
+  log "Running benchmark -> ${log_file}"
   if [[ "$push_mode" == "rps" ]]; then
     QLM_QUEUE_LOOP_SLEEP="${sleep_s}" \
       QLM_SORT_ALGO="${SORT_ALGO}" \
@@ -231,9 +302,22 @@ run_one() {
       VLLM_ENABLE_CHUNKED_PREFILL="${chunked_prefill}" \
       "${BENCH_CMD[@]}" >>"${log_file}"
   fi
-
   log "Benchmark done."
 
+  # 5) (실험 끝난 뒤) 5분 idle (flush/GC tail 포함시키기)
+  log "Post-rest ${REST_SEC}s (included in blktrace)..."
+  sleep "$REST_SEC"
+  sync || true
+
+  # 6) blktrace 종료 + blkparse
+  if [[ "$TRACE_IO" == "1" ]]; then
+    stop_blktrace "${blktrace_pid}"
+    run_blkparse "${trace_prefix}"
+    log "blktrace outputs: ${trace_prefix}.blktrace.*"
+    log "blkparse output  : ${trace_prefix}.blkparse.txt"
+  fi
+
+  # 7) 이제 cleanup (트레이스에 섞이지 않게)
   reboot_like_cleanup
 
   require_cmd python3
@@ -244,22 +328,25 @@ run_one() {
     log "WARNING: log2csv_monitoring_slotype_lmcache_cols.py not found in current directory. Skipping csv conversion."
   fi
 
-  log "Post-rest ${REST_SEC}s..."
-  sleep "$REST_SEC"
-
   log "---- Experiment end: max_batch_size=${mb}, QLM_QUEUE_LOOP_SLEEP=${sleep_s}, PUSH_MODE=${push_mode}, PUSH_VAL=${push_val}, CHUNKED_PREFILL=${chunked_prefill} ----"
   echo
 }
 
 main() {
-  if [[ "$DROP_CACHES" == "1" || "$GPU_RESET" == "1" ]]; then
-    log "Requesting sudo credential (for drop_caches/gpu-reset if enabled)..."
+  if [[ "$DROP_CACHES" == "1" || "$GPU_RESET" == "1" || "$TRACE_IO" == "1" ]]; then
+    log "Requesting sudo credential (for drop_caches/gpu-reset/blktrace if enabled)..."
     sudo -v || true
   fi
 
   require_cmd awk
   require_cmd mktemp
   require_cmd python3
+  if [[ "$TRACE_IO" == "1" ]]; then
+    require_cmd blktrace
+    require_cmd blkparse
+    require_cmd df
+    require_cmd lsblk
+  fi
 
   if [[ -z "${QLMPROJDIR:-}" ]]; then
     echo "ERROR: QLMPROJDIR is not set. config.py expects \$QLMPROJDIR/qlm/config.yaml" >&2

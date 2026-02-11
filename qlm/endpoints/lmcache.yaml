@@ -1,0 +1,27 @@
+# core
+chunk_size: 256
+local_cpu: true
+max_local_cpu_size: 4.0  # GB
+
+# local disk tier (너 주석이 4GB였으니 맞춰줌)
+local_disk: "file:///tmp/lmcache_disk/"
+max_local_disk_size: 4.0  # GB
+
+# async loading (원하면 켬: vLLM 플래그가 아니라 LMCache 설정임)
+enable_async_loading: true
+
+# KV cache events (LMCache 쪽 생성)
+enable_kv_events: true
+# vLLM worker 여러 개면 해시 중복/불일치 방지 위해 비-default 권장이라고 문서에 명시
+pre_caching_hash_algorithm: sha256_cbor_64bit
+
+# chunk statistics (너가 켜고 있었던 걸 제대로 쓰려면 아래도 같이 권장)
+internal_api_server_enabled: true
+internal_api_server_port_start: 6999
+enable_chunk_statistics: true
+chunk_statistics_strategy: "memory_bloom_filter"
+chunk_statistics_auto_start_statistics: true
+extra_config:
+  chunk_statistics_mem_bf_expected_chunks: 20000000
+  chunk_statistics_mem_bf_false_positive_rate: 0.01
+
