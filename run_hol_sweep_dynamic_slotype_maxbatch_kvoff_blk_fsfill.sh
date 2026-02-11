@@ -58,7 +58,7 @@ FILL_SAFETY_MIB=512                         # 메타/오차 여유분 (MiB)
 
 # (요청) fill% sweep
 #FILL_PCTS=(70 80 90)
-FILL_PCTS=(10)
+FILL_PCTS=(90)
 
 # blktrace용 mount 기준도 NVMe로 변경 (자동 디바이스 탐지에 사용)
 TRACE_MOUNT="${NVME_MNT}"
