@@ -1,7 +1,11 @@
 # core
 chunk_size: 256
+save_unfull_chunk: true
 local_cpu: true
 max_local_cpu_size: 4.0  # GB
+
+# Native (no compression)
+remote_serde: torch
 
 # local disk tier (너 주석이 4GB였으니 맞춰줌)
 local_disk: "file:///tmp/lmcache/lmcache_disk/"
@@ -24,4 +28,3 @@ chunk_statistics_auto_start_statistics: true
 extra_config:
   chunk_statistics_mem_bf_expected_chunks: 20000000
   chunk_statistics_mem_bf_false_positive_rate: 0.01
-

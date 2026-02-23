@@ -195,6 +195,7 @@ class Worker:
             #===============================================
             start_time=time.time() # 추가: 요청 별 처리 시작 시간
             first_token_time = None
+            ts_lines = []
 
             last_token_time = None
             
@@ -215,6 +216,7 @@ class Worker:
             for attempt in range(self._stream_retries + 1):
                 try:
                     first_token_time = None
+                    ts_lines = []
                     #[SH] TTFT 추적 로직
                     client = self._get_client()
                     stream = client.completions.create(
@@ -235,9 +237,11 @@ class Worker:
                     
                                 if first_token_time is None:
                                     first_token_time = now
+                                    ts_lines.append(f"[TTFT] {first_token_time:.6f}\n")
                     
                                 if prev_text_time is not None:
                                     tbt_samples.append(now - prev_text_time)
+                                    ts_lines.append(f"[TBT] {now:.6f}\n")
                                 prev_text_time = now
                     
                                 last_token_time = now
@@ -264,6 +268,8 @@ class Worker:
 
             end_time = time.time()
             ttlt = end_time - start_time
+
+            ts_lines.append(f"[TTLT] {(last_token_time if last_token_time is not None else end_time):.6f}\n")
 
             # 공통: deadline은 동일하게 계산
             deadline = original_insertion_time + original_slo
@@ -457,6 +463,8 @@ class Worker:
 
             try:
                 with open("experiment_result_EDF.log", "a", encoding="utf-8") as f:
+                    if ts_lines:
+                        f.writelines(ts_lines)
                     f.write(log_message + "\n")
             except Exception as file_error:
                 print(f"[Warning] Failed to write log to file: {file_error}")

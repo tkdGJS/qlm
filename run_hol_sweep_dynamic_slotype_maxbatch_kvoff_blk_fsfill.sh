@@ -26,7 +26,7 @@ MAX_BATCH_SIZES=(100)
 CHUNKED_PREFILL_VALUES=(1)
 # push 종료 후 큐 드레인 대기(초) - 요청 처리 완료까지 기다리게 하려면 0보다 크게!
 #DRAIN_TIMEOUT_S_DEFAULT=600
-DRAIN_TIMEOUT_S_DEFAULT=30
+DRAIN_TIMEOUT_S_DEFAULT=0
 
 SORT_ALGO="timsort"
 SORT_PROFILE="1"
@@ -38,7 +38,7 @@ OUT_DIR="results_hol_sweep_kvoff_blk"
 mkdir -p "$OUT_DIR"
 
 # 실험 전/후 휴식(초)
-REST_SEC=300
+REST_SEC=30
 # ===== blktrace/blkparse 설정 =====
 TRACE_IO=1
 TRACE_MOUNT="/tmp/lmcache/lmcache_disk" # lmcache disk dir가 있는 파일시스템 기준으로 디바이스 자동 탐지

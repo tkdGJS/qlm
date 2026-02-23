@@ -87,6 +87,8 @@ export LMCACHE_CONFIG_FILE="${LMCACHE_CONFIG_FILE:-${SCRIPT_DIR}/lmcache.yaml}"
 export PYTHONHASHSEED="${PYTHONHASHSEED:-0}"
 export VLLM_DEBUG_MFU_METRICS=1
 
+KV_TRANSFER_CONFIG="${KV_TRANSFER_CONFIG:-{\"kv_connector\":\"LMCacheConnectorV1\",\"kv_role\":\"kv_both\",\"kv_connector_extra_config\":{\"discard_partial_chunks\":false}}}"
+
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \
   --dtype="${DTYPE}" \
@@ -95,10 +97,11 @@ exec vllm serve "${MODEL}" \
   --max-num-batched-tokens "${MAX_NUM_BATCHED_TOKENS}" \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}" \
   --disable-hybrid-kv-cache-manager \
-  --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1", "kv_role":"kv_both"}' \
+  --kv-transfer-config "${KV_TRANSFER_CONFIG}" \
   --scheduling-policy "${SCHEDULING_POLICY}" \
   --kv-events-config '{"enable_kv_cache_events": true, "publisher": "zmq", "endpoint": "tcp://*:5557"}' \
   --enable-mfu-metrics \
   --enable-logging-iteration-details \
+  --no-enable-prefix-caching \
   ${CHUNK_FLAG} \
   ${EXTRA_ARGS}
