@@ -51,7 +51,6 @@ MAX_NUM_SEQS="${VLLM_MAX_NUM_SEQS:-128}"
 MAX_NUM_BATCHED_TOKENS="${VLLM_MAX_NUM_BATCHED_TOKENS:-131072}"
 #MAX_NUM_BATCHED_TOKENS="${VLLM_MAX_NUM_BATCHED_TOKENS:-262144}"
 GPU_MEMORY_UTILIZATION="${VLLM_GPU_MEMORY_UTILIZATION:-0.9}"
-KVOFFLOADING_SIZE="${VLLM_KVOFFLOADING_SIZE:-4}"
 KVOFFLOADING_BACKEND="${VLLM_KVOFFLOADING_BACKEND:-lmcache}"
 #PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-swap}"
 #PREEMPTION_MODE="${VLLM_PREEMPTION_MODE:-None}"
@@ -73,7 +72,6 @@ echo "[start_vllm] max_model_len=${MAX_MODEL_LEN}"
 echo "[start_vllm] max_num_seqs=${MAX_NUM_SEQS}"
 echo "[start_vllm] max_num_batched_tokens=${MAX_NUM_BATCHED_TOKENS}"
 echo "[start_vllm] gpu_memory_utilization=${GPU_MEMORY_UTILIZATION}"
-echo "[start_vllm] kv-offloading-size=${KVOFFLOADING_SIZE}"
 echo "[start_vllm] kv-offloading-backend=${KVOFFLOADING_BACKEND}"
 echo "[start_vllm] scheduling_policy=${SCHEDULING_POLICY}"
 echo "[start_vllm] chunked_prefill=${ENABLE_CHUNKED_PREFILL}"
@@ -87,7 +85,7 @@ export LMCACHE_CONFIG_FILE="${LMCACHE_CONFIG_FILE:-${SCRIPT_DIR}/lmcache.yaml}"
 export PYTHONHASHSEED="${PYTHONHASHSEED:-0}"
 export VLLM_DEBUG_MFU_METRICS=1
 
-KV_TRANSFER_CONFIG="${KV_TRANSFER_CONFIG:-{\"kv_connector\":\"LMCacheConnectorV1\",\"kv_role\":\"kv_both\",\"kv_connector_extra_config\":{\"discard_partial_chunks\":false}}}"
+KV_TRANSFER_CONFIG="${KV_TRANSFER_CONFIG:-{\"kv_connector\":\"LMCacheConnectorV1\",\"kv_role\":\"kv_both\",\"kv_connector_extra_config\":{\"discard_partial_chunks\":true}}}"
 
 exec vllm serve "${MODEL}" \
   --port "${PORT}" \

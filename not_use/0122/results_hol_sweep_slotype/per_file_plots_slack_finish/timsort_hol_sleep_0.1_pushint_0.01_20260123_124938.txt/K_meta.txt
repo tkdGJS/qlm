@@ -1,7 +1,0 @@
-file=timsort_hol_sleep_0.1_pushint_0.01_20260123_124938.txt.csv
-sleep=0.1
-pushint=0.01
-service_col=ttlt
-N_total=3878
-N_plotted=200
-y=(_t_ins+orig_slo)-_t_fin
