@@ -445,6 +445,121 @@ class LocalDiskBackend(StorageBackendInterface):
                 key, memory_obj, on_complete_callback=on_complete_callback
             )
 
+    def submit_put_task_from_bytes(
+        self,
+        key: CacheEngineKey,
+        encoded_bytes: bytes,
+        shape: torch.Size,
+        dtype: torch.dtype,
+        fmt: MemoryFormat,
+        cached_positions: Optional[torch.Tensor] = None,
+        on_complete_callback: Optional[Callable[[CacheEngineKey], None]] = None,
+    ) -> None:
+        """
+        Fast-path: submit a disk write task directly from pre-encoded bytes.
+
+        Bypasses memory_obj lifecycle entirely.  Used when the caller has already
+        cachegen-encoded the KV on the GPU (from_gpu_and_encode fast path) and
+        just needs the bytes persisted to disk.
+
+        :param key: cache key for this chunk.
+        :param encoded_bytes: cachegen-encoded bytes ready to write.
+        :param shape: original KV tensor shape (for metadata / eviction sizing).
+        :param dtype: original KV tensor dtype.
+        :param fmt: memory format (KV_2LTD etc.).
+        :param cached_positions: optional token positions for prefix matching.
+        :param on_complete_callback: optional callback after disk write.
+        """
+        if self.exists_in_put_tasks(key):
+            logger.debug(f"Put task for {key} is already in progress.")
+            return None
+
+        self.disk_worker.insert_put_task(key)
+
+        required_size = len(encoded_bytes)
+        evict_success = True
+        with self.disk_lock:
+            while self.current_cache_size + required_size > self.max_cache_size:
+                evict_keys = self.cache_policy.get_evict_candidates(
+                    self.dict, num_candidates=1
+                )
+                if not evict_keys:
+                    logger.warning(
+                        "No eviction candidates found. Disk space under pressure."
+                    )
+                    evict_success = False
+                    break
+                for evict_key in evict_keys:
+                    self.current_cache_size -= self.dict[evict_key].size
+                self.batched_remove(evict_keys, force=False)
+            if evict_success:
+                self.current_cache_size += required_size
+
+        if not evict_success:
+            self.disk_worker.remove_put_task(key)
+            return None
+
+        self.cache_policy.update_on_put(key)
+
+        asyncio.run_coroutine_threadsafe(
+            self.disk_worker.submit_task(
+                "put",
+                self._async_write_bytes_to_disk,
+                key=key,
+                encoded_bytes=encoded_bytes,
+                shape=shape,
+                dtype=dtype,
+                fmt=fmt,
+                cached_positions=cached_positions,
+                on_complete_callback=on_complete_callback,
+            ),
+            self.loop,
+        )
+
+    @_lmcache_nvtx_annotate
+    @torch.inference_mode()
+    def _async_write_bytes_to_disk(
+        self,
+        key: CacheEngineKey,
+        encoded_bytes: bytes,
+        shape: torch.Size,
+        dtype: torch.dtype,
+        fmt: MemoryFormat,
+        cached_positions: Optional[torch.Tensor] = None,
+        on_complete_callback: Optional[Callable[[CacheEngineKey], None]] = None,
+    ) -> None:
+        """Write pre-encoded bytes directly to disk (cachegen fast-path).
+
+        No memory_obj is involved; bytes are written as-is and metadata is
+        registered so subsequent reads go through the normal decode path.
+        """
+        path = self._key_to_path(key)
+        size = len(encoded_bytes)
+        self.usage += size
+        self.stats_monitor.update_local_storage_usage(self.usage)
+
+        if self.vram_log_enabled:
+            current_time = time.time()
+            log_msg = (
+                f"[LMCACHE_VRAM][LocalDiskBackend] {current_time:.6f}"
+                " serialize (fast-path: no DRAM memory_obj)"
+            )
+            print(log_msg, flush=True)
+            with open(self.vram_log_file, "a") as f:
+                f.write(log_msg + "\n")
+
+        self.write_file(encoded_bytes, path)
+
+        # Use the compressed bytes size for disk-space tracking (more accurate
+        # than raw KV size since it reflects actual disk usage).
+        self.insert_key(key, size, shape, dtype, fmt, cached_positions=cached_positions)
+        self.disk_worker.remove_put_task(key)
+
+        if on_complete_callback is not None:
+            try:
+                on_complete_callback(key)
+            except Exception as e:
+                logger.warning(f"on_complete_callback failed for key {key}: {e}")
     def get_blocking(
         self,
         key: CacheEngineKey,

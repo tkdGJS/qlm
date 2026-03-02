@@ -416,6 +416,54 @@ class VLLMPagedMemGPUConnectorV2(GPUConnectorInterface):
         kv_size = 1 if self.use_mla else 2
         return torch.Size([kv_size, self.num_layers, num_tokens, self.hidden_dim_size])
 
+    @_lmcache_nvtx_annotate
+    def from_gpu_and_encode(self, start: int, end: int, serializer, **kwargs):
+        """
+        Scatter-gather paged VRAM KV into a tmp VRAM buffer and encode with
+        cachegen directly -- no DRAM memory_obj intermediate.
+
+        Normal store path:  paged VRAM -> DRAM memory_obj -> VRAM encode input
+        This fast path:     paged VRAM -> tmp VRAM buffer -> encode -> bytes (DRAM)
+
+        :param start: start token index for this chunk.
+        :param end:   end token index for this chunk.
+        :param serializer: CacheGenSerializer with serialize_from_gpu_tensor().
+        :param kwargs: must contain 'slot_mapping' and 'kvcaches'.
+        :returns: BytesBufferMemoryObj with cachegen-encoded bytes.
+        """
+        self.initialize_kvcaches_ptr(**kwargs)
+        assert self.kvcaches is not None, (
+            "kvcaches should be provided in kwargs or initialized beforehand."
+        )
+        if "slot_mapping" not in kwargs:
+            raise ValueError("'slot_mapping' should be provided in kwargs.")
+
+        slot_mapping: torch.Tensor = kwargs["slot_mapping"]
+        kv_cache_pointers = self._initialize_pointers(self.kvcaches)
+
+        num_tokens = end - start
+        # [2, num_layers, num_tokens, hidden_dim] -- all layers, contiguous on VRAM.
+        buffer_shape = self.get_shape(num_tokens)
+        dtype = self.kvcaches[0].dtype
+
+        # One unavoidable gather copy: paged KV (scattered) -> contiguous VRAM buffer.
+        tmp_gpu_tensor = torch.empty(buffer_shape, dtype=dtype, device=self.device)
+        with torch.cuda.stream(self.store_stream):
+            lmc_ops.multi_layer_kv_transfer(
+                tmp_gpu_tensor,
+                kv_cache_pointers,
+                slot_mapping[start:end],
+                self.device,
+                self.page_buffer_size,
+                True,   # store direction: kvcaches -> tmp_gpu_tensor
+                self.use_mla,
+            )
+        self.store_stream.synchronize()  # ensure data is ready before encode
+
+        # Encode directly from VRAM; no H2D copy.
+        # tmp_gpu_tensor is freed when this function returns.
+        return serializer.serialize_from_gpu_tensor(tmp_gpu_tensor)
+
 
 class VLLMPagedMemGPUConnectorV3(GPUConnectorInterface):
     def __init__(

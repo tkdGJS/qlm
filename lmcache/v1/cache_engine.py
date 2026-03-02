@@ -309,6 +309,36 @@ class LMCacheEngine:
             return self.storage_manager.is_frozen()
         return False
 
+    def _is_cachegen_disk_fastpath(self) -> bool:
+        """Return True when the VRAM→encode→disk fast path is usable.
+
+        Conditions:
+        - CUDA is available.
+        - GPU connector is VLLMPagedMemGPUConnectorV2 (multi_layer_kv_transfer).
+        - LocalDiskBackend has cachegen serde enabled.
+        - LocalCPUBackend is NOT storing (use_hot=False); when local_cpu=True
+          the CPU backend still needs the DRAM buffer to encode its own copy.
+        """
+        if not torch.cuda.is_available():
+            return False
+        from lmcache.v1.gpu_connector import VLLMPagedMemGPUConnectorV2
+        if not isinstance(self.gpu_connector, VLLMPagedMemGPUConnectorV2):
+            return False
+        if self.storage_manager is None:
+            return False
+        # If local_cpu is active (use_hot=True), it encodes using the DRAM
+        # buffer, so we cannot skip DRAM allocation.
+        cpu_backend = self.storage_manager.storage_backends.get("LocalCPUBackend")
+        if cpu_backend is not None and getattr(cpu_backend, "use_hot", False):
+            return False
+        disk_backend = self.storage_manager.storage_backends.get("LocalDiskBackend")
+        if disk_backend is None:
+            return False
+        if not getattr(disk_backend, "_serde_enabled", False):
+            return False
+        if getattr(disk_backend, "_serde_type", None) != "cachegen":
+            return False
+        return True
     @_lmcache_nvtx_annotate
     @torch.inference_mode()
     def store(
@@ -395,6 +425,9 @@ class LMCacheEngine:
         ends: List[int] = []
         keys: List[CacheEngineKey] = []
         memory_objs: List[MemoryObj] = []
+        # Fast-path only: per-chunk shape/dtype metadata (no allocation).
+        all_kv_shapes: List[list] = []
+        all_kv_dtypes: List[list] = []
 
         tot_kv_size = 0
         tot_token_num = 0
@@ -402,6 +435,12 @@ class LMCacheEngine:
         request_configs = kwargs.get("request_configs")
         if request_configs is not None and len(request_configs) != 0:
             assert isinstance(request_configs, dict)
+
+        # Determine once whether the VRAM→encode→disk fast path is usable.
+        # Fast path: local_cpu=False + remote_serde=cachegen + V2 connector.
+        # In this mode we skip storage_manager.allocate() and
+        # batched_from_gpu() entirely.
+        use_fast_path = self._is_cachegen_disk_fastpath()
 
         with store_stats.profile_process_tokens():
             prev_key = 0
@@ -413,35 +452,44 @@ class LMCacheEngine:
                 request_configs=request_configs,
             ):
                 assert isinstance(key, CacheEngineKey)
-                # Allocate the memory object
                 num_tokens = end - start
                 kv_shapes = self.metadata.get_shapes(num_tokens)
                 kv_dtypes = self.metadata.get_dtypes()
 
-                # TODO (Jiayi): should be batched in the future
-                memory_obj = self.storage_manager.allocate(
-                    kv_shapes,
-                    kv_dtypes,
-                    busy_loop=self.force_store_wait,
-                    fmt=self.fmt,
-                )
-                if memory_obj is None:
-                    logger.warning(
-                        "Local cpu memory under pressure so"
-                        " choosing to store only "
-                        f" {len(memory_objs)}"
-                        " total chunks of KV cache."
+                if not use_fast_path:
+                    # ── normal path: allocate DRAM buffer ──────────────────────────
+                    # TODO (Jiayi): should be batched in the future
+                    memory_obj = self.storage_manager.allocate(
+                        kv_shapes,
+                        kv_dtypes,
+                        busy_loop=self.force_store_wait,
+                        fmt=self.fmt,
                     )
-                    break
+                    if memory_obj is None:
+                        logger.warning(
+                            "Local cpu memory under pressure so"
+                            " choosing to store only "
+                            f" {len(memory_objs)}"
+                            " total chunks of KV cache."
+                        )
+                        break
+                    memory_objs.append(memory_obj)
+                    tot_kv_size += memory_obj.get_size()
+                else:
+                    # ── fast path: collect metadata only (no allocation) ─────────
+                    all_kv_shapes.append(kv_shapes)
+                    all_kv_dtypes.append(kv_dtypes)
+                    tot_kv_size += sum(
+                        s.numel() * d.itemsize
+                        for s, d in zip(kv_shapes, kv_dtypes)
+                    )
 
                 starts.append(start)
                 ends.append(end)
                 keys.append(key)
-                memory_objs.append(memory_obj)
-                tot_kv_size += memory_obj.get_size()
                 tot_token_num += num_tokens
 
-                # Create KV event
+                # Create KV event (unchanged in both paths).
                 if self.kv_events_enabled:
                     stored_event = CacheStoreEvent(
                         block_hashes=[key.chunk_hash],
@@ -471,20 +519,40 @@ class LMCacheEngine:
                     self.kv_events.append(stored_event)
                     prev_key = key.chunk_hash
 
-        # memory_objs might be empty, directly return to avoid sending tokens
-        if not memory_objs:
-            return
+        if use_fast_path:
+            # ── fast path: VRAM → encode → bytes → disk (no DRAM memory_obj) ────
+            if not starts:
+                return
+            disk_backend = self.storage_manager.storage_backends["LocalDiskBackend"]
+            serializer, _ = disk_backend._get_thread_local_serde()
+            with store_stats.profile_from_gpu():
+                for i, (start, end, key) in enumerate(zip(starts, ends, keys)):
+                    encoded = self.gpu_connector.from_gpu_and_encode(
+                        start, end, serializer, **kwargs
+                    )
+                    disk_backend.submit_put_task_from_bytes(
+                        key,
+                        encoded.byte_array,
+                        shape=all_kv_shapes[i][0],
+                        dtype=all_kv_dtypes[i][0],
+                        fmt=self.fmt,
+                    )
+        else:
+            # ── normal path: VRAM → DRAM → backends ─────────────────────────
+            # memory_objs might be empty, directly return to avoid sending tokens
+            if not memory_objs:
+                return
 
-        with store_stats.profile_from_gpu():
-            self.gpu_connector.batched_from_gpu(memory_objs, starts, ends, **kwargs)
+            with store_stats.profile_from_gpu():
+                self.gpu_connector.batched_from_gpu(memory_objs, starts, ends, **kwargs)
 
-        with store_stats.profile_put():
-            transfer_spec = kwargs.get("transfer_spec", None)
-            # TODO: we implicitly rely on batched_put to call ref_count_down
-            # this management should be done in a cleaner way
-            self.storage_manager.batched_put(
-                keys, memory_objs, transfer_spec=transfer_spec
-            )
+            with store_stats.profile_put():
+                transfer_spec = kwargs.get("transfer_spec", None)
+                # TODO: we implicitly rely on batched_put to call ref_count_down
+                # this management should be done in a cleaner way
+                self.storage_manager.batched_put(
+                    keys, memory_objs, transfer_spec=transfer_spec
+                )
 
         tot_time = store_stats.time_to_store()
 

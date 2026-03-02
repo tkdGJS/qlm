@@ -57,7 +57,7 @@ class CacheGenSerializer(Serializer):
         # Temporary fix for issue #83: encoder will have the default device 0
         # on all the ray workers. Need to set it to the correct device.
         # Also need to figure out why this happens.
-        if torch.cuda.current_device != tensor.device:
+        if torch.cuda.current_device() != tensor.device.index:
             torch.cuda.set_device(tensor.device)
         if tensor.device != self.key_bins.device:
             self.key_bins = self.key_bins.to(tensor.device)
@@ -80,4 +80,48 @@ class CacheGenSerializer(Serializer):
             ntokens,
         )
 
+        return BytesBufferMemoryObj(output_dict.to_bytes())
+
+    @_lmcache_nvtx_annotate
+    def serialize_from_gpu_tensor(self, gpu_tensor: torch.Tensor) -> BytesBufferMemoryObj:
+        """
+        Serialize directly from a VRAM tensor without H2D/D2H round-trip.
+
+        Eliminates the DRAM memory_obj intermediate: the caller has already
+        scatter-gathered paged KV into a contiguous VRAM buffer and passes it
+        here for encoding.
+
+        Input:
+            gpu_tensor: CUDA tensor with shape [2, num_layers, num_tokens, hidden_dim]
+
+        Returns:
+            BytesBufferMemoryObj: the serialized binary memory object.
+        """
+        assert gpu_tensor.is_cuda, "gpu_tensor must already be on a CUDA device"
+
+        # Temporary fix for issue #83: encoder will have the default device 0
+        # on all the ray workers. Need to set it to the correct device.
+        if torch.cuda.current_device() != gpu_tensor.device.index:
+            torch.cuda.set_device(gpu_tensor.device)
+        if gpu_tensor.device != self.key_bins.device:
+            self.key_bins = self.key_bins.to(gpu_tensor.device)
+        if gpu_tensor.device != self.value_bins.device:
+            self.value_bins = self.value_bins.to(gpu_tensor.device)
+
+        # gpu_tensor is [2, num_layers, num_tokens, hidden_dim]
+        # Same reshape/permute as serialize() but skipping the .cuda() call.
+        tensor = gpu_tensor.view(
+            *gpu_tensor.shape[:-1], self.kv_shape[-2], self.kv_shape[-1]
+        )
+        tensor = tensor.permute([1, 0, 2, 3, 4])
+        # tensor is now [num_layers, 2, num_tokens, num_heads, head_size]
+
+        ntokens = tensor.shape[2]
+        output_dict = encode_function(
+            tensor,
+            self.cachegen_config,
+            self.key_bins,
+            self.value_bins,
+            ntokens,
+        )
         return BytesBufferMemoryObj(output_dict.to_bytes())

@@ -16,6 +16,7 @@ from lmcache.utils import CacheEngineKey, _lmcache_nvtx_annotate
 from lmcache.v1.cache_controller.message import OpType
 from lmcache.v1.config import LMCacheEngineConfig
 from lmcache.v1.memory_management import (
+    BytesBufferMemoryObj,
     MemoryAllocatorInterface,
     MemoryFormat,
     MemoryObj,
@@ -102,6 +103,30 @@ class LocalCPUBackend(AllocatorBackendInterface):
 
         self._setup_metrics()
 
+        # ── cachegen serde (local_cpu + remote_serde=cachegen) ────────────────
+        # When enabled, submit_put_task() encodes each chunk with cachegen and
+        # stores BytesBufferMemoryObj in hot_cache instead of a raw tensor.
+        # get_blocking() / batched_get_non_blocking() decode on the GPU.
+        self._serde_tls = threading.local()
+        self._serde_type = config.remote_serde
+        self._serde_enabled = (
+            self.use_hot
+            and metadata is not None
+            and self._serde_type is not None
+            and self._serde_type != "naive"
+        )
+        self._serde_config = config
+        self._serde_metadata = metadata
+        # Total compressed bytes held in hot_cache (for eviction budget).
+        self._compressed_usage: int = 0
+        self._max_compressed_bytes: int = int(config.max_local_cpu_size * 1024**3)
+        if self._serde_enabled:
+            logger.info(
+                "LocalCPUBackend: cachegen serde enabled (%s); ", "compressed budget: %.2f GB",
+                self._serde_type,
+                config.max_local_cpu_size,
+            )
+
     def _setup_metrics(self):
         prometheus_logger = PrometheusLogger.GetInstanceOrNone()
         if prometheus_logger is not None:
@@ -114,6 +139,30 @@ class LocalCPUBackend(AllocatorBackendInterface):
 
     def __str__(self):
         return self.__class__.__name__
+
+    def _get_thread_local_serde(self):
+        """Return (serializer, deserializer) for the calling thread.
+
+        Lazily creates per-thread CacheGenSerializer/CacheGenDeserializer so
+        GPU state (bins, output_buffer) is never shared across threads.
+        Returns (None, None) when serde is disabled.
+        """
+        if not self._serde_enabled:
+            return None, None
+        if (
+            getattr(self._serde_tls, "serializer", None) is None
+            or getattr(self._serde_tls, "deserializer", None) is None
+        ):
+            from lmcache.v1.storage_backend.naive_serde import CreateSerde
+
+            assert self._serde_metadata is not None
+            assert self._serde_type is not None
+            s, d = CreateSerde(
+                self._serde_type, self._serde_metadata, self._serde_config
+            )
+            self._serde_tls.serializer = s
+            self._serde_tls.deserializer = d
+        return self._serde_tls.serializer, self._serde_tls.deserializer
 
     def contains(self, key: CacheEngineKey, pin: bool = False) -> bool:
         with self.cpu_lock:
@@ -150,6 +199,65 @@ class LocalCPUBackend(AllocatorBackendInterface):
         :param on_complete_callback: Optional callback invoked after the
             synchronous put completes. Callback exceptions are caught and logged.
         """
+        # ── cachegen fast path ─────────────────────────────────────────────────
+        # When cachegen serde is enabled, we encode the raw KV tensor to
+        # compressed bytes *before* acquiring the lock so the GPU operation
+        # does not block other threads.
+        if self._serde_enabled:
+            serializer, _ = self._get_thread_local_serde()
+            if serializer is not None:
+                # Quick pre-check (no lock) to skip obvious duplicates.
+                if key in self.hot_cache:
+                    return None
+
+                # Encode outside the lock -- GPU operation can take a while.
+                compressed = serializer.serialize(memory_obj)
+                new_size = compressed.get_size()
+
+                stored = False
+                with self.cpu_lock:
+                    if key in self.hot_cache:
+                        return None  # lost the race, discard
+
+                    # Evict LRU entries until we have enough compressed budget.
+                    while (
+                        self._compressed_usage + new_size
+                        > self._max_compressed_bytes
+                    ):
+                        evict_keys = self.cache_policy.get_evict_candidates(
+                            self.hot_cache, num_candidates=1
+                        )
+                        if not evict_keys:
+                            logger.warning(
+                                "LocalCPUBackend cachegen: no eviction candidates,"
+                                " dropping store for key %s",
+                                key,
+                            )
+                            return None
+                        self.batched_remove(evict_keys, force=False)
+
+                    # BytesBufferMemoryObj.ref_count_up/down are no-ops;
+                    # Python GC handles the bytes object lifetime.
+                    self.hot_cache[key] = compressed
+                    self._compressed_usage += new_size
+                    self.cache_policy.update_on_put(key)
+                    if self.batched_msg_sender is not None:
+                        self.batched_msg_sender.add_kv_op(
+                            op_type=OpType.ADMIT,
+                            key=key.chunk_hash,
+                        )
+                    stored = True
+
+                if stored and on_complete_callback is not None:
+                    try:
+                        on_complete_callback(key)
+                    except Exception as e:
+                        logger.warning(
+                            f"on_complete_callback failed for key {key}: {e}"
+                        )
+                return None
+
+        # ── original (raw-tensor) path ───────────────────────────────────────────────
         stored = False
         with self.cpu_lock:
             if key in self.hot_cache:
@@ -203,13 +311,33 @@ class LocalCPUBackend(AllocatorBackendInterface):
         self,
         key: CacheEngineKey,
     ) -> Optional[MemoryObj]:
+        # ── cachegen path ──────────────────────────────────────────────────
+        # Grab a local reference under the lock (keeps the bytes alive even if
+        # the key is concurrently evicted) then decode *outside* the lock so
+        # the GPU operation does not stall other threads.
+        if self._serde_enabled:
+            with self.cpu_lock:
+                if key not in self.hot_cache:
+                    return None
+                stored = self.hot_cache[key]
+                self.cache_policy.update_on_hit(key, self.hot_cache)
+            if isinstance(stored, BytesBufferMemoryObj):
+                _, deserializer = self._get_thread_local_serde()
+                if deserializer is not None:
+                    # Returns a GPU TensorMemoryObj with ref_count=-1.
+                    # Caller's ref_count_down() on the result is a no-op
+                    # (guarded in TensorMemoryObj.ref_count_down for ref<0).
+                    return deserializer.deserialize(stored)
+            # Fallback: stored is a raw TensorMemoryObj (serde was toggled).
+            stored.ref_count_up()
+            return stored
+
+        # ── original path ─────────────────────────────────────────────────────
         with self.cpu_lock:
             if key not in self.hot_cache:
                 return None
             memory_obj = self.hot_cache[key]
-            # ref count up for caller to avoid situation where the memory_obj
-            # is evicted from the local cpu backend before the caller calls
-            # ref count up themselves
+            # ref count up so the object survives until the caller is done.
             memory_obj.ref_count_up()
             return memory_obj
 
@@ -219,6 +347,25 @@ class LocalCPUBackend(AllocatorBackendInterface):
         keys: list[CacheEngineKey],
         transfer_spec: Any = None,
     ) -> list[MemoryObj]:
+        # ── cachegen path ──────────────────────────────────────────────────
+        if self._serde_enabled:
+            _, deserializer = self._get_thread_local_serde()
+            # Collect all compressed objects under the lock.
+            compressed_objs = []
+            with self.cpu_lock:
+                for key in keys:
+                    compressed_objs.append(self.hot_cache[key])
+            # Decode outside the lock (GPU operation).
+            mem_objs = []
+            for stored in compressed_objs:
+                if isinstance(stored, BytesBufferMemoryObj) and deserializer is not None:
+                    mem_objs.append(deserializer.deserialize(stored))
+                else:
+                    stored.ref_count_up()
+                    mem_objs.append(stored)
+            return mem_objs
+
+        # ── original path ─────────────────────────────────────────────────────
         mem_objs = []
         with self.cpu_lock:
             for key in keys:
@@ -270,8 +417,12 @@ class LocalCPUBackend(AllocatorBackendInterface):
                 self.cpu_lock.release()
             return False
 
-        memory_obj = self.hot_cache.pop(key)
-        memory_obj.ref_count_down()
+        stored = self.hot_cache.pop(key)
+        # Update compressed budget when a cachegen entry is removed.
+        if self._serde_enabled and isinstance(stored, BytesBufferMemoryObj):
+            self._compressed_usage -= stored.get_size()
+            # BytesBufferMemoryObj.ref_count_down() is a no-op; Python GC handles it.
+        stored.ref_count_down()
 
         if force:
             self.cache_policy.update_on_force_evict(key)
