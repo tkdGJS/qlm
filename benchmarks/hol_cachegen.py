@@ -432,12 +432,12 @@ def _usage() -> None:
     print(f"Usage: python {p} native|cachegen")
 
 
-def _select_lmcache_config(mode: str) -> str:
-    if mode == "native":
-        return "/home/noslab-gpu/tkdgjs/experiment/lmcache_native.yaml"
-    if mode == "cachegen":
-        return "/home/noslab-gpu/tkdgjs/experiment/lmcache_cachegen.yaml"
-    raise ValueError(f"unknown mode: {mode}")
+#def _select_lmcache_config(mode: str) -> str:
+#    if mode == "native":
+#        return "/home/noslab-gpu/tkdgjs/experiment/lmcache_native.yaml"
+#    if mode == "cachegen":
+#        return "/home/noslab-gpu/tkdgjs/experiment/lmcache_cachegen.yaml"
+#    raise ValueError(f"unknown mode: {mode}")
 
 
 def _env_default(key: str, default: str) -> None:
