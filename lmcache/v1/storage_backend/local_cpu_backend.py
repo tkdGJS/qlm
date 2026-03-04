@@ -120,12 +120,6 @@ class LocalCPUBackend(AllocatorBackendInterface):
         # Total compressed bytes held in hot_cache (for eviction budget).
         self._compressed_usage: int = 0
         self._max_compressed_bytes: int = int(config.max_local_cpu_size * 1024**3)
-        if self._serde_enabled:
-            logger.info(
-                "LocalCPUBackend: cachegen serde enabled (%s); ", "compressed budget: %.2f GB",
-                self._serde_type,
-                config.max_local_cpu_size,
-            )
 
     def _setup_metrics(self):
         prometheus_logger = PrometheusLogger.GetInstanceOrNone()
