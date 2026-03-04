@@ -49,7 +49,7 @@ LMCACHE_CONFIG_FILES=(
 )
 
 # benchmark script path for each run
-BENCH_SCRIPTS= "benchmarks/hol_cachegen.py"
+BENCH_SCRIPTS= "benchmarks/hol_cachegen_patched.py"
 
 # --- sanity check ---
 if [[ ${#RUN_LABELS[@]} -ne 6 || ${#LMCACHE_CONFIG_FILES[@]} -ne 6 || ${#BENCH_SCRIPTS[@]} -ne 6 ]; then

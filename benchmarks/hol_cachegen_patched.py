@@ -448,17 +448,6 @@ def _infer_mode_from_env() -> str:
     # Default to native when we cannot infer the mode.
     return "native"
 
-
-def _select_lmcache_config(mode: str) -> str:
-    # Fallback only: the runner script should set $LMCACHE_CONFIG_FILE per run.
-    base_dir = os.environ.get("LMCACHE_CONFIG_DIR", "/home/noslab-gpu/tkdgjs/qlm")
-    if mode == "native":
-        return os.path.join(base_dir, "lmcache_native_dram_disk.yaml")
-    if mode == "cachegen":
-        return os.path.join(base_dir, "lmcache_cachegen_dram_disk.yaml")
-    raise ValueError(f"unknown mode: {mode}")
-
-
 def _env_default(key: str, default: str) -> None:
     if key not in os.environ or os.environ[key] == "":
         os.environ[key] = default
@@ -569,10 +558,6 @@ async def basic_test() -> None:
     _env_default("VLLM_GPU_MEMORY_UTILIZATION", "0.7")
     _env_default("VLLM_DTYPE", "half")
     _env_default("VLLM_ENABLE_CHUNKED_PREFILL", "1")
-
-    # Allow caller to override config path without editing this script.
-    if not (os.environ.get("LMCACHE_CONFIG_FILE", "") or "").strip():
-        os.environ["LMCACHE_CONFIG_FILE"] = _select_lmcache_config(mode)
 
     vram_log_file = _setup_vram_log_env()
 
