@@ -96,7 +96,7 @@ for i in "${!RUN_LABELS[@]}"; do
   export LMCACHE_CONFIG_FILE="${LMCACHE_CONFIG_FILES[$i]}"
   export LMCACHE_RESULT_DIR="$RESULT_DIR"
 
-  LOG_FILE="$RESULT_DIR/run.log"
+  LOG_FILE="$RESULT_DIR/run_$RUN_LABELS.log"
 
   {
     echo "============================================================"

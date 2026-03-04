@@ -2,6 +2,7 @@
 .python-version
 LICENSE
 cachegen_native_dram_disk.sh
+cachegen_native_dram_disk_fixed.sh
 exeshell.sh
 lmcache_cachegen_disk.yaml
 lmcache_cachegen_diskread.yaml
@@ -4493,6 +4494,7 @@ benchmarks/basic_test_legacy.py
 benchmarks/hol.py
 benchmarks/hol_backup_static_request.py
 benchmarks/hol_cachegen.py
+benchmarks/hol_cachegen_patched.py
 benchmarks/hol_kvoff.py
 benchmarks/hol_priority.py
 benchmarks/hol_slotype.py
