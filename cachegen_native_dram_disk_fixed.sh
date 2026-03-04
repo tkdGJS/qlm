@@ -53,12 +53,12 @@ LMCACHE_CONFIG_FILES=(
 # benchmark script path for each run
 # (same benchmark repeated 6 times; replace per-run if needed)
 BENCH_SCRIPTS=(
-  "benchmarks/hol_cachegen.py"
-  "benchmarks/hol_cachegen.py"
-  "benchmarks/hol_cachegen.py"
-  "benchmarks/hol_cachegen.py"
-  "benchmarks/hol_cachegen.py"
-  "benchmarks/hol_cachegen.py"
+  "benchmarks/hol_cachegen_patched.py"
+  "benchmarks/hol_cachegen_patched.py"
+  "benchmarks/hol_cachegen_patched.py"
+  "benchmarks/hol_cachegen_patched.py"
+  "benchmarks/hol_cachegen_patched.py"
+  "benchmarks/hol_cachegen_patched.py"
 )
 
 # --- sanity checks ---
