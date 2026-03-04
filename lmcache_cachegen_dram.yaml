@@ -1,0 +1,14 @@
+chunk_size: 256
+save_unfull_chunk: false
+local_cpu: true
+max_local_cpu_size: 8.0
+#local_disk: "file:///home/noslab_gpu/tkdgjs/qlm/lmcache_cachegen_disk/"
+#max_local_disk_size: 8.0
+remote_serde: cachegen
+enable_async_loading: true
+enable_kv_events: true
+internal_api_server_enabled: true
+internal_api_server_port_start: 6999
+enable_chunk_statistics: true
+chunk_statistics_strategy: "memory_bloom_filter"
+chunk_statistics_auto_start_statistics: true
