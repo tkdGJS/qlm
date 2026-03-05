@@ -279,6 +279,64 @@ class LocalCPUBackend(AllocatorBackendInterface):
 
         return None
 
+    def submit_put_task_from_bytes(
+        self,
+        key: CacheEngineKey,
+        encoded_bytes: bytes,
+        on_complete_callback: Optional[Callable[[CacheEngineKey], None]] = None,
+    ) -> None:
+        """
+        Fast-path: store pre-encoded cachegen bytes directly in hot_cache.
+
+        Used when the caller already ran GPU encode (from_gpu_and_encode) and
+        just needs the compressed BytesBufferMemoryObj placed into hot_cache,
+        bypassing the DRAM TensorMemoryObj intermediate entirely.
+
+        :param key: cache key for this chunk.
+        :param encoded_bytes: cachegen-encoded bytes from serialize_from_gpu_tensor.
+        :param on_complete_callback: optional callback after storage completes.
+        """
+        if not self.use_hot or not self._serde_enabled:
+            return
+
+        compressed = BytesBufferMemoryObj(encoded_bytes)
+        new_size = compressed.get_size()
+
+        stored = False
+        with self.cpu_lock:
+            if key in self.hot_cache:
+                return  # already stored
+
+            # Evict LRU entries to stay within the compressed byte budget.
+            while self._compressed_usage + new_size > self._max_compressed_bytes:
+                evict_keys = self.cache_policy.get_evict_candidates(
+                    self.hot_cache, num_candidates=1
+                )
+                if not evict_keys:
+                    logger.warning(
+                        "LocalCPUBackend cachegen: no eviction candidates,"
+                        " dropping fast-path store for key %s",
+                        key,
+                    )
+                    return
+                self.batched_remove(evict_keys, force=False)
+
+            self.hot_cache[key] = compressed
+            self._compressed_usage += new_size
+            self.cache_policy.update_on_put(key)
+            if self.batched_msg_sender is not None:
+                self.batched_msg_sender.add_kv_op(
+                    op_type=OpType.ADMIT,
+                    key=key.chunk_hash,
+                )
+            stored = True
+
+        if stored and on_complete_callback is not None:
+            try:
+                on_complete_callback(key)
+            except Exception as e:
+                logger.warning(f"on_complete_callback failed for key {key}: {e}")
+
     def batched_submit_put_task(
         self,
         keys: Sequence[CacheEngineKey],

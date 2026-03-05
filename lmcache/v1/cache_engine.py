@@ -310,35 +310,53 @@ class LMCacheEngine:
         return False
 
     def _is_cachegen_disk_fastpath(self) -> bool:
-        """Return True when the VRAM→encode→disk fast path is usable.
+        """Deprecated alias kept for backwards compat. Use _is_cachegen_fastpath."""
+        return self._is_cachegen_fastpath()[0]
 
-        Conditions:
-        - CUDA is available.
-        - GPU connector is VLLMPagedMemGPUConnectorV2 (multi_layer_kv_transfer).
-        - LocalDiskBackend has cachegen serde enabled.
-        - LocalCPUBackend is NOT storing (use_hot=False); when local_cpu=True
-          the CPU backend still needs the DRAM buffer to encode its own copy.
+    def _is_cachegen_fastpath(self):
+        """Return (use_fast_path, cpu_backend, disk_backend) for the VRAM→encode fast path.
+
+        Fast path conditions:
+        - CUDA available.
+        - GPU connector is VLLMPagedMemGPUConnectorV2 (has multi_layer_kv_transfer).
+        - At least one of LocalCPUBackend or LocalDiskBackend has cachegen serde enabled.
+
+        When LocalCPU has cachegen (use_hot=True + _serde_enabled):
+          → encode once on GPU, push bytes to CPU hot_cache (and disk if configured).
+          → DRAM intermediate buffer is skipped entirely.
+
+        Returns:
+            (True, cpu_backend_or_None, disk_backend_or_None)
+            (False, None, None) when fast path is not applicable.
         """
         if not torch.cuda.is_available():
-            return False
+            return False, None, None
         from lmcache.v1.gpu_connector import VLLMPagedMemGPUConnectorV2
         if not isinstance(self.gpu_connector, VLLMPagedMemGPUConnectorV2):
-            return False
+            return False, None, None
         if self.storage_manager is None:
-            return False
-        # If local_cpu is active (use_hot=True), it encodes using the DRAM
-        # buffer, so we cannot skip DRAM allocation.
+            return False, None, None
+
         cpu_backend = self.storage_manager.storage_backends.get("LocalCPUBackend")
-        if cpu_backend is not None and getattr(cpu_backend, "use_hot", False):
-            return False
         disk_backend = self.storage_manager.storage_backends.get("LocalDiskBackend")
-        if disk_backend is None:
-            return False
-        if not getattr(disk_backend, "_serde_enabled", False):
-            return False
-        if getattr(disk_backend, "_serde_type", None) != "cachegen":
-            return False
-        return True
+
+        # Check which backends are cachegen-enabled.
+        cpu_cachegen = (
+            cpu_backend is not None
+            and getattr(cpu_backend, "use_hot", False)
+            and getattr(cpu_backend, "_serde_enabled", False)
+            and getattr(cpu_backend, "_serde_type", None) == "cachegen"
+        )
+        disk_cachegen = (
+            disk_backend is not None
+            and getattr(disk_backend, "_serde_enabled", False)
+            and getattr(disk_backend, "_serde_type", None) == "cachegen"
+        )
+
+        if not cpu_cachegen and not disk_cachegen:
+            return False, None, None
+
+        return True, (cpu_backend if cpu_cachegen else None), (disk_backend if disk_cachegen else None)
     @_lmcache_nvtx_annotate
     @torch.inference_mode()
     def store(
@@ -436,11 +454,12 @@ class LMCacheEngine:
         if request_configs is not None and len(request_configs) != 0:
             assert isinstance(request_configs, dict)
 
-        # Determine once whether the VRAM→encode→disk fast path is usable.
-        # Fast path: local_cpu=False + remote_serde=cachegen + V2 connector.
-        # In this mode we skip storage_manager.allocate() and
-        # batched_from_gpu() entirely.
-        use_fast_path = self._is_cachegen_disk_fastpath()
+        # Determine once whether the VRAM→encode fast path is usable.
+        # When enabled, skip storage_manager.allocate() and batched_from_gpu()
+        # entirely: one GPU encode feeds all cachegen-enabled backends.
+        use_fast_path, _fp_cpu_backend, _fp_disk_backend = (
+            self._is_cachegen_fastpath()
+        )
 
         with store_stats.profile_process_tokens():
             prev_key = 0
@@ -520,23 +539,40 @@ class LMCacheEngine:
                     prev_key = key.chunk_hash
 
         if use_fast_path:
-            # ── fast path: VRAM → encode → bytes → disk (no DRAM memory_obj) ────
+            # ── fast path: VRAM → encode once → bytes → CPU/disk (no DRAM buf) ──
+            # _fp_cpu_backend and _fp_disk_backend are the cachegen-enabled
+            # backends returned by _is_cachegen_fastpath(); either may be None.
             if not starts:
                 return
-            disk_backend = self.storage_manager.storage_backends["LocalDiskBackend"]
-            serializer, _ = disk_backend._get_thread_local_serde()
+
+            # Get a serializer from whichever backend is available.
+            _serde_source = _fp_disk_backend if _fp_disk_backend is not None else _fp_cpu_backend
+            serializer, _ = _serde_source._get_thread_local_serde()
+
             with store_stats.profile_from_gpu():
                 for i, (start, end, key) in enumerate(zip(starts, ends, keys)):
+                    # ONE encode per chunk shared across all cachegen backends.
                     encoded = self.gpu_connector.from_gpu_and_encode(
                         start, end, serializer, **kwargs
                     )
-                    disk_backend.submit_put_task_from_bytes(
-                        key,
-                        encoded.byte_array,
-                        shape=all_kv_shapes[i][0],
-                        dtype=all_kv_dtypes[i][0],
-                        fmt=self.fmt,
-                    )
+                    encoded_bytes = encoded.byte_array
+
+                    if _fp_cpu_backend is not None:
+                        # VRAM → encode → DRAM hot_cache (compressed)
+                        _fp_cpu_backend.submit_put_task_from_bytes(
+                            key,
+                            encoded_bytes,
+                        )
+
+                    if _fp_disk_backend is not None:
+                        # VRAM → encode → disk (compressed)
+                        _fp_disk_backend.submit_put_task_from_bytes(
+                            key,
+                            encoded_bytes,
+                            shape=all_kv_shapes[i][0],
+                            dtype=all_kv_dtypes[i][0],
+                            fmt=self.fmt,
+                        )
         else:
             # ── normal path: VRAM → DRAM → backends ─────────────────────────
             # memory_objs might be empty, directly return to avoid sending tokens
