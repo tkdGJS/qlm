@@ -3,7 +3,7 @@ pre_caching_hash_algorithm: builtin
 save_unfull_chunk: false
 local_cpu: false
 #max_local_cpu_size: 8.0
-local_disk: "file:///home/noslab_gpu/tkdgjs/qlm/lmcache_torch_disk/"
+local_disk: "file:///home/noslab-gpu/tkdgjs/qlm/lmcache_torch_disk/"
 max_local_disk_size: 8.0
 enable_async_loading: true
 enable_kv_events: true
