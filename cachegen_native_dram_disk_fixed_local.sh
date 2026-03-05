@@ -39,6 +39,7 @@ export PROMPT_POOL_LIMIT=10000
 export PROMPT_MIN_TOKENS=512
 export MAX_INPUT_TOKENS=1024
 export EXP_SLEEP=30
+export VLLM_STARTUP_WAIT_S=300
 
 RUN_LABELS=(
   "native_dram"
@@ -158,6 +159,8 @@ for i in "${!RUN_LABELS[@]}"; do
     echo "PY=$PY"
     echo "============================================================"
   } | tee -a "$LOG_FILE"
+
+  echo "Benchmark will start vLLM via Endpoint (VLLM_STARTUP_WAIT_S=${VLLM_STARTUP_WAIT_S}s)" | tee -a "$LOG_FILE"
 
   "$PY" -u "${BENCH_SCRIPTS[$i]}" 2>&1 | tee -a "$LOG_FILE"
 

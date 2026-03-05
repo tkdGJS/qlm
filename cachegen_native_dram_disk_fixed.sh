@@ -37,6 +37,7 @@ export PROMPT_POOL_LIMIT=10000
 export PROMPT_MIN_TOKENS=512
 export MAX_INPUT_TOKENS=1024
 export EXP_SLEEP=30
+export VLLM_STARTUP_WAIT_S=300
 
 # --- per-run configs (EDIT THESE 6 ITEMS AS YOU WANT) ---
 # RESULT_DIR suffix label (used in folder name)
@@ -157,7 +158,7 @@ for i in "${!RUN_LABELS[@]}"; do
   export LMCACHE_CONFIG_FILE="${LMCACHE_CONFIG_FILES[$i]}"
   export LMCACHE_RESULT_DIR="$RESULT_DIR"
 
-  LOG_FILE="$RESULT_DIR/run_$RUN_LABELS.log"
+  LOG_FILE="$RESULT_DIR/run_${RUN_LABELS[$i]}.log"
 
   {
     echo "============================================================"
@@ -168,6 +169,8 @@ for i in "${!RUN_LABELS[@]}"; do
     echo "PY=$PY"
     echo "============================================================"
   } | tee -a "$LOG_FILE"
+
+  echo "Benchmark will start vLLM via Endpoint (VLLM_STARTUP_WAIT_S=${VLLM_STARTUP_WAIT_S}s)" | tee -a "$LOG_FILE"
 
   # Run (pipefail makes python nonzero exit stop the script)
   "$PY" -u "${BENCH_SCRIPTS[$i]}" 2>&1 | tee -a "$LOG_FILE"
