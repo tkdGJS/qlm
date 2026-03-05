@@ -3,6 +3,7 @@
 LICENSE
 cachegen_native_dram_disk.sh
 cachegen_native_dram_disk_fixed.sh
+cachegen_native_dram_disk_fixed_local.sh
 exeshell.sh
 lmcache_cachegen_disk.yaml
 lmcache_cachegen_diskread.yaml
@@ -14,6 +15,12 @@ lmcache_native_diskread.yaml
 lmcache_native_dram.yaml
 lmcache_native_dram_disk.yaml
 lmcache_native_fsread.yaml
+local_lmcache_cachegen_disk.yaml
+local_lmcache_cachegen_dram.yaml
+local_lmcache_cachegen_dram_disk.yaml
+local_lmcache_native_disk.yaml
+local_lmcache_native_dram.yaml
+local_lmcache_native_dram_disk.yaml
 log2csv.py
 log2csv_monitoring.py
 log2csv_monitoring_slotype.py
