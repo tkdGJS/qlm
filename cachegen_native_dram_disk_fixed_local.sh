@@ -39,12 +39,7 @@ export PROMPT_POOL_LIMIT=10000
 export PROMPT_MIN_TOKENS=512
 export MAX_INPUT_TOKENS=1024
 export EXP_SLEEP=30
-
-VLLM_PORT="${VLLM_PORT:-8000}"
-VLLM_STABILIZE_SLEEP="${VLLM_STABILIZE_SLEEP:-300}"
-VLLM_START_SCRIPT="${VLLM_START_SCRIPT:-${PROJECT_ROOT}/qlm/endpoints/start_vllm.sh}"
-VLLM_MODEL="${VLLM_MODEL:-}"
-CURRENT_VLLM_PID=""
+export VLLM_STARTUP_WAIT_S=300
 
 RUN_LABELS=(
   "native_dram"
@@ -130,61 +125,6 @@ extract_local_disk_path() {
   return 1
 }
 
-kill_vllm_on_port() {
-  local pids=()
-  if command -v lsof >/dev/null 2>&1; then
-    mapfile -t pids < <(lsof -tiTCP:"${VLLM_PORT}" -sTCP:LISTEN 2>/dev/null || true)
-  elif command -v fuser >/dev/null 2>&1; then
-    mapfile -t pids < <(fuser -n tcp "${VLLM_PORT}" 2>/dev/null | tr ' ' '\n' | grep -E '^[0-9]+$' || true)
-  fi
-
-  if [[ ${#pids[@]} -gt 0 ]]; then
-    kill -TERM "${pids[@]}" 2>/dev/null || true
-    sleep 2
-    kill -KILL "${pids[@]}" 2>/dev/null || true
-  fi
-
-  pkill -u "$(id -u)" -TERM -f 'vllm|api_server|uvicorn' 2>/dev/null || true
-  sleep 2
-  pkill -u "$(id -u)" -KILL -f 'vllm|api_server|uvicorn' 2>/dev/null || true
-}
-
-stop_vllm_instance() {
-  if [[ -n "${CURRENT_VLLM_PID}" ]] && kill -0 "${CURRENT_VLLM_PID}" 2>/dev/null; then
-    kill -TERM "${CURRENT_VLLM_PID}" 2>/dev/null || true
-    sleep 2
-    kill -KILL "${CURRENT_VLLM_PID}" 2>/dev/null || true
-  fi
-  CURRENT_VLLM_PID=""
-  kill_vllm_on_port
-}
-
-start_vllm_instance() {
-  local vllm_log_file="$1"
-
-  if [[ ! -f "${VLLM_START_SCRIPT}" ]]; then
-    echo "ERROR: Missing VLLM_START_SCRIPT: ${VLLM_START_SCRIPT}" >&2
-    exit 1
-  fi
-
-  stop_vllm_instance
-
-  local cmd=("bash" "${VLLM_START_SCRIPT}" --port "${VLLM_PORT}")
-  if [[ -n "${VLLM_MODEL}" ]]; then
-    cmd+=(--model "${VLLM_MODEL}")
-  fi
-
-  "${cmd[@]}" >"${vllm_log_file}" 2>&1 &
-  CURRENT_VLLM_PID=$!
-
-  if ! kill -0 "${CURRENT_VLLM_PID}" 2>/dev/null; then
-    echo "ERROR: Failed to start vLLM process" >&2
-    exit 1
-  fi
-}
-
-trap stop_vllm_instance EXIT
-
 for f in "${LMCACHE_CONFIG_FILES[@]}"; do
   disk_path="$(extract_local_disk_path "$f" || true)"
   [[ -z "$disk_path" ]] && continue
@@ -220,16 +160,11 @@ for i in "${!RUN_LABELS[@]}"; do
     echo "============================================================"
   } | tee -a "$LOG_FILE"
 
-  VLLM_LOG_FILE="$RESULT_DIR/vllm_${RUN_LABELS[$i]}.log"
-  echo "Starting vLLM for RUN $((i + 1))/6 on port ${VLLM_PORT}" | tee -a "$LOG_FILE"
-  start_vllm_instance "$VLLM_LOG_FILE"
-  echo "Stabilizing vLLM for ${VLLM_STABILIZE_SLEEP}s before benchmark" | tee -a "$LOG_FILE"
-  sleep "$VLLM_STABILIZE_SLEEP"
+  echo "Benchmark will start vLLM via Endpoint (VLLM_STARTUP_WAIT_S=${VLLM_STARTUP_WAIT_S}s)" | tee -a "$LOG_FILE"
 
   "$PY" -u "${BENCH_SCRIPTS[$i]}" 2>&1 | tee -a "$LOG_FILE"
 
   echo "DONE RUN $((i + 1))/6  |  $(date)" | tee -a "$LOG_FILE"
-  stop_vllm_instance
   sleep "$EXP_SLEEP"
 done
 
